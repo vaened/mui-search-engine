@@ -36,18 +36,20 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
+    "@mui/material": "^7.3",
     "react": ">=19.2",
-    "react-dom": ">=19.2",
-    "@mui/material": "^7.3"
+    "react-dom": ">=19.2"
   },
   "devDependencies": {
-    "typescript": "^5.9",
-    "tsup": "^8.5",
-    "rimraf": "^5",
     "@types/react": "^18",
-    "@types/react-dom": "^18"
+    "@types/react-dom": "^18",
+    "@vitejs/plugin-react": "^5.0.4",
+    "rimraf": "^5",
+    "tsconfig-paths": "^4.2.0",
+    "tsup": "^8.5",
+    "typescript": "^5.9",
+    "vite": "^7.1.9"
   },
-  "dependencies": {},
   "authors": [
     {
       "name": "Enea Dhack",
