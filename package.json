@@ -1,0 +1,67 @@
+{
+  "name": "@vaened/mui-search-engine",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "React + Material UI component library for building advanced search and filtering.",
+  "keywords": [
+    "react",
+    "mui",
+    "material-ui",
+    "search",
+    "search-builder",
+    "filters",
+    "typescript",
+    "ui",
+    "component-library",
+    "frontend"
+  ],
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch --dts",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=19.2",
+    "react-dom": ">=19.2",
+    "@mui/material": "^7.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.9",
+    "tsup": "^8.5",
+    "rimraf": "^5",
+    "@types/react": "^18",
+    "@types/react-dom": "^18"
+  },
+  "dependencies": {},
+  "authors": [
+    {
+      "name": "Enea Dhack",
+      "email": "enea.so@live.com"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vaened/mui-search-engine"
+  },
+  "bugs": {
+    "url": "https://github.com/vaened/mui-search-engine/issues"
+  },
+  "homepage": "https://github.com/vaened/mui-search-engine#readme",
+  "packageManager": "pnpm@10.16.0"
+}
