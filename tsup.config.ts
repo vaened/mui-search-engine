@@ -1,5 +1,8 @@
+import tsconfigPaths from "tsconfig-paths";
 import { defineConfig } from "tsup";
 import pkg from "./package.json";
+
+tsconfigPaths.register();
 
 export default defineConfig({
   entry: ["src/index.ts"],
