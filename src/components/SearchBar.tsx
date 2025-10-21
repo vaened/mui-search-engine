@@ -12,7 +12,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MuiPaper, { type PaperProps } from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 import { IconSearch } from "@tabler/icons-react";
-import { useEffect, useId, useMemo, useRef } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 const HEIGHT = { small: 40, medium: 56 } as const;
 const INPUT_PY = { small: 8.5, medium: 16.5 } as const;
@@ -29,6 +29,7 @@ interface SearchBarProps<IB extends FilterBag<FilterName>, FB extends FlagsBag<F
   placeholder?: string;
   indexes?: IB;
   flags?: FB;
+  debounceDelay?: number;
   defaultIndex?: KeysOf<IB>;
   defaultFlags?: FlagsKeysOf<FB>[];
   defaultValue?: string;
@@ -116,6 +117,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   size = "medium",
   indexes,
   flags,
+  debounceDelay = 400,
   placeholder,
   defaultIndex,
   defaultFlags,
@@ -125,8 +127,8 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   const inputId = id || useId();
   const inputSearch = useRef<HTMLInputElement>(undefined);
   const dictionary = useMemo(() => createFilterDictionaryFrom<KeysOf<IB>>(indexes), [indexes]);
-  const { isLoading } = useSearchEngine();
 
+  const { isLoading } = useSearchEngine();
   const { value, set } = useSearchEngineField({
     name: "q",
     defaultValue: defaultValue,
@@ -134,13 +136,16 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
     unserialize: async (v) => v,
   });
 
+  const [queryString, setQueryString] = useState(value || "");
+  const debouncedTerm = useDebounce(queryString, debounceDelay);
+
   useEffect(() => {
-    set(defaultValue || "");
-  }, []);
+    set(debouncedTerm);
+    onChange?.(debouncedTerm);
+  }, [debouncedTerm]);
 
   function onQueryStringChange(event: React.ChangeEvent<HTMLInputElement>) {
-    set(event.target.value);
-    onChange?.(event.target.value);
+    setQueryString(event.target.value);
   }
 
   return (
@@ -194,6 +199,22 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
       </Container>
     </>
   );
+}
+
+function useDebounce(queryString: string, delay: number) {
+  const [debounced, setValue] = useState(queryString);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setValue(queryString);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [queryString, delay]);
+
+  return debounced;
 }
 
 export default SearchBar;
