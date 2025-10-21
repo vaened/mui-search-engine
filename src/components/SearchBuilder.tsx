@@ -1,12 +1,15 @@
 import { SearchEngineContext } from "@/context";
 import { createFieldsStore } from "@/context/fieldStore";
-import type { FilterValue, RegisteredField, SearchParams, SerializedValue } from "@/types";
+import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
+import { UrlPersistenceAdapter } from "@/persistence/UrlPersistenceAdapter";
+import type { FilterValue, PersistenceMode, RegisteredField, SearchParams, SerializedFilterDictionary, SerializedValue } from "@/types";
 import Grid from "@mui/material/Grid";
 import React, { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 
 export type SearchEngineContextProviderProps<P extends SearchParams> = {
   children: ReactNode;
   loading: boolean;
+  persistence?: PersistenceMode;
   manualStart?: boolean;
   autoStartDelay?: number;
   onSearch?: (params: P) => void;
@@ -16,13 +19,16 @@ export type SearchEngineContextProviderProps<P extends SearchParams> = {
 export function SearchBuilder<P extends SearchParams>({
   children,
   loading,
+  persistence,
   manualStart,
   autoStartDelay = 200,
   onSearch,
   onChange,
 }: SearchEngineContextProviderProps<P>) {
   const autostarted = useRef(false);
-  const store = useMemo(() => createFieldsStore(), []);
+
+  const persistenceAdapter = useMemo(() => resolverPersistenceAdapter(persistence), [persistence]);
+  const store = useMemo(() => createFieldsStore(persistenceAdapter?.read() ?? {}), [persistenceAdapter]);
   const fields = useSyncExternalStore(store.subscribe, store.all, store.all);
 
   const values: P = useMemo(() => {
@@ -44,7 +50,7 @@ export function SearchBuilder<P extends SearchParams>({
     }
 
     const timmer = setTimeout(() => {
-      onSearch?.(values);
+      dispatch(values);
       autostarted.current = true;
     }, autoStartDelay);
 
@@ -57,11 +63,44 @@ export function SearchBuilder<P extends SearchParams>({
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onSearch?.(values);
+    dispatch(values);
+  }
+
+  function resolverPersistenceAdapter(mode: PersistenceMode): PersistenceAdapter | null {
+    switch (true) {
+      case mode === "url":
+        return new UrlPersistenceAdapter();
+      case mode === undefined:
+        return null;
+    }
+
+    throw new Error("Unsupported persistence mode");
   }
 
   function refresh(params: SearchParams) {
-    onSearch?.(params as P);
+    dispatch(params as P);
+  }
+
+  function dispatch(values: P) {
+    if (persistenceAdapter) {
+      const serialized = Object.entries<RegisteredField<FilterValue, SerializedValue>>(fields).reduce((acc, [name, field]) => {
+        const serialize = field.serialize ?? ((value) => value as SerializedValue | undefined);
+        const value = serialize(field.value);
+
+        if (value === undefined) {
+          return acc;
+        }
+
+        return {
+          ...acc,
+          [name]: value,
+        };
+      }, {} as SerializedFilterDictionary);
+
+      persistenceAdapter.write(serialized);
+    }
+
+    onSearch?.(values);
   }
 
   return (

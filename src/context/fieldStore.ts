@@ -1,4 +1,4 @@
-import type { FilterName, FilterValue, RegisteredField, SerializedValue } from "@/types";
+import type { FilterName, FilterValue, RegisteredField, SerializedFilterDictionary, SerializedValue } from "@/types";
 
 export interface FieldStore {
   fields: Record<FilterName, RegisteredField<FilterValue, SerializedValue>>;
@@ -14,7 +14,12 @@ export interface FieldStore {
 
 export class Fields implements FieldStore {
   private listeners: Set<() => void> = new Set();
+  #initial: SerializedFilterDictionary;
   fields: Record<FilterName, RegisteredField<FilterValue, SerializedValue>> = {};
+
+  constructor(values: SerializedFilterDictionary) {
+    this.#initial = values;
+  }
 
   private notify = () => {
     this.listeners.forEach((listener) => listener());
@@ -39,7 +44,15 @@ export class Fields implements FieldStore {
       [field.name]: field as unknown as RegisteredField<FilterValue, SerializedValue>,
     };
 
-    this.notify();
+    const value = this.#initial[field.name];
+
+    if (!value) {
+      this.notify();
+      return;
+    }
+
+    const unserialize = field.unserialize ?? (async (value) => value);
+    unserialize(value as S).then((serialized) => this.set(field.name, serialized));
   };
 
   unregister = (name: FilterName) => {
@@ -79,6 +92,6 @@ export class Fields implements FieldStore {
   };
 }
 
-export function createFieldsStore(): FieldStore {
-  return new Fields();
+export function createFieldsStore(values: SerializedFilterDictionary): FieldStore {
+  return new Fields(values);
 }
