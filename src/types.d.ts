@@ -1,0 +1,33 @@
+type InputValue = string | number | boolean | Date | Record<FilterName, unknown>;
+export type InputSize = "small" | "medium";
+
+export type FilterName = string;
+export type FilterLabel = string;
+export type FilterValue = undefined | InputValue | InputValue[];
+export type FilterMetaData = { label: FilterLabel; description?: string };
+export type FilterContext = FilterLabel | FilterMetaData;
+export type FilterElement<T extends FilterName> = FilterMetaData & { value: T };
+export type FilterBag<N extends FilterName> = Record<N, FilterContext>;
+export type FilterDictionary<N extends FilterName> = Record<N, FilterElement<N>>;
+
+export interface PlainFilterChip {
+  label: FilterLabel;
+}
+
+export interface IndexedFilterChip extends PlainFilterChip {
+  name: FilterName;
+}
+
+export type HumanizedValue<V extends FilterValue> = V extends unknown[] ? IndexedFilterChip[] : PlainFilterChip;
+export type SerializedValue = string | string[];
+
+export interface RegisteredField<V extends FilterValue, S extends SerializedValue> {
+  name: FilterName;
+  value?: V;
+  humanize?: (value: V) => HumanizedValue<V>;
+  serialize?: (value: V) => S | undefined;
+  unserialize?: (value: S) => Promise<V>;
+}
+
+export type FieldDictionary = Record<FilterName, RegisteredField<FilterValue>>;
+export type SearchParams = Record<FilterName, FilterValue>;
