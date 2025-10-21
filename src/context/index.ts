@@ -4,6 +4,7 @@ import { createContext, useContext } from "react";
 
 export interface SearchEngineContextState<P extends SearchParams = SearchParams> {
   store: FieldStore;
+  values: P;
   fields: Record<FilterName, RegisteredField<FilterValue, SerializedValue>>;
   isLoading: boolean;
   refresh: (params: P) => void;
