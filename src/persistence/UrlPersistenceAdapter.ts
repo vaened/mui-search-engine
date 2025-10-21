@@ -23,10 +23,9 @@ export class UrlPersistenceAdapter implements PersistenceAdapter {
       }
     });
 
-    console.log({ values });
-
     return values;
   };
+
   write = (values: SerializedFilterDictionary) => {
     const params = new URLSearchParams();
 
