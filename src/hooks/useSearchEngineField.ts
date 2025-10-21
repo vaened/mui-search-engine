@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 import { useSearchEngine } from "@/context";
 import type { FilterValue, RegisteredField, SerializedValue } from "@/types";
 import { useEffect, useMemo } from "react";

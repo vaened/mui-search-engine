@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 import { SearchEngineContext } from "@/context";
 import { createFieldsStore } from "@/context/fieldStore";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";

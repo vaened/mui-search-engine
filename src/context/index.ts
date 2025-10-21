@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 import type { FieldStore } from "@/context/fieldStore";
 import type { FilterName, FilterValue, RegisteredField, SearchParams, SerializedValue } from "@/types";
 import { createContext, useContext } from "react";

@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import type { SerializedFilterDictionary } from "@/types";
 

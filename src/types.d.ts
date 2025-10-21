@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 type InputValue = string | number | boolean | Date | Record<FilterName, unknown>;
 export type InputSize = "small" | "medium";
 export type PersistenceMode = "url" | undefined;

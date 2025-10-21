@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 import type { FilterBag, FilterContext, FilterDictionary, FilterElement, FilterLabel, FilterMetaData, FilterName } from "@/types";
 
 export function isFilterContextLabel(x: FilterContext): x is FilterLabel {
