@@ -1,6 +1,6 @@
 type InputValue = string | number | boolean | Date | Record<FilterName, unknown>;
 export type InputSize = "small" | "medium";
-
+export type PersistenceMode = "url" | undefined;
 export type FilterName = string;
 export type FilterLabel = string;
 export type FilterValue = undefined | InputValue | InputValue[];
@@ -9,6 +9,7 @@ export type FilterContext = FilterLabel | FilterMetaData;
 export type FilterElement<T extends FilterName> = FilterMetaData & { value: T };
 export type FilterBag<N extends FilterName> = Record<N, FilterContext>;
 export type FilterDictionary<N extends FilterName> = Record<N, FilterElement<N>>;
+export type SerializedFilterDictionary = Record<FilterName, SerializedValue>;
 
 export interface PlainFilterChip {
   label: FilterLabel;
