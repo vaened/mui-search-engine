@@ -1,20 +1,18 @@
 import { useSearchEngineField } from "@/hooks/useSearchEngineField";
 import type { FilterBag, FilterDictionary, FilterElement, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
-
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import Divider from "@mui/material/Divider";
 import FormControlLabel, { type FormControlLabelProps } from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
+import ListSubheader from "@mui/material/ListSubheader";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-
-import ListSubheader from "@mui/material/ListSubheader";
 import { IconEraser, IconFilter, IconFilterOff } from "@tabler/icons-react";
 import React, { useMemo, useRef, useState } from "react";
 
@@ -45,63 +43,6 @@ export interface FlagsSelectProps<N extends FilterName> {
   defaultValue?: N[];
   compact?: boolean;
   onChange?: (flags: N[]) => void;
-}
-
-function hasAdditive<N extends FilterName>(x: FlagsBag<N>): x is { additives: FilterBag<N> } {
-  return typeof x === "object" && !!x && "additives" in x && typeof x.additives === "object" && x.additives !== null;
-}
-
-function hasExclusive<N extends FilterName>(x: FlagsBag<N>): x is { exclusives: FilterBag<N> } {
-  return typeof x === "object" && !!x && "exclusives" in x && typeof x.exclusives === "object" && x.exclusives !== null;
-}
-
-function isFlagConfiguration<N extends FilterName>(x: FlagsBag<N>): x is FlagConfiguration<N> {
-  return hasAdditive<N>(x) && hasExclusive<N>(x);
-}
-
-function parseValue<N extends FilterName>(value: N[] | undefined, bag: FlagConfiguration<N>): FlagFilterValue<N> {
-  if (!value) {
-    return { additives: {} as AdditiveFilterFlagBag<N>, exclusive: null };
-  }
-
-  const exclusive = value.find((flag) => bag?.exclusives?.hasOwnProperty(flag));
-  const additives = value.reduce<AdditiveFilterFlagBag<N>>((acc, flag) => {
-    acc[flag] = bag.additives?.hasOwnProperty(flag) ?? false;
-    return acc;
-  }, {} as AdditiveFilterFlagBag<N>);
-
-  return { additives, exclusive };
-}
-
-function createDictionary<N extends FilterName>(bag: FlagsBag<N>): FlagDictionary<N> {
-  if (isFlagConfiguration<N>(bag)) {
-    return {
-      additives: createFilterDictionaryFrom(bag.additives),
-      exclusives: createFilterDictionaryFrom(bag.exclusives),
-    };
-  }
-
-  if (hasAdditive<N>(bag)) {
-    return { additives: createFilterDictionaryFrom(bag.additives) };
-  }
-
-  if (hasExclusive<N>(bag)) {
-    return { exclusives: createFilterDictionaryFrom(bag.exclusives) };
-  }
-
-  return {
-    additives: createFilterDictionaryFrom(bag),
-  };
-}
-
-function MenuItemAction(props: FormControlLabelProps & { description?: string }) {
-  return (
-    <MenuItem sx={{ p: 0 }} dense>
-      <Tooltip title={props.description} placement="left">
-        <FormControlLabel {...props} sx={{ mx: 1, minWidth: "100%" }} />
-      </Tooltip>
-    </MenuItem>
-  );
 }
 
 export function FlagsSelect<N extends FilterName>({
@@ -236,6 +177,63 @@ export function FlagsSelect<N extends FilterName>({
       </Menu>
     </>
   );
+}
+
+function MenuItemAction(props: FormControlLabelProps & { description?: string }) {
+  return (
+    <MenuItem sx={{ p: 0 }} dense>
+      <Tooltip title={props.description} placement="left">
+        <FormControlLabel {...props} sx={{ mx: 1, minWidth: "100%" }} />
+      </Tooltip>
+    </MenuItem>
+  );
+}
+
+function hasAdditive<N extends FilterName>(x: FlagsBag<N>): x is { additives: FilterBag<N> } {
+  return typeof x === "object" && !!x && "additives" in x && typeof x.additives === "object" && x.additives !== null;
+}
+
+function hasExclusive<N extends FilterName>(x: FlagsBag<N>): x is { exclusives: FilterBag<N> } {
+  return typeof x === "object" && !!x && "exclusives" in x && typeof x.exclusives === "object" && x.exclusives !== null;
+}
+
+function isFlagConfiguration<N extends FilterName>(x: FlagsBag<N>): x is FlagConfiguration<N> {
+  return hasAdditive<N>(x) && hasExclusive<N>(x);
+}
+
+function parseValue<N extends FilterName>(value: N[] | undefined, bag: FlagConfiguration<N>): FlagFilterValue<N> {
+  if (!value) {
+    return { additives: {} as AdditiveFilterFlagBag<N>, exclusive: null };
+  }
+
+  const exclusive = value.find((flag) => bag?.exclusives?.hasOwnProperty(flag));
+  const additives = value.reduce<AdditiveFilterFlagBag<N>>((acc, flag) => {
+    acc[flag] = bag.additives?.hasOwnProperty(flag) ?? false;
+    return acc;
+  }, {} as AdditiveFilterFlagBag<N>);
+
+  return { additives, exclusive };
+}
+
+function createDictionary<N extends FilterName>(bag: FlagsBag<N>): FlagDictionary<N> {
+  if (isFlagConfiguration<N>(bag)) {
+    return {
+      additives: createFilterDictionaryFrom(bag.additives),
+      exclusives: createFilterDictionaryFrom(bag.exclusives),
+    };
+  }
+
+  if (hasAdditive<N>(bag)) {
+    return { additives: createFilterDictionaryFrom(bag.additives) };
+  }
+
+  if (hasExclusive<N>(bag)) {
+    return { exclusives: createFilterDictionaryFrom(bag.exclusives) };
+  }
+
+  return {
+    additives: createFilterDictionaryFrom(bag),
+  };
 }
 
 export default FlagsSelect;

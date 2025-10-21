@@ -14,6 +14,9 @@ import { styled } from "@mui/material/styles";
 import { IconSearch } from "@tabler/icons-react";
 import { useEffect, useId, useMemo, useRef } from "react";
 
+const HEIGHT = { small: 40, medium: 56 } as const;
+const INPUT_PY = { small: 8.5, medium: 16.5 } as const;
+
 type KeysOf<T> = T extends Record<infer K extends FilterName, unknown> ? K : never;
 type FromAdditives<T> = T extends { additives?: Record<infer U extends FilterName, unknown> } ? U : never;
 type FromExclusives<T> = T extends { exclusives?: Record<infer U extends FilterName, unknown> } ? U : never;
@@ -37,9 +40,6 @@ type PanelProps = PaperProps & { size: InputSize };
 const Container = styled(Box)<{ size: InputSize }>(() => ({
   position: "relative",
 }));
-
-const HEIGHT = { small: 40, medium: 56 } as const;
-const INPUT_PY = { small: 8.5, medium: 16.5 } as const;
 
 const Panel = styled(MuiPaper, {
   shouldForwardProp: (p) => p !== "size",
