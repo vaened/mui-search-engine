@@ -2,7 +2,7 @@ import { SearchEngineContext } from "@/context";
 import { createFieldsStore } from "@/context/fieldStore";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import { UrlPersistenceAdapter } from "@/persistence/UrlPersistenceAdapter";
-import type { FilterValue, PersistenceMode, RegisteredField, SearchParams, SerializedFilterDictionary, SerializedValue } from "@/types";
+import type { FilterName, FilterValue, PersistenceMode, RegisteredField, SearchParams, SerializedValue } from "@/types";
 import Grid from "@mui/material/Grid";
 import React, { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 
@@ -26,23 +26,14 @@ export function SearchBuilder<P extends SearchParams>({
   onChange,
 }: SearchEngineContextProviderProps<P>) {
   const autostarted = useRef(false);
-
   const persistenceAdapter = useMemo(() => resolverPersistenceAdapter(persistence), [persistence]);
   const store = useMemo(() => createFieldsStore(persistenceAdapter?.read() ?? {}), [persistenceAdapter]);
   const fields = useSyncExternalStore(store.subscribe, store.all, store.all);
+  const values: P = useMemo(() => collect(fields, (field) => field.value), [fields]);
 
-  const values: P = useMemo(() => {
-    return Object.entries<RegisteredField<FilterValue, SerializedValue>>(fields).reduce((acc, [name, field]) => {
-      if (field.value === undefined) {
-        return acc;
-      }
-
-      return {
-        ...acc,
-        [name]: field.value,
-      };
-    }, {} as P);
-  }, [fields]);
+  useEffect(() => {
+    onChange?.(values);
+  }, [values]);
 
   useEffect(() => {
     if (manualStart || autostarted.current) {
@@ -56,10 +47,6 @@ export function SearchBuilder<P extends SearchParams>({
 
     return () => clearTimeout(timmer);
   }, [values, autoStartDelay, onSearch]);
-
-  useEffect(() => {
-    onChange?.(values);
-  }, [values]);
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -83,19 +70,9 @@ export function SearchBuilder<P extends SearchParams>({
 
   function dispatch(values: P) {
     if (persistenceAdapter) {
-      const serialized = Object.entries<RegisteredField<FilterValue, SerializedValue>>(fields).reduce((acc, [name, field]) => {
-        const serialize = field.serialize ?? ((value) => value as SerializedValue | undefined);
-        const value = serialize(field.value);
-
-        if (value === undefined) {
-          return acc;
-        }
-
-        return {
-          ...acc,
-          [name]: value,
-        };
-      }, {} as SerializedFilterDictionary);
+      const serialized = collect(fields, (field) =>
+        field.serialize ? field.serialize(field.value) : (field.value as SerializedValue | undefined)
+      );
 
       persistenceAdapter.write(serialized);
     }
@@ -117,6 +94,24 @@ export function SearchBuilder<P extends SearchParams>({
       </Grid>
     </SearchEngineContext.Provider>
   );
+}
+
+function collect<N extends FilterName, V extends SerializedValue | FilterValue, R = Record<N, V>>(
+  fields: Record<FilterName, RegisteredField<FilterValue, SerializedValue>>,
+  resolve: (field: (typeof fields)[keyof typeof fields]) => V | undefined
+): R {
+  return Object.values(fields).reduce((acc, field) => {
+    const value = resolve(field);
+
+    if (!value) {
+      return acc;
+    }
+
+    return {
+      ...acc,
+      [field.name]: value,
+    };
+  }, {} as R);
 }
 
 export default SearchBuilder;
