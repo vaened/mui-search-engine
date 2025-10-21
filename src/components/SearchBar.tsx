@@ -26,6 +26,7 @@ type KeysOf<T> = T extends Record<infer K extends FilterName, unknown> ? K : nev
 type FromAdditives<T> = T extends { additives?: Record<infer U extends FilterName, unknown> } ? U : never;
 type FromExclusives<T> = T extends { exclusives?: Record<infer U extends FilterName, unknown> } ? U : never;
 export type FlagsKeysOf<T> = FromAdditives<T> | FromExclusives<T> | KeysOf<T>;
+export type SearchBarName = { query: string; index: string; flags: string };
 
 interface SearchBarProps<IB extends FilterBag<FilterName>, FB extends FlagsBag<FilterName>> {
   id?: string;
@@ -34,6 +35,7 @@ interface SearchBarProps<IB extends FilterBag<FilterName>, FB extends FlagsBag<F
   placeholder?: string;
   indexes?: IB;
   flags?: FB;
+  name?: SearchBarName;
   debounceDelay?: number;
   defaultIndex?: KeysOf<IB>;
   defaultFlags?: FlagsKeysOf<FB>[];
@@ -122,6 +124,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   size = "medium",
   indexes,
   flags,
+  name,
   debounceDelay = 400,
   placeholder,
   defaultIndex,
@@ -135,7 +138,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
 
   const { isLoading } = useSearchEngine();
   const { value, set } = useSearchEngineField({
-    name: "q",
+    name: name?.query || "q",
     defaultValue: defaultValue,
     serialize: (v) => v,
     unserialize: async (v) => v,
@@ -170,6 +173,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
           <Box className="content">
             {dictionary && (
               <IndexSelect
+                name={name?.index}
                 size={size}
                 options={dictionary}
                 defaultValue={defaultIndex || Object.keys(dictionary)[0]}
@@ -196,7 +200,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
             {flags && (
               <>
                 <Divider sx={{ height: HEIGHT[size] - 25, m: 0.5 }} orientation="vertical" />
-                <FlagsSelect size={size} options={flags} defaultValue={defaultFlags} />
+                <FlagsSelect name={name?.flags} size={size} options={flags} defaultValue={defaultFlags} />
               </>
             )}
           </Box>
