@@ -32,14 +32,11 @@ export class FieldStore {
       throw new Error(`Field "${field.name}" is already registered`);
     }
 
-    const initial = this.#initial[field.name];
-    const value = initial && field.unserialize ? field.unserialize(initial as S) : field.value;
-
     this.fields = {
       ...this.fields,
       [field.name]: {
         ...(field as unknown as RegisteredField<FilterValue, SerializedValue>),
-        value,
+        value: this.#parse(field),
       },
     };
 
@@ -80,6 +77,16 @@ export class FieldStore {
 
   value = <V extends FilterValue>(name: FilterName): V | undefined => {
     return this.get<V, SerializedValue>(name)?.value as V | undefined;
+  };
+
+  #parse = <V extends FilterValue, S extends SerializedValue>(field: RegisteredField<V, S>): FilterValue => {
+    const initial = this.#initial[field.name];
+
+    if (!initial) {
+      return field.value;
+    }
+
+    return field.unserialize ? field.unserialize(initial as S) : initial;
   };
 }
 
