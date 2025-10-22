@@ -141,7 +141,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
     name: name?.query || "q",
     defaultValue: defaultValue,
     serialize: (v) => v,
-    unserialize: async (v) => v,
+    unserialize: (v) => v,
   });
 
   const [queryString, setQueryString] = useState(value);

@@ -44,20 +44,18 @@ export class Fields implements FieldStore {
       throw new Error(`Field "${field.name}" is already registered`);
     }
 
+    const initial = this.#initial[field.name];
+    const value = initial && field.unserialize ? field.unserialize(initial as S) : field.value;
+
     this.fields = {
       ...this.fields,
-      [field.name]: field as unknown as RegisteredField<FilterValue, SerializedValue>,
+      [field.name]: {
+        ...(field as unknown as RegisteredField<FilterValue, SerializedValue>),
+        value,
+      },
     };
 
-    const value = this.#initial[field.name];
-
-    if (!value) {
-      this.notify();
-      return;
-    }
-
-    const unserialize = field.unserialize ?? (async (value) => value);
-    unserialize(value as S).then((serialized) => this.set(field.name, serialized));
+    this.notify();
   };
 
   unregister = (name: FilterName) => {

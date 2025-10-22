@@ -32,7 +32,7 @@ export interface RegisteredField<V extends FilterValue, S extends SerializedValu
   value?: V;
   humanize?: (value: V) => HumanizedValue<V>;
   serialize?: (value: V) => S | undefined;
-  unserialize?: (value: S) => Promise<V>;
+  unserialize?: (value: S) => V;
 }
 
 export type FieldDictionary = Record<FilterName, RegisteredField<FilterValue>>;

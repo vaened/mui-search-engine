@@ -66,7 +66,7 @@ export function FlagsSelect<N extends FilterName>({
     name,
     defaultValue,
     serialize: (flags) => flags,
-    unserialize: async (flags) => flags,
+    unserialize: (flags) => flags,
   });
 
   const filters: FlagFilterValue<N> = useMemo(() => parseValue(value, dictionary), [value]);

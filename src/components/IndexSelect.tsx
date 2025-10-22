@@ -46,7 +46,7 @@ export function IndexSelect<N extends FilterName>({
     name,
     defaultValue,
     serialize: (index) => index,
-    unserialize: async (index) => Promise.resolve(index),
+    unserialize: (index) => index,
   });
 
   const current = useMemo(() => (value ? dictionary[value] : null), [value]);
