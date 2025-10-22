@@ -16,6 +16,7 @@ import InputBase from "@mui/material/InputBase";
 import InputLabel from "@mui/material/InputLabel";
 import MuiPaper, { type PaperProps } from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
 import { IconSearch } from "@tabler/icons-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 
@@ -135,6 +136,9 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   const inputId = id || useId();
   const inputSearch = useRef<HTMLInputElement>(undefined);
   const dictionary = useMemo(() => createFilterDictionaryFrom<KeysOf<IB>>(indexes), [indexes]);
+  const [index, setIndex] = useState<KeysOf<IB> | undefined>(() => {
+    return dictionary && !defaultIndex ? (Object.keys(dictionary)[0] as KeysOf<IB>) : defaultIndex;
+  });
 
   const { isLoading } = useSearchEngine();
   const { value, set } = useSearchEngineField({
@@ -147,6 +151,8 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
 
   const [queryString, setQueryString] = useState(value);
   const debouncedTerm = useDebounce(queryString || "", debounceDelay);
+
+  const description = dictionary && index ? dictionary[index].description : null;
 
   useEffect(() => {
     setQueryString(value);
@@ -165,6 +171,11 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
     setQueryString(event.target.value);
   }
 
+  function onIndexChange(string: KeysOf<IB> | undefined) {
+    setIndex(string);
+    setTimeout(() => inputSearch.current?.focus(), 100);
+  }
+
   return (
     <>
       <Container size={size}>
@@ -180,14 +191,8 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
           </fieldset>
 
           <Box className="content">
-            {dictionary && (
-              <IndexSelect
-                name={name?.index}
-                size={size}
-                options={dictionary}
-                defaultValue={defaultIndex || Object.keys(dictionary)[0]}
-                onChange={() => setTimeout(() => inputSearch.current?.focus(), 100)}
-              />
+            {dictionary && index && (
+              <IndexSelect name={name?.index} size={size} options={dictionary} defaultValue={index} onChange={onIndexChange} />
             )}
 
             <InputBase
@@ -215,6 +220,11 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
           </Box>
         </Panel>
       </Container>
+      {index && description && (
+        <Typography component="p" textAlign="right" color="text.secondary" sx={{ fontSize: 12, mt: 0.5 }}>
+          {description}
+        </Typography>
+      )}
     </>
   );
 }
