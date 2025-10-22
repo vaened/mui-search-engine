@@ -45,6 +45,7 @@ export function IndexSelect<N extends FilterName>({
   const { value, set } = useSearchEngineField({
     name,
     defaultValue,
+    humanize: (index) => dictionary[index].label,
     serialize: (index) => index,
     unserialize: (index) => index,
   });

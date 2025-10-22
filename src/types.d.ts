@@ -24,13 +24,13 @@ export interface IndexedFilterChip extends PlainFilterChip {
   name: FilterName;
 }
 
-export type HumanizedValue<V extends FilterValue> = V extends unknown[] ? IndexedFilterChip[] : PlainFilterChip;
+export type HumanizedValue = IndexedFilterChip[] | FilterLabel;
 export type SerializedValue = null | string | string[];
 
 export interface RegisteredField<V extends FilterValue, S extends SerializedValue> {
   name: FilterName;
   value: V;
-  humanize?: (value: V) => HumanizedValue<V>;
+  humanize?: (value: V) => HumanizedValue | null;
   serialize?: (value: V) => S | null;
   unserialize?: (value: S) => V;
 }
