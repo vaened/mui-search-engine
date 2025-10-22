@@ -139,7 +139,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   const { isLoading } = useSearchEngine();
   const { value, set } = useSearchEngineField({
     name: name?.query || "q",
-    defaultValue: defaultValue,
+    defaultValue: defaultValue || null,
     serialize: (v) => v,
     unserialize: (v) => v,
   });

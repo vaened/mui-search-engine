@@ -55,7 +55,7 @@ export function FlagsSelect<N extends FilterName>({
   options,
   size = "medium",
   tooltip = "Select Filters",
-  defaultValue,
+  defaultValue = [],
   onChange,
 }: FlagsSelectProps<N>) {
   const anchorRef = useRef<HTMLButtonElement>(null);
@@ -65,6 +65,7 @@ export function FlagsSelect<N extends FilterName>({
   const { value, set } = useSearchEngineField({
     name,
     defaultValue,
+    humanize: (flags) => flags.map((flag) => ({ name: flag, label: (dictionary.additives && dictionary.additives[flag].label) ?? "flag" })),
     serialize: (flags) => flags,
     unserialize: (flags) => flags,
   });

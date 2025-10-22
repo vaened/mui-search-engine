@@ -8,7 +8,7 @@ export type InputSize = "small" | "medium";
 export type PersistenceMode = "url" | undefined;
 export type FilterName = string;
 export type FilterLabel = string;
-export type FilterValue = undefined | InputValue | InputValue[];
+export type FilterValue = null | InputValue | InputValue[];
 export type FilterMetaData = { label: FilterLabel; description?: string };
 export type FilterContext = FilterLabel | FilterMetaData;
 export type FilterElement<T extends FilterName> = FilterMetaData & { value: T };
@@ -25,13 +25,13 @@ export interface IndexedFilterChip extends PlainFilterChip {
 }
 
 export type HumanizedValue<V extends FilterValue> = V extends unknown[] ? IndexedFilterChip[] : PlainFilterChip;
-export type SerializedValue = string | string[];
+export type SerializedValue = null | string | string[];
 
 export interface RegisteredField<V extends FilterValue, S extends SerializedValue> {
   name: FilterName;
-  value?: V;
+  value: V;
   humanize?: (value: V) => HumanizedValue<V>;
-  serialize?: (value: V) => S | undefined;
+  serialize?: (value: V) => S | null;
   unserialize?: (value: S) => V;
 }
 
