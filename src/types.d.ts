@@ -36,4 +36,4 @@ export interface RegisteredField<V extends FilterValue, S extends SerializedValu
 }
 
 export type FieldDictionary = Record<FilterName, RegisteredField<FilterValue>>;
-export type SearchParams = Record<FilterName, FilterValue>;
+export type SearchParams = Partial<Record<FilterName, FilterValue>>;
