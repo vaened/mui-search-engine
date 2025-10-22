@@ -144,10 +144,18 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
     unserialize: async (v) => v,
   });
 
-  const [queryString, setQueryString] = useState(value || "");
-  const debouncedTerm = useDebounce(queryString, debounceDelay);
+  const [queryString, setQueryString] = useState(value);
+  const debouncedTerm = useDebounce(queryString || "", debounceDelay);
 
   useEffect(() => {
+    setQueryString(value);
+  }, [value]);
+
+  useEffect(() => {
+    if (queryString === value) {
+      return;
+    }
+
     set(debouncedTerm);
     onChange?.(debouncedTerm);
   }, [debouncedTerm]);
