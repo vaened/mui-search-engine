@@ -27,12 +27,7 @@ export function useSearchEngineField<V extends FilterValue, S extends Serialized
   const { store, fields } = useSearchEngine();
 
   const field = useMemo(() => fields[name] as unknown as RegisteredField<V, S> | undefined, [fields, name]);
-
   const value = useMemo(() => field?.value, [field?.value]);
-
-  useEffect(() => {
-    console.log({ field: { ...field }, value, defaultValue });
-  }, [field, value, defaultValue]);
 
   useEffect(() => {
     store.register({
