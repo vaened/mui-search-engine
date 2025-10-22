@@ -5,19 +5,7 @@
 
 import type { FilterName, FilterValue, RegisteredField, SerializedFilterDictionary, SerializedValue } from "@/types";
 
-export interface FieldStore {
-  fields: Record<FilterName, RegisteredField<FilterValue, SerializedValue>>;
-  subscribe: (listener: () => void) => () => void;
-  all: () => Record<FilterName, RegisteredField<FilterValue, SerializedValue>>;
-  exists: (name: FilterName) => boolean;
-  register: <V extends FilterValue, S extends SerializedValue>(field: RegisteredField<V, S>) => void;
-  unregister: (name: FilterName) => void;
-  set: <V extends FilterValue>(name: FilterName, value: V) => void;
-  get: <V extends FilterValue, S extends SerializedValue>(name: FilterName) => RegisteredField<V, S> | undefined;
-  value: <V extends FilterValue>(name: FilterName) => V | undefined;
-}
-
-export class Fields implements FieldStore {
+export class FieldStore {
   private listeners: Set<() => void> = new Set();
   #initial: SerializedFilterDictionary;
   fields: Record<FilterName, RegisteredField<FilterValue, SerializedValue>> = {};
@@ -96,5 +84,5 @@ export class Fields implements FieldStore {
 }
 
 export function createFieldsStore(values: SerializedFilterDictionary): FieldStore {
-  return new Fields(values);
+  return new FieldStore(values);
 }
