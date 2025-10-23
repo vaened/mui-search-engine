@@ -4,16 +4,16 @@
  */
 
 import { useSearchEngineField } from "@/hooks/useSearchEngineField";
-import type { FilterName, FilterValue, RegisteredField, SerializedValue } from "@/types";
+import type { Field, FilterName, FilterValue, SerializedValue } from "@/types";
 import { Select, type SelectProps } from "@mui/material";
 import type { SelectChangeEvent } from "node_modules/@mui/material";
 
 export type OptionSelectProps<V extends FilterValue, S extends SerializedValue> = Omit<SelectProps<V>, "value" | "name"> & {
   name: FilterName;
   defaultValue: V;
-  humanize?: RegisteredField<V, S>["humanize"];
-  serialize?: RegisteredField<V, S>["serialize"];
-  unserialize?: RegisteredField<V, S>["unserialize"];
+  humanize?: Field<V, S>["humanize"];
+  serialize?: Field<V, S>["serialize"];
+  unserialize?: Field<V, S>["unserialize"];
 };
 
 export function OptionSelect<V extends FilterValue, S extends SerializedValue>({

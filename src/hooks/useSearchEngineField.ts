@@ -4,16 +4,16 @@
  */
 
 import { useSearchEngine } from "@/context";
-import type { FilterValue, RegisteredField, SerializedValue } from "@/types";
+import type { Field, FilterValue, SerializedValue } from "@/types";
 import { useEffect, useMemo } from "react";
 
-export type UseSearchEngineFieldProps<V extends FilterValue, S extends SerializedValue> = Omit<RegisteredField<V, S>, "value"> & {
+export type UseSearchEngineFieldProps<V extends FilterValue, S extends SerializedValue> = Omit<Field<V, S>, "value"> & {
   defaultValue: V;
 };
 
 export interface UseSearchEngineFieldResult<V extends FilterValue, S extends SerializedValue> {
   value?: V;
-  field?: RegisteredField<V, S>;
+  field?: Field<V, S>;
   set: (value: V) => void;
 }
 
@@ -26,7 +26,7 @@ export function useSearchEngineField<V extends FilterValue, S extends Serialized
 }: UseSearchEngineFieldProps<V, S>): UseSearchEngineFieldResult<V, S> {
   const { store, fields } = useSearchEngine();
 
-  const field = useMemo(() => fields[name] as unknown as RegisteredField<V, S> | undefined, [fields, name]);
+  const field = useMemo(() => fields[name] as unknown as Field<V, S> | undefined, [fields, name]);
   const value = useMemo(() => field?.value, [field?.value]);
 
   useEffect(() => {

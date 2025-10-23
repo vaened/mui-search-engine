@@ -4,13 +4,13 @@
  */
 
 import type { FieldStore } from "@/context/fieldStore";
-import type { FilterName, FilterValue, RegisteredField, SearchParams, SerializedValue } from "@/types";
+import type { Field, FilterName, FilterValue, SearchParams, SerializedValue } from "@/types";
 import { createContext, useContext } from "react";
 
 export interface SearchEngineContextState<P extends SearchParams = SearchParams> {
   store: FieldStore;
   values: P;
-  fields: Record<FilterName, RegisteredField<FilterValue, SerializedValue>>;
+  fields: Record<FilterName, Field<FilterValue, SerializedValue>>;
   isLoading: boolean;
   refresh: (params: P) => void;
 }

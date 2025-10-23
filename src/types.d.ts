@@ -27,7 +27,7 @@ export interface IndexedFilterChip extends PlainFilterChip {
 export type HumanizedValue = IndexedFilterChip[] | FilterLabel;
 export type SerializedValue = null | string | string[];
 
-export interface RegisteredField<V extends FilterValue, S extends SerializedValue> {
+export interface Field<V extends FilterValue, S extends SerializedValue> {
   name: FilterName;
   value: V;
   humanize?: (value: V) => HumanizedValue | null;
@@ -35,5 +35,5 @@ export interface RegisteredField<V extends FilterValue, S extends SerializedValu
   unserialize?: (value: S) => V;
 }
 
-export type FieldDictionary = Record<FilterName, RegisteredField<FilterValue>>;
+export type FieldDictionary = Record<FilterName, Field<FilterValue>>;
 export type SearchParams = Partial<Record<FilterName, FilterValue>>;

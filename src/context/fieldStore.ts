@@ -3,12 +3,12 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { FilterName, FilterValue, RegisteredField, SerializedFilterDictionary, SerializedValue } from "@/types";
+import type { Field, FilterName, FilterValue, SerializedFilterDictionary, SerializedValue } from "@/types";
 
 export class FieldStore {
   #listeners: Set<() => void> = new Set();
   #initial: SerializedFilterDictionary;
-  fields: Record<FilterName, RegisteredField<FilterValue, SerializedValue>> = {};
+  fields: Record<FilterName, Field<FilterValue, SerializedValue>> = {};
 
   constructor(values: SerializedFilterDictionary) {
     this.#initial = values;
@@ -23,7 +23,7 @@ export class FieldStore {
     return () => this.#listeners.delete(listener);
   };
 
-  register = <V extends FilterValue, S extends SerializedValue>(field: RegisteredField<V, S>) => {
+  register = <V extends FilterValue, S extends SerializedValue>(field: Field<V, S>) => {
     if (this.exists(field.name)) {
       throw new Error(`Field "${field.name}" is already registered`);
     }
@@ -31,7 +31,7 @@ export class FieldStore {
     this.fields = {
       ...this.fields,
       [field.name]: {
-        ...(field as unknown as RegisteredField<FilterValue, SerializedValue>),
+        ...(field as unknown as Field<FilterValue, SerializedValue>),
         value: this.#parse(field),
       },
     };
@@ -67,8 +67,8 @@ export class FieldStore {
     this.#notify();
   };
 
-  get = <V extends FilterValue, S extends SerializedValue>(name: FilterName): RegisteredField<V, S> | undefined => {
-    return this.fields[name] as unknown as RegisteredField<V, S> | undefined;
+  get = <V extends FilterValue, S extends SerializedValue>(name: FilterName): Field<V, S> | undefined => {
+    return this.fields[name] as unknown as Field<V, S> | undefined;
   };
 
   value = <V extends FilterValue>(name: FilterName): V | undefined => {
@@ -79,7 +79,7 @@ export class FieldStore {
     this.#listeners.forEach((listener) => listener());
   };
 
-  #parse = <V extends FilterValue, S extends SerializedValue>(field: RegisteredField<V, S>): FilterValue => {
+  #parse = <V extends FilterValue, S extends SerializedValue>(field: Field<V, S>): FilterValue => {
     const initial = this.#initial[field.name];
 
     if (!this.#isValid(initial)) {

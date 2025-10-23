@@ -7,7 +7,7 @@ import { SearchEngineContext } from "@/context";
 import { createFieldsStore } from "@/context/fieldStore";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import { UrlPersistenceAdapter } from "@/persistence/UrlPersistenceAdapter";
-import type { FilterName, FilterValue, PersistenceMode, RegisteredField, SearchParams, SerializedValue } from "@/types";
+import type { Field, FilterName, FilterValue, PersistenceMode, SearchParams, SerializedValue } from "@/types";
 import Grid from "@mui/material/Grid";
 import React, { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 
@@ -102,7 +102,7 @@ export function SearchBuilder<P extends SearchParams>({
 }
 
 function collect<N extends FilterName, V extends SerializedValue | FilterValue, R = Record<N, V>>(
-  fields: Record<FilterName, RegisteredField<FilterValue, SerializedValue>>,
+  fields: Record<FilterName, Field<FilterValue, SerializedValue>>,
   resolve: (field: (typeof fields)[keyof typeof fields]) => V | undefined
 ): R {
   return Object.values(fields).reduce((acc, field) => {
