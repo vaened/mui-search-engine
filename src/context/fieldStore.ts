@@ -37,28 +37,23 @@ export class FieldStore {
 
   rehydrate = (newValues: SerializedFilterDictionary): RegisteredFieldDictionary<FilterValue, SerializedValue> | undefined => {
     this.#persisted = newValues;
+    const newFields = { ...this.#state.fields };
     let changed = false;
-    const currentFields = { ...this.#state.fields };
-    const newFields = { ...currentFields };
 
-    Object.keys(currentFields).forEach((name) => {
-      const field = currentFields[name];
-      let newValue: FilterValue = this.#parse(field);
+    for (const [name, field] of Object.entries(this.#state.fields)) {
+      const newValue = this.#parse(field);
 
       if (!Object.is(field.value, newValue)) {
         newFields[name] = { ...field, value: newValue };
         changed = true;
       }
-    });
+    }
 
     if (!changed) {
       return;
     }
 
-    this.#put({
-      fields: newFields,
-    });
-
+    this.#put({ fields: newFields });
     return newFields;
   };
 
