@@ -4,7 +4,7 @@
  */
 
 import { SearchEngineContext } from "@/context";
-import { createFieldsStore } from "@/context/fieldStore";
+import { createFieldsStore, FieldStore } from "@/context/fieldStore";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import { UrlPersistenceAdapter } from "@/persistence/UrlPersistenceAdapter";
 import type { Field, FilterName, FilterValue, PersistenceMode, SearchParams, SerializedValue } from "@/types";
@@ -31,8 +31,14 @@ export function SearchBuilder<P extends SearchParams>({
   onChange,
 }: SearchEngineContextProviderProps<P>) {
   const autostarted = useRef(false);
+  const storeInstance = useRef<FieldStore | null>(null);
   const persistenceAdapter = useMemo(() => resolverPersistenceAdapter(persistence), [persistence]);
-  const store = useMemo(() => createFieldsStore(persistenceAdapter?.read() ?? {}), [persistenceAdapter]);
+
+  if (!storeInstance.current) {
+    storeInstance.current = createFieldsStore(persistenceAdapter?.read() ?? {});
+  }
+
+  const store = storeInstance.current;
   const fields = useSyncExternalStore(store.subscribe, store.all, store.all);
   const values: P = useMemo(() => collect(fields, (field) => field.value), [fields]);
 
