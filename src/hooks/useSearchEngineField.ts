@@ -19,10 +19,8 @@ export interface UseSearchEngineFieldResult<V extends FilterValue, S extends Ser
 
 export function useSearchEngineField<V extends FilterValue, S extends SerializedValue>({
   name,
-  humanize,
   defaultValue,
-  serialize,
-  unserialize,
+  ...restOfProps
 }: UseSearchEngineFieldProps<V, S>): UseSearchEngineFieldResult<V, S> {
   const { store, fields } = useSearchEngine();
 
@@ -33,9 +31,7 @@ export function useSearchEngineField<V extends FilterValue, S extends Serialized
     store.register({
       name,
       value: defaultValue,
-      humanize,
-      serialize,
-      unserialize,
+      ...restOfProps,
     });
 
     return () => store.unregister(name);
