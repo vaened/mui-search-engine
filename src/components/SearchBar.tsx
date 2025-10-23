@@ -203,7 +203,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
               sx={{ ml: 1, flex: 1 }}
               placeholder={placeholder}
               inputProps={{ "aria-label": label }}
-              defaultValue={value}
+              value={queryString ?? ""}
               onChange={onQueryStringChange}
             />
 
