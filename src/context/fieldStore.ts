@@ -6,7 +6,7 @@
 import type { FilterName, FilterValue, RegisteredField, SerializedFilterDictionary, SerializedValue } from "@/types";
 
 export class FieldStore {
-  private listeners: Set<() => void> = new Set();
+  #listeners: Set<() => void> = new Set();
   #initial: SerializedFilterDictionary;
   fields: Record<FilterName, RegisteredField<FilterValue, SerializedValue>> = {};
 
@@ -14,17 +14,13 @@ export class FieldStore {
     this.#initial = values;
   }
 
-  private notify = () => {
-    this.listeners.forEach((listener) => listener());
-  };
-
   all = () => this.fields;
 
   exists = (name: FilterName) => !!this.fields[name];
 
   subscribe = (listener: () => void) => {
-    this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
+    this.#listeners.add(listener);
+    return () => this.#listeners.delete(listener);
   };
 
   register = <V extends FilterValue, S extends SerializedValue>(field: RegisteredField<V, S>) => {
@@ -40,7 +36,7 @@ export class FieldStore {
       },
     };
 
-    this.notify();
+    this.#notify();
   };
 
   unregister = (name: FilterName) => {
@@ -51,7 +47,7 @@ export class FieldStore {
     delete this.fields[name];
 
     this.fields = { ...this.fields };
-    this.notify();
+    this.#notify();
   };
 
   set = <V extends FilterValue>(name: FilterName, value: V) => {
@@ -68,7 +64,7 @@ export class FieldStore {
         value,
       },
     };
-    this.notify();
+    this.#notify();
   };
 
   get = <V extends FilterValue, S extends SerializedValue>(name: FilterName): RegisteredField<V, S> | undefined => {
@@ -77,6 +73,10 @@ export class FieldStore {
 
   value = <V extends FilterValue>(name: FilterName): V | undefined => {
     return this.get<V, SerializedValue>(name)?.value as V | undefined;
+  };
+
+  #notify = () => {
+    this.#listeners.forEach((listener) => listener());
   };
 
   #parse = <V extends FilterValue, S extends SerializedValue>(field: RegisteredField<V, S>): FilterValue => {
