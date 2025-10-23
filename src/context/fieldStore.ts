@@ -40,10 +40,6 @@ export class FieldStore {
         newFields[name] = { ...field, value: newValue };
         changed = true;
       }
-
-      if (name === "q") {
-        console.log({ newValue, equals: Object.is(field.value, newValue), field: { ...newFields[name] } });
-      }
     });
 
     if (changed) {
