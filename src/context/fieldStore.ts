@@ -24,8 +24,6 @@ export class FieldStore {
     this.#persisted = values;
   }
 
-  all = () => this.#state.fields;
-
   state = () => this.#state;
 
   exists = (name: FilterName) => !!this.#state.fields[name];
