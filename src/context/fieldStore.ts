@@ -53,7 +53,7 @@ export class FieldStore {
       return;
     }
 
-    this.#put({ fields: newFields });
+    this.#commit({ fields: newFields });
     return newFields;
   };
 
@@ -67,7 +67,7 @@ export class FieldStore {
       defaultValue: field.value,
     };
 
-    this.#put({
+    this.#commit({
       fields: {
         ...this.#state.fields,
         [field.name]: {
@@ -85,7 +85,7 @@ export class FieldStore {
 
     const { [name]: _, ...rest } = this.#state.fields;
 
-    this.#put({
+    this.#commit({
       fields: {
         ...rest,
       },
@@ -99,7 +99,7 @@ export class FieldStore {
       return;
     }
 
-    this.#put({
+    this.#commit({
       fields: {
         ...this.#state.fields,
         [name]: {
@@ -118,16 +118,12 @@ export class FieldStore {
     return this.get<V, SerializedValue>(name)?.value as V | undefined;
   };
 
-  #put = (state: Partial<FieldStoreState>) => {
+  #commit = (state: Partial<FieldStoreState>) => {
     this.#state = {
       ...this.#state,
       ...state,
     };
 
-    this.#notify();
-  };
-
-  #notify = () => {
     this.#listeners.forEach((listener) => listener());
   };
 
