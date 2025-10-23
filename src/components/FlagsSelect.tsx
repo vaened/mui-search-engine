@@ -45,6 +45,7 @@ export interface FlagsSelectProps<N extends FilterName> {
   tooltip?: string;
   size?: InputSize;
   options: FlagsBag<N>;
+  submittable?: boolean;
   defaultValue?: N[];
   compact?: boolean;
   onChange?: (flags: N[]) => void;
@@ -53,6 +54,7 @@ export interface FlagsSelectProps<N extends FilterName> {
 export function FlagsSelect<N extends FilterName>({
   name = "flags",
   options,
+  submittable = true,
   size = "medium",
   tooltip = "Select Filters",
   defaultValue = [],
@@ -65,6 +67,7 @@ export function FlagsSelect<N extends FilterName>({
   const { value, set } = useSearchEngineField({
     name,
     defaultValue,
+    submittable,
     humanize: (flags) => flags.map((flag) => ({ name: flag, label: labeled(dictionary, flag) ?? flag })),
     serialize: (flags) => flags,
     unserialize: (flags) => flags,

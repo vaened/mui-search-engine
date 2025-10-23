@@ -28,6 +28,7 @@ type FromAdditives<T> = T extends { additives?: Record<infer U extends FilterNam
 type FromExclusives<T> = T extends { exclusives?: Record<infer U extends FilterName, unknown> } ? U : never;
 export type FlagsKeysOf<T> = FromAdditives<T> | FromExclusives<T> | KeysOf<T>;
 export type SearchBarName = { query?: string; index?: string; flags?: string };
+export type SubmmitableFields = { query?: boolean; index?: boolean; flags?: boolean };
 
 interface SearchBarProps<IB extends FilterBag<FilterName>, FB extends FlagsBag<FilterName>> {
   id?: string;
@@ -37,6 +38,7 @@ interface SearchBarProps<IB extends FilterBag<FilterName>, FB extends FlagsBag<F
   indexes?: IB;
   flags?: FB;
   name?: SearchBarName;
+  submittable?: SubmmitableFields;
   debounceDelay?: number;
   defaultIndex?: KeysOf<IB>;
   defaultFlags?: FlagsKeysOf<FB>[];
@@ -126,6 +128,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   indexes,
   flags,
   name,
+  submittable,
   debounceDelay = 400,
   placeholder,
   defaultIndex,
@@ -144,6 +147,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   const { value, set } = useSearchEngineField({
     name: name?.query || "q",
     defaultValue: defaultValue || null,
+    submittable: submittable?.query ?? true,
     humanize: (v) => v,
     serialize: (v) => v,
     unserialize: (v) => v,
@@ -192,7 +196,14 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
 
           <Box className="content">
             {dictionary && index && (
-              <IndexSelect name={name?.index} size={size} options={dictionary} defaultValue={index} onChange={onIndexChange} />
+              <IndexSelect
+                name={name?.index}
+                size={size}
+                submittable={submittable?.index}
+                options={dictionary}
+                defaultValue={index}
+                onChange={onIndexChange}
+              />
             )}
 
             <InputBase

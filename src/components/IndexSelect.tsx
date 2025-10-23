@@ -21,6 +21,7 @@ interface IndexSelectProps<N extends FilterName> {
   size?: InputSize;
   options: FilterBag<N>;
   tooltip?: string;
+  submittable?: boolean;
   mobileIcon?: ReactNode;
   defaultValue: N;
   uncaret?: boolean;
@@ -31,6 +32,7 @@ export function IndexSelect<N extends FilterName>({
   name = "index",
   size = "medium",
   options,
+  submittable = false,
   defaultValue,
   mobileIcon,
   tooltip,
@@ -45,6 +47,7 @@ export function IndexSelect<N extends FilterName>({
   const { value, set } = useSearchEngineField({
     name,
     defaultValue,
+    submittable,
     humanize: (index) => dictionary[index].label,
     serialize: (index) => index,
     unserialize: (index) => index,
