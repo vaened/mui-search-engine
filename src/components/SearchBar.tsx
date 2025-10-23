@@ -27,7 +27,7 @@ type KeysOf<T> = T extends Record<infer K extends FilterName, unknown> ? K : nev
 type FromAdditives<T> = T extends { additives?: Record<infer U extends FilterName, unknown> } ? U : never;
 type FromExclusives<T> = T extends { exclusives?: Record<infer U extends FilterName, unknown> } ? U : never;
 export type FlagsKeysOf<T> = FromAdditives<T> | FromExclusives<T> | KeysOf<T>;
-export type SearchBarName = { query: string; index: string; flags: string };
+export type SearchBarName = { query?: string; index?: string; flags?: string };
 
 interface SearchBarProps<IB extends FilterBag<FilterName>, FB extends FlagsBag<FilterName>> {
   id?: string;
