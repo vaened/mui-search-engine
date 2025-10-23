@@ -36,7 +36,9 @@ export class UrlPersistenceAdapter implements PersistenceAdapter {
 
     Object.entries(values).forEach(([key, value]) => {
       if (Array.isArray(value)) {
-        value.forEach((v) => {
+        const values = [...value].sort();
+
+        values.forEach((v) => {
           if (!this.#isValid(v)) {
             return;
           }
@@ -53,8 +55,13 @@ export class UrlPersistenceAdapter implements PersistenceAdapter {
     });
 
     const newSearch = params.toString();
-    const newPath = newSearch ? `${window.location.pathname}?${newSearch}` : window.location.pathname;
+    const oldSearch = new URLSearchParams(window.location.search).toString();
 
+    if (newSearch === oldSearch) {
+      return;
+    }
+
+    const newPath = newSearch ? `${window.location.pathname}?${newSearch}` : window.location.pathname;
     window.history.pushState({ path: newPath }, "", newPath);
   };
 
