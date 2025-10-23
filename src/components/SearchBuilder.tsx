@@ -39,7 +39,7 @@ export function SearchBuilder<P extends SearchParams>({
   }
 
   const store = storeInstance.current;
-  const fields = useSyncExternalStore(store.subscribe, store.all, store.all);
+  const { fields } = useSyncExternalStore(store.subscribe, store.state, store.state);
   const values: P = useMemo(() => collect(fields, (field) => field.value), [fields]);
 
   useEffect(() => {

@@ -11,18 +11,24 @@ export interface RegisteredField<V extends FilterValue, S extends SerializedValu
 
 export type RegisteredFieldDictionary<V extends FilterValue, S extends SerializedValue> = Record<FilterName, RegisteredField<V, S>>;
 
+export interface FieldStoreState {
+  readonly fields: RegisteredFieldDictionary<FilterValue, SerializedValue>;
+}
+
 export class FieldStore {
   #listeners: Set<() => void> = new Set();
   #persisted: SerializedFilterDictionary;
-  fields: RegisteredFieldDictionary<FilterValue, SerializedValue> = {};
+  #state: FieldStoreState = { fields: {} };
 
   constructor(values: SerializedFilterDictionary) {
     this.#persisted = values;
   }
 
-  all = () => this.fields;
+  all = () => this.#state.fields;
 
-  exists = (name: FilterName) => !!this.fields[name];
+  state = () => this.#state;
+
+  exists = (name: FilterName) => !!this.#state.fields[name];
 
   subscribe = (listener: () => void) => {
     this.#listeners.add(listener);
@@ -32,10 +38,11 @@ export class FieldStore {
   rehydrate = (newValues: SerializedFilterDictionary): RegisteredFieldDictionary<FilterValue, SerializedValue> | undefined => {
     this.#persisted = newValues;
     let changed = false;
-    const newFields = { ...this.fields };
+    const currentFields = { ...this.#state.fields };
+    const newFields = { ...currentFields };
 
-    Object.keys(this.fields).forEach((name) => {
-      const field = this.fields[name];
+    Object.keys(currentFields).forEach((name) => {
+      const field = currentFields[name];
       let newValue: FilterValue = this.#parse(field);
 
       if (!Object.is(field.value, newValue)) {
@@ -48,8 +55,9 @@ export class FieldStore {
       return;
     }
 
-    this.fields = newFields;
-    this.#notify();
+    this.#put({
+      fields: newFields,
+    });
 
     return newFields;
   };
@@ -64,15 +72,15 @@ export class FieldStore {
       defaultValue: field.value,
     };
 
-    this.fields = {
-      ...this.fields,
-      [field.name]: {
-        ...registered,
-        value: this.#parse(registered),
+    this.#put({
+      fields: {
+        ...this.#state.fields,
+        [field.name]: {
+          ...registered,
+          value: this.#parse(registered),
+        },
       },
-    };
-
-    this.#notify();
+    });
   };
 
   unregister = (name: FilterName) => {
@@ -80,35 +88,48 @@ export class FieldStore {
       return;
     }
 
-    delete this.fields[name];
+    delete this.#state.fields[name];
 
-    this.fields = { ...this.fields };
-    this.#notify();
+    this.#put({
+      fields: {
+        ...this.#state.fields,
+      },
+    });
   };
 
   set = <V extends FilterValue>(name: FilterName, value: V) => {
-    const field = this.fields[name];
+    const field = this.#state.fields[name];
 
     if (!field || Object.is(field.value, value)) {
       return;
     }
 
-    this.fields = {
-      ...this.fields,
-      [name]: {
-        ...field,
-        value,
+    this.#put({
+      fields: {
+        ...this.#state.fields,
+        [name]: {
+          ...field,
+          value,
+        },
       },
-    };
-    this.#notify();
+    });
   };
 
   get = <V extends FilterValue, S extends SerializedValue>(name: FilterName): Field<V, S> | undefined => {
-    return this.fields[name] as unknown as Field<V, S> | undefined;
+    return this.#state.fields[name] as unknown as Field<V, S> | undefined;
   };
 
   value = <V extends FilterValue>(name: FilterName): V | undefined => {
     return this.get<V, SerializedValue>(name)?.value as V | undefined;
+  };
+
+  #put = (state: Partial<FieldStoreState>) => {
+    this.#state = {
+      ...this.#state,
+      ...state,
+    };
+
+    this.#notify();
   };
 
   #notify = () => {
