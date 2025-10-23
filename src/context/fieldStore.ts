@@ -5,10 +5,14 @@
 
 import type { Field, FilterName, FilterValue, SerializedFilterDictionary, SerializedValue } from "@/types";
 
+export interface RegisteredField<V extends FilterValue, S extends SerializedValue> extends Field<V, S> {
+  readonly defaultValue: V;
+}
+
 export class FieldStore {
   #listeners: Set<() => void> = new Set();
   #initial: SerializedFilterDictionary;
-  fields: Record<FilterName, Field<FilterValue, SerializedValue>> = {};
+  fields: Record<FilterName, RegisteredField<FilterValue, SerializedValue>> = {};
 
   constructor(values: SerializedFilterDictionary) {
     this.#initial = values;
@@ -28,11 +32,16 @@ export class FieldStore {
       throw new Error(`Field "${field.name}" is already registered`);
     }
 
+    const registered = {
+      ...(field as unknown as Field<FilterValue, SerializedValue>),
+      defaultValue: field.value,
+    };
+
     this.fields = {
       ...this.fields,
       [field.name]: {
-        ...(field as unknown as Field<FilterValue, SerializedValue>),
-        value: this.#parse(field),
+        ...registered,
+        value: this.#parse(registered),
       },
     };
 
@@ -79,11 +88,11 @@ export class FieldStore {
     this.#listeners.forEach((listener) => listener());
   };
 
-  #parse = <V extends FilterValue, S extends SerializedValue>(field: Field<V, S>): FilterValue => {
+  #parse = <V extends FilterValue, S extends SerializedValue>(field: RegisteredField<V, S>): FilterValue => {
     const initial = this.#initial[field.name];
 
     if (!this.#isValid(initial)) {
-      return field.value;
+      return field.defaultValue;
     }
 
     return field.unserialize ? field.unserialize(initial as S) : initial;
