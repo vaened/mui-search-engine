@@ -8,6 +8,7 @@ import type { Field, FilterName, FilterValue, SerializedFilterDictionary, Serial
 export interface RegisteredField<V extends FilterValue, S extends SerializedValue> extends Field<V, S> {
   readonly defaultValue: V;
 }
+
 export type RegisteredFieldDictionary<V extends FilterValue, S extends SerializedValue> = Record<FilterName, RegisteredField<V, S>>;
 
 export class FieldStore {
