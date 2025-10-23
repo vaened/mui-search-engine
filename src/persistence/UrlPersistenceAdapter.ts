@@ -58,7 +58,15 @@ export class UrlPersistenceAdapter implements PersistenceAdapter {
     window.history.pushState({ path: newPath }, "", newPath);
   };
 
+  subscribe = (callback: () => void) => {
+    window.addEventListener("popstate", callback);
+
+    return () => {
+      window.removeEventListener("popstate", callback);
+    };
+  };
+
   #isValid = (value: unknown) => {
-    return value !== undefined && value !== null && value !== "";
+    return value !== undefined && value !== null;
   };
 }
