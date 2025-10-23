@@ -13,12 +13,13 @@ export type RegisteredFieldDictionary<V extends FilterValue, S extends Serialize
 
 export interface FieldStoreState {
   readonly fields: Readonly<RegisteredFieldDictionary<FilterValue, SerializedValue>>;
+  readonly touched: FilterName[];
 }
 
 export class FieldStore {
   #listeners: Set<() => void> = new Set();
   #persisted: SerializedFilterDictionary;
-  #state: FieldStoreState = { fields: {} };
+  #state: FieldStoreState = { fields: {}, touched: [] };
 
   constructor(values: SerializedFilterDictionary) {
     this.#persisted = values;
@@ -36,6 +37,7 @@ export class FieldStore {
   rehydrate = (newValues: SerializedFilterDictionary): RegisteredFieldDictionary<FilterValue, SerializedValue> | undefined => {
     this.#persisted = newValues;
     const newFields = { ...this.#state.fields };
+    const touched: FilterName[] = [];
     let changed = false;
 
     for (const [name, field] of Object.entries(this.#state.fields)) {
@@ -43,6 +45,7 @@ export class FieldStore {
 
       if (!Object.is(field.value, newValue)) {
         newFields[name] = { ...field, value: newValue };
+        touched.push(name);
         changed = true;
       }
     }
@@ -51,7 +54,7 @@ export class FieldStore {
       return;
     }
 
-    this.#commit({ fields: newFields });
+    this.#commit({ fields: newFields, touched });
     return newFields;
   };
 
@@ -98,6 +101,7 @@ export class FieldStore {
     }
 
     this.#commit({
+      touched: [name],
       fields: {
         ...this.#state.fields,
         [name]: {
