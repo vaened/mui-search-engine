@@ -30,6 +30,7 @@ export type SerializedValue = null | string | string[];
 export interface Field<V extends FilterValue, S extends SerializedValue> {
   name: FilterName;
   value: V;
+  submittable?: boolean;
   humanize?: (value: V) => HumanizedValue | null;
   serialize?: (value: V) => S | null;
   unserialize?: (value: S) => V;
