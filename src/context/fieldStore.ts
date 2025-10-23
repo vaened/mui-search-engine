@@ -27,6 +27,31 @@ export class FieldStore {
     return () => this.#listeners.delete(listener);
   };
 
+  rehydrate = (newValues: SerializedFilterDictionary) => {
+    this.#persisted = newValues;
+    let changed = false;
+    const newFields = { ...this.fields };
+
+    Object.keys(this.fields).forEach((name) => {
+      const field = this.fields[name];
+      let newValue: FilterValue = this.#parse(field);
+
+      if (!Object.is(field.value, newValue)) {
+        newFields[name] = { ...field, value: newValue };
+        changed = true;
+      }
+
+      if (name === "q") {
+        console.log({ newValue, equals: Object.is(field.value, newValue), field: { ...newFields[name] } });
+      }
+    });
+
+    if (changed) {
+      this.fields = newFields;
+      this.#notify();
+    }
+  };
+
   register = <V extends FilterValue, S extends SerializedValue>(field: Field<V, S>) => {
     if (this.exists(field.name)) {
       throw new Error(`Field "${field.name}" is already registered`);

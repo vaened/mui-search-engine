@@ -53,6 +53,21 @@ export function SearchBuilder<P extends SearchParams>({
     return () => clearTimeout(timmer);
   }, [values, autoStartDelay, onSearch]);
 
+  useEffect(() => {
+    if (!persistenceAdapter?.subscribe) {
+      return;
+    }
+
+    const handleExternalUpdate = () => {
+      const newValues = persistenceAdapter.read();
+      store.rehydrate(newValues);
+    };
+
+    const unsubscribe = persistenceAdapter.subscribe(handleExternalUpdate);
+
+    return () => unsubscribe();
+  }, [persistenceAdapter, store]);
+
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     dispatch(values);
