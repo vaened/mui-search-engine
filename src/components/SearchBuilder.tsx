@@ -66,7 +66,13 @@ export function SearchBuilder<P extends SearchParams>({
 
     const handleExternalUpdate = () => {
       const newValues = persistenceAdapter.read();
-      store.rehydrate(newValues);
+      const currentFields = store.rehydrate(newValues);
+
+      if (!currentFields) {
+        return;
+      }
+
+      onSearch?.(collect(currentFields, (field) => field.value));
     };
 
     const unsubscribe = persistenceAdapter.subscribe(handleExternalUpdate);
@@ -133,7 +139,7 @@ function collect<N extends FilterName, V extends SerializedValue | FilterValue, 
   }, {} as R);
 }
 
-function createSerializeDictionaryFrom<N extends FilterName, V extends FilterValue>(
+function createSerializeDictionaryFrom<N extends FilterName>(
   fields: Record<N, Field<FilterValue, SerializedValue>>
 ): SerializedFilterDictionary {
   return collect(fields, (field) => (field.serialize ? field.serialize(field.value) : (field.value as SerializedValue | undefined)));

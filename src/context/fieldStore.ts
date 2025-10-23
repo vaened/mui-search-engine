@@ -8,11 +8,12 @@ import type { Field, FilterName, FilterValue, SerializedFilterDictionary, Serial
 export interface RegisteredField<V extends FilterValue, S extends SerializedValue> extends Field<V, S> {
   readonly defaultValue: V;
 }
+export type RegisteredFieldDictionary<V extends FilterValue, S extends SerializedValue> = Record<FilterName, RegisteredField<V, S>>;
 
 export class FieldStore {
   #listeners: Set<() => void> = new Set();
   #persisted: SerializedFilterDictionary;
-  fields: Record<FilterName, RegisteredField<FilterValue, SerializedValue>> = {};
+  fields: RegisteredFieldDictionary<FilterValue, SerializedValue> = {};
 
   constructor(values: SerializedFilterDictionary) {
     this.#persisted = values;
@@ -27,7 +28,7 @@ export class FieldStore {
     return () => this.#listeners.delete(listener);
   };
 
-  rehydrate = (newValues: SerializedFilterDictionary) => {
+  rehydrate = (newValues: SerializedFilterDictionary): RegisteredFieldDictionary<FilterValue, SerializedValue> | undefined => {
     this.#persisted = newValues;
     let changed = false;
     const newFields = { ...this.fields };
@@ -42,10 +43,14 @@ export class FieldStore {
       }
     });
 
-    if (changed) {
-      this.fields = newFields;
-      this.#notify();
+    if (!changed) {
+      return;
     }
+
+    this.fields = newFields;
+    this.#notify();
+
+    return newFields;
   };
 
   register = <V extends FilterValue, S extends SerializedValue>(field: Field<V, S>) => {
