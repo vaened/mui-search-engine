@@ -65,7 +65,7 @@ export function FlagsSelect<N extends FilterName>({
   const { value, set } = useSearchEngineField({
     name,
     defaultValue,
-    humanize: (flags) => flags.map((flag) => ({ name: flag, label: labeled(dictionary, flag)  ?? flag  })),
+    humanize: (flags) => flags.map((flag) => ({ name: flag, label: labeled(dictionary, flag) ?? flag })),
     serialize: (flags) => flags,
     unserialize: (flags) => flags,
   });
@@ -184,8 +184,8 @@ export function FlagsSelect<N extends FilterName>({
     </>
   );
 }
-function labeled<N extends FilterName>(bag: FlagDictionary<N>, name: N): string|undefined {
-  const compact = (bag: FilterDictionary<N>|undefined) => bag?.[name]?.label;
+function labeled<N extends FilterName>(bag: FlagDictionary<N>, name: N): string | undefined {
+  const compact = (bag: FilterDictionary<N> | undefined) => bag?.[name]?.label;
   return compact(bag.additives) ?? compact(bag.exclusives);
 }
 
