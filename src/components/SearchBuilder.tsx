@@ -17,6 +17,7 @@ export type SearchEngineContextProviderProps<P extends SearchParams> = {
   persistence?: PersistenceMode;
   manualStart?: boolean;
   autoStartDelay?: number;
+  submitOnChange?: boolean;
   onSearch?: (params: P) => void;
   onChange?: (params: P) => void;
 };
@@ -27,6 +28,7 @@ export function SearchBuilder<P extends SearchParams>({
   persistence,
   manualStart,
   autoStartDelay = 200,
+  submitOnChange,
   onSearch,
   onChange,
 }: SearchEngineContextProviderProps<P>) {
@@ -41,13 +43,20 @@ export function SearchBuilder<P extends SearchParams>({
   const store = storeInstance.current;
   const { fields } = useSyncExternalStore(store.subscribe, store.state, store.state);
   const values: P = useMemo(() => collect(fields, (field) => field.value), [fields]);
+  const isAutostartable = !autostarted.current && !manualStart;
 
   useEffect(() => {
     onChange?.(values);
-  }, [values]);
+
+    if (!submitOnChange || isAutostartable) {
+      return;
+    }
+
+    dispatch(values);
+  }, [values, submitOnChange]);
 
   useEffect(() => {
-    if (manualStart || autostarted.current) {
+    if (!isAutostartable) {
       return;
     }
 
@@ -57,7 +66,7 @@ export function SearchBuilder<P extends SearchParams>({
     }, autoStartDelay);
 
     return () => clearTimeout(timmer);
-  }, [values, autoStartDelay, onSearch]);
+  }, [values, autoStartDelay]);
 
   useEffect(() => {
     if (!persistenceAdapter?.subscribe) {
@@ -68,7 +77,7 @@ export function SearchBuilder<P extends SearchParams>({
       const newValues = persistenceAdapter.read();
       const currentFields = store.rehydrate(newValues);
 
-      if (!currentFields) {
+      if (!currentFields || submitOnChange) {
         return;
       }
 
