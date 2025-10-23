@@ -11,11 +11,11 @@ export interface RegisteredField<V extends FilterValue, S extends SerializedValu
 
 export type RegisteredFieldDictionary<V extends FilterValue, S extends SerializedValue> = Record<FilterName, RegisteredField<V, S>>;
 
-export interface FieldStoreState {
-  readonly fields: Readonly<RegisteredFieldDictionary<FilterValue, SerializedValue>>;
-  readonly operation: "set" | "unregister" | "register" | "rehydrate" | null;
-  readonly touched: FilterName[];
-}
+export type FieldStoreState = Readonly<{
+  fields: Readonly<RegisteredFieldDictionary<FilterValue, SerializedValue>>;
+  operation: "set" | "unregister" | "register" | "rehydrate" | null;
+  touched: FilterName[];
+}>;
 
 export class FieldStore {
   #listeners: Set<() => void> = new Set();
