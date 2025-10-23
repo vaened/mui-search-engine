@@ -82,11 +82,15 @@ export class FieldStore {
   #parse = <V extends FilterValue, S extends SerializedValue>(field: RegisteredField<V, S>): FilterValue => {
     const initial = this.#initial[field.name];
 
-    if (!initial) {
+    if (!this.#isValid(initial)) {
       return field.value;
     }
 
     return field.unserialize ? field.unserialize(initial as S) : initial;
+  };
+
+  #isValid = (value: unknown) => {
+    return value !== undefined && value !== null;
   };
 }
 
