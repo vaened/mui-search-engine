@@ -11,11 +11,11 @@ export interface RegisteredField<V extends FilterValue, S extends SerializedValu
 
 export class FieldStore {
   #listeners: Set<() => void> = new Set();
-  #initial: SerializedFilterDictionary;
+  #persisted: SerializedFilterDictionary;
   fields: Record<FilterName, RegisteredField<FilterValue, SerializedValue>> = {};
 
   constructor(values: SerializedFilterDictionary) {
-    this.#initial = values;
+    this.#persisted = values;
   }
 
   all = () => this.fields;
@@ -89,7 +89,7 @@ export class FieldStore {
   };
 
   #parse = <V extends FilterValue, S extends SerializedValue>(field: RegisteredField<V, S>): FilterValue => {
-    const initial = this.#initial[field.name];
+    const initial = this.#persisted[field.name];
 
     if (!this.#isValid(initial)) {
       return field.defaultValue;
