@@ -12,7 +12,7 @@ export interface RegisteredField<V extends FilterValue, S extends SerializedValu
 export type RegisteredFieldDictionary<V extends FilterValue, S extends SerializedValue> = Record<FilterName, RegisteredField<V, S>>;
 
 export interface FieldStoreState {
-  readonly fields: RegisteredFieldDictionary<FilterValue, SerializedValue>;
+  readonly fields: Readonly<RegisteredFieldDictionary<FilterValue, SerializedValue>>;
 }
 
 export class FieldStore {
@@ -88,11 +88,11 @@ export class FieldStore {
       return;
     }
 
-    delete this.#state.fields[name];
+    const { [name]: _, ...rest } = this.#state.fields;
 
     this.#put({
       fields: {
-        ...this.#state.fields,
+        ...rest,
       },
     });
   };
