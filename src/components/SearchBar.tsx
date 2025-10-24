@@ -170,9 +170,9 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
     apply(debouncedTerm);
   }, [debouncedTerm]);
 
-  function apply(query: string) {
-    set(query);
-    onChange?.(query);
+  function apply(query?: string | null) {
+    set(query ?? "");
+    onChange?.(query ?? "");
   }
 
   function onQueryStringKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -181,12 +181,12 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
     }
 
     if (!isSubmitOnChangeEnabled) {
-      apply(queryString ?? "");
+      apply(queryString);
       return;
     }
 
     event.preventDefault();
-    apply(queryString ?? "");
+    apply(queryString);
   }
 
   function onQueryStringChange(event: React.ChangeEvent<HTMLInputElement>) {
