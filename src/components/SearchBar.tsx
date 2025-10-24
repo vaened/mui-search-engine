@@ -188,7 +188,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
     event.preventDefault();
     apply(queryString ?? "");
   }
-  
+
   function onQueryStringChange(event: React.ChangeEvent<HTMLInputElement>) {
     setQueryString(event.target.value);
   }
@@ -217,7 +217,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
               <IndexSelect
                 name={name?.index}
                 size={size}
-                submittable={submittable?.index}
+                submittable={submittable?.index === undefined ? false : submittable?.index}
                 options={dictionary}
                 defaultValue={index}
                 onChange={onIndexChange}
