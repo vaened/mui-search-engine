@@ -176,7 +176,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   }
 
   function onQueryStringKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key !== "Enter") {
+    if (event.key !== "Enter" || queryString === value) {
       return;
     }
 
