@@ -54,7 +54,7 @@ export interface FlagsSelectProps<N extends FilterName> {
 export function FlagsSelect<N extends FilterName>({
   name = "flags",
   options,
-  submittable = true,
+  submittable,
   size = "medium",
   tooltip = "Select Filters",
   defaultValue = [],

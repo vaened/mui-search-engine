@@ -28,7 +28,7 @@ export function SearchBuilder<P extends SearchParams>({
   persistence,
   manualStart,
   autoStartDelay = 200,
-  submitOnChange,
+  submitOnChange = false,
   onSearch,
   onChange,
 }: SearchEngineContextProviderProps<P>) {
@@ -122,6 +122,7 @@ export function SearchBuilder<P extends SearchParams>({
     <SearchEngineContext.Provider
       value={{
         store,
+        submitOnChange,
         fields,
         values,
         isLoading: loading,

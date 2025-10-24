@@ -9,6 +9,7 @@ import { createContext, useContext } from "react";
 
 export interface SearchEngineContextState<P extends SearchParams = SearchParams> {
   store: FieldStore;
+  submitOnChange: boolean;
   values: P;
   fields: Record<FilterName, Field<FilterValue, SerializedValue>>;
   isLoading: boolean;

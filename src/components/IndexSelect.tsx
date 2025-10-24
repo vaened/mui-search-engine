@@ -32,7 +32,7 @@ export function IndexSelect<N extends FilterName>({
   name = "index",
   size = "medium",
   options,
-  submittable = false,
+  submittable,
   defaultValue,
   mobileIcon,
   tooltip,

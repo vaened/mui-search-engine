@@ -147,7 +147,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   const { value, set } = useSearchEngineField({
     name: name?.query || "q",
     defaultValue: defaultValue || null,
-    submittable: submittable?.query ?? true,
+    submittable: submittable?.query,
     humanize: (v) => v,
     serialize: (v) => v,
     unserialize: (v) => v,

@@ -14,23 +14,27 @@ export type UseSearchEngineFieldProps<V extends FilterValue, S extends Serialize
 export interface UseSearchEngineFieldResult<V extends FilterValue, S extends SerializedValue> {
   value?: V;
   field?: Field<V, S>;
+  isSubmitOnChangeEnabled: boolean;
   set: (value: V) => void;
 }
 
 export function useSearchEngineField<V extends FilterValue, S extends SerializedValue>({
   name,
   defaultValue,
+  submittable,
   ...restOfProps
 }: UseSearchEngineFieldProps<V, S>): UseSearchEngineFieldResult<V, S> {
-  const { store, fields } = useSearchEngine();
+  const { store, fields, submitOnChange } = useSearchEngine();
 
   const field = useMemo(() => fields[name] as unknown as Field<V, S> | undefined, [fields, name]);
   const value = useMemo(() => field?.value, [field?.value]);
+  const isSubmitOnChangeEnabled = submittable === undefined ? submitOnChange : submittable;
 
   useEffect(() => {
     store.register({
       name,
       value: defaultValue,
+      submittable: isSubmitOnChangeEnabled,
       ...restOfProps,
     });
 
@@ -45,5 +49,6 @@ export function useSearchEngineField<V extends FilterValue, S extends Serialized
     set,
     field,
     value,
+    isSubmitOnChangeEnabled,
   };
 }
