@@ -144,7 +144,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   });
 
   const { isLoading } = useSearchEngine();
-  const { value, set } = useSearchEngineField({
+  const { value, isSubmitOnChangeEnabled, set } = useSearchEngineField({
     name: name?.query || "q",
     defaultValue: defaultValue || null,
     submittable: submittable?.query,
@@ -167,10 +167,28 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
       return;
     }
 
-    set(debouncedTerm);
-    onChange?.(debouncedTerm);
+    apply(debouncedTerm);
   }, [debouncedTerm]);
 
+  function apply(query: string) {
+    set(query);
+    onChange?.(query);
+  }
+
+  function onQueryStringKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key !== "Enter") {
+      return;
+    }
+
+    if (!isSubmitOnChangeEnabled) {
+      apply(queryString ?? "");
+      return;
+    }
+
+    event.preventDefault();
+    apply(queryString ?? "");
+  }
+  
   function onQueryStringChange(event: React.ChangeEvent<HTMLInputElement>) {
     setQueryString(event.target.value);
   }
@@ -215,6 +233,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
               placeholder={placeholder}
               inputProps={{ "aria-label": label }}
               value={queryString ?? ""}
+              onKeyDown={onQueryStringKeyDown}
               onChange={onQueryStringChange}
             />
 
