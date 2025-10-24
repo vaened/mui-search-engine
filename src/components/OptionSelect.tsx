@@ -18,7 +18,7 @@ export function OptionSelect<V extends FilterValue, S extends SerializedValue>({
   defaultValue,
   children,
   multiple,
-  submittable = true,
+  submittable,
   humanize,
   serialize,
   unserialize,
