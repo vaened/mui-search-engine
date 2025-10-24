@@ -157,13 +157,14 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   const debouncedTerm = useDebounce(queryString || "", debounceDelay);
 
   const description = dictionary && index ? dictionary[index].description : null;
+  const isQuerySynced = queryString === value;
 
   useEffect(() => {
     setQueryString(value);
   }, [value]);
 
   useEffect(() => {
-    if (queryString === value) {
+    if (isQuerySynced) {
       return;
     }
 
@@ -176,7 +177,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   }
 
   function onQueryStringKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key !== "Enter" || queryString === value) {
+    if (event.key !== "Enter" || isQuerySynced) {
       return;
     }
 
