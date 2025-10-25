@@ -75,13 +75,13 @@ export function SearchBuilder<P extends SearchParams>({
 
     const handleExternalUpdate = () => {
       const newValues = persistenceAdapter.read();
-      const currentFields = store.rehydrate(newValues);
+      const newFields = store.rehydrate(newValues);
 
-      if (!currentFields || submitOnChange) {
+      if (!newFields || submitOnChange) {
         return;
       }
 
-      onSearch?.(collect(currentFields, (field) => field.value));
+      onSearch?.(collect(newFields, (field) => field.value));
     };
 
     const unsubscribe = persistenceAdapter.subscribe(handleExternalUpdate);
