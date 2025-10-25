@@ -3,15 +3,12 @@
  * @link https://vaened.dev DevFolio
  */
 
-import {
-  ClickAwayListener,
-  Grow,
-  ListSubheader, // 1. Importa MenuList
-  MenuList,
-  Paper,
-  Popper,
-} from "@mui/material";
-import type { PopperProps } from "node_modules/@mui/material/Popper/BasePopper.types";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
+import Grow from "@mui/material/Grow";
+import ListSubheader from "@mui/material/ListSubheader";
+import MenuList from "@mui/material/MenuList";
+import Paper from "@mui/material/Paper";
+import Popper, { type PopperProps } from "@mui/material/Popper";
 import React, { useEffect, useRef } from "react";
 
 export type DropdownMenuProps = {
