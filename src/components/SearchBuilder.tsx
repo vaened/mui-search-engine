@@ -48,11 +48,7 @@ export function SearchBuilder<P extends SearchParams>({
   useEffect(() => {
     onChange?.(values);
 
-    if (!submitOnChange || isAutostartable) {
-      return;
-    }
-
-    if (!touchedFieldNames.some((name) => fields[name]?.submittable)) {
+    if (isAutostartable || !touchedFieldNames.some((name) => fields[name]?.submittable)) {
       return;
     }
 
