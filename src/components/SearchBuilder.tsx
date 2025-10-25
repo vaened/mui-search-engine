@@ -4,7 +4,7 @@
  */
 
 import { SearchEngineContext } from "@/context";
-import { createFieldsStore, FieldStore } from "@/context/fieldStore";
+import { createFieldsStore, FieldStore } from "@/context/FieldStore";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import { UrlPersistenceAdapter } from "@/persistence/UrlPersistenceAdapter";
 import type { Field, FilterName, FilterValue, PersistenceMode, SearchParams, SerializedFilterDictionary, SerializedValue } from "@/types";

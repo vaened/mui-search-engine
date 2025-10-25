@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { FieldStore } from "@/context/fieldStore";
+import type { FieldStore } from "@/context/FieldStore";
 import type { Field, FilterName, FilterValue, SearchParams, SerializedValue } from "@/types";
 import { createContext, useContext } from "react";
 
