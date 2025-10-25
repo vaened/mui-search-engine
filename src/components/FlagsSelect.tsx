@@ -15,11 +15,10 @@ import FormControlLabel, { type FormControlLabelProps } from "@mui/material/Form
 import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { IconEraser, IconFilter, IconFilterOff } from "@tabler/icons-react";
-import React, { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 export type AdditiveFilterFlagBag<N extends FilterName> = Record<N, boolean>;
 
@@ -96,9 +95,7 @@ export function FlagsSelect<N extends FilterName>({
     onChange?.(flags);
   }
 
-  function onAdditivesChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const { name, checked } = event.target;
-
+  function onAdditivesChange({ name, checked }: { name: N; checked: boolean }) {
     process({
       ...filters,
       additives: {
@@ -108,12 +105,10 @@ export function FlagsSelect<N extends FilterName>({
     });
   }
 
-  function onExclusivesChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const { value } = event.target;
-
+  function onExclusivesChange(value: N) {
     process({
       ...filters,
-      exclusive: value as N,
+      exclusive: value,
     });
   }
 
@@ -148,32 +143,27 @@ export function FlagsSelect<N extends FilterName>({
               key={`${value}-${index}`}
               label={label}
               description={description}
-              control={
-                <Checkbox
-                  size="small"
-                  name={value}
-                  onChange={onAdditivesChange}
-                  checked={filters.additives[value] ?? false}
-                  autoFocus={index === 0}
-                />
-              }
+              control={<Checkbox size="small" name={value} checked={filters.additives[value] ?? false} autoFocus={index === 0} />}
+              onClick={() => {
+                onAdditivesChange({ name: value, checked: !filters.additives[value] });
+              }}
             />
           ))}
 
         {dictionary.additives && dictionary.exclusives && <Divider className="!my-0" />}
 
-        {dictionary.exclusives && (
-          <RadioGroup value={filters.exclusive || ""} onChange={onExclusivesChange}>
-            {Object.values<FilterElement<N>>(dictionary.exclusives).map(({ value, label, description }, index) => (
-              <MenuItemAction
-                key={`${value}-${index}`}
-                label={label}
-                description={description}
-                control={<Radio size="small" value={value} />}
-              />
-            ))}
-          </RadioGroup>
-        )}
+        {dictionary.exclusives &&
+          Object.values<FilterElement<N>>(dictionary.exclusives).map(({ value, label, description }, index) => (
+            <MenuItemAction
+              key={`${value}-${index}`}
+              label={label}
+              description={description}
+              control={<Radio size="small" value={value} checked={filters.exclusive === value} />}
+              onClick={() => {
+                onExclusivesChange(value);
+              }}
+            />
+          ))}
 
         {dictionary.exclusives && (
           <Divider textAlign="right" variant="middle" className="!my-0">
@@ -199,11 +189,11 @@ function labeled<N extends FilterName>(bag: FlagDictionary<N>, name: N): string 
   return compact(bag.additives) ?? compact(bag.exclusives);
 }
 
-function MenuItemAction(props: FormControlLabelProps & { description?: string }) {
+function MenuItemAction(props: Omit<FormControlLabelProps, "onClick"> & { description?: string; onClick: () => void }) {
   return (
-    <MenuItem sx={{ p: 0 }} dense>
+    <MenuItem sx={{ p: 0 }} onClick={props.onClick} dense>
       <Tooltip title={props.description} placement="left" arrow>
-        <FormControlLabel {...props} sx={{ mx: 1, minWidth: "100%" }} />
+        <FormControlLabel {...props} sx={{ mx: 1, minWidth: "100%", pointerEvents: "none" }} />
       </Tooltip>
     </MenuItem>
   );
