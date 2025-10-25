@@ -3,16 +3,16 @@
  * @link https://vaened.dev DevFolio
  */
 
+import DropdownMenu from "@/components/DropdownMenu";
 import { useSearchEngineField } from "@/hooks/useSearchEngineField";
 import type { FilterBag, FilterDictionary, FilterElement, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
+import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import Divider from "@mui/material/Divider";
 import FormControlLabel, { type FormControlLabelProps } from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
-import ListSubheader from "@mui/material/ListSubheader";
-import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
@@ -126,30 +126,37 @@ export function FlagsSelect<N extends FilterName>({
 
   return (
     <>
-      <Tooltip title={tooltip}>
-        <IconButton
-          onClick={openMenu}
-          ref={anchorRef}
-          size={size}
-          sx={{ p: "6px" }}
-          color={hasFilter ? "primary" : "inherit"}
-          aria-controls={open ? "composition-menu" : undefined}
-          aria-expanded={open ? "true" : undefined}
-          aria-haspopup="true">
-          {hasFilter ? <IconFilter /> : <IconFilterOff />}
-        </IconButton>
-      </Tooltip>
+      <Box ref={anchorRef} sx={{ display: "inline-flex" }}>
+        <Tooltip title={tooltip} disableHoverListener={open}>
+          <IconButton
+            onClick={openMenu}
+            size={size}
+            sx={{ p: "6px" }}
+            color={hasFilter ? "primary" : "inherit"}
+            aria-controls={open ? "composition-menu" : undefined}
+            aria-expanded={open ? "true" : undefined}
+            aria-haspopup="true">
+            {hasFilter ? <IconFilter /> : <IconFilterOff />}
+          </IconButton>
+        </Tooltip>
+      </Box>
 
-      <Menu onClose={closeMenu} open={open} anchorEl={anchorRef.current} aria-labelledby="composition-button">
-        <ListSubheader>Available Flags</ListSubheader>
-
+      <DropdownMenu open={open} anchorRef={anchorRef} onClose={closeMenu} title="Available Flags">
         {dictionary.additives &&
           Object.values<FilterElement<N>>(dictionary.additives).map(({ value, label, description }, index) => (
             <MenuItemAction
               key={`${value}-${index}`}
               label={label}
               description={description}
-              control={<Checkbox size="small" name={value} onChange={onAdditivesChange} checked={filters.additives[value] ?? false} />}
+              control={
+                <Checkbox
+                  size="small"
+                  name={value}
+                  onChange={onAdditivesChange}
+                  checked={filters.additives[value] ?? false}
+                  autoFocus={index === 0}
+                />
+              }
             />
           ))}
 
@@ -183,7 +190,7 @@ export function FlagsSelect<N extends FilterName>({
             </Button>
           </Divider>
         )}
-      </Menu>
+      </DropdownMenu>
     </>
   );
 }
@@ -195,7 +202,7 @@ function labeled<N extends FilterName>(bag: FlagDictionary<N>, name: N): string 
 function MenuItemAction(props: FormControlLabelProps & { description?: string }) {
   return (
     <MenuItem sx={{ p: 0 }} dense>
-      <Tooltip title={props.description} placement="left">
+      <Tooltip title={props.description} placement="left" arrow>
         <FormControlLabel {...props} sx={{ mx: 1, minWidth: "100%" }} />
       </Tooltip>
     </MenuItem>

@@ -3,14 +3,13 @@
  * @link https://vaened.dev DevFolio
  */
 
+import DropdownMenu from "@/components/DropdownMenu";
 import { useSearchEngineField } from "@/hooks/useSearchEngineField";
 import type { FilterBag, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom, dictionaryToFilterElements } from "@/utils";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
-import ListSubheader from "@mui/material/ListSubheader";
-import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import { IconChevronDown, IconPrompt } from "@tabler/icons-react";
@@ -67,7 +66,7 @@ export function IndexSelect<N extends FilterName>({
   return (
     <>
       <Box ref={anchorRef} sx={{ display: "inline-flex" }}>
-        <Tooltip title={tooltip ?? "Search by"}>
+        <Tooltip title={tooltip ?? "Search by"} disableHoverListener={open}>
           <Button
             onClick={openMenu}
             size={size}
@@ -81,7 +80,7 @@ export function IndexSelect<N extends FilterName>({
           </Button>
         </Tooltip>
 
-        <Tooltip title={current?.label ?? "Search by"} sx={{ display: { xs: "inline-flex", sm: "none" } }}>
+        <Tooltip title={current?.label ?? "Search by"} sx={{ display: { xs: "inline-flex", sm: "none" } }} disableHoverListener={open}>
           <IconButton
             onClick={openMenu}
             size={size}
@@ -94,14 +93,13 @@ export function IndexSelect<N extends FilterName>({
         </Tooltip>
       </Box>
 
-      <Menu onClose={closeMenu} open={open} anchorEl={anchorRef.current} aria-labelledby="composition-button">
-        <ListSubheader>Index</ListSubheader>
+      <DropdownMenu title="Index" open={open} anchorRef={anchorRef} onClose={closeMenu}>
         {elements.map((element, index) => (
           <MenuItem key={`${index}-${element.value}`} value={element.value} onClick={() => onIndexChange(element.value)}>
             {element.label}
           </MenuItem>
         ))}
-      </Menu>
+      </DropdownMenu>
     </>
   );
 }
