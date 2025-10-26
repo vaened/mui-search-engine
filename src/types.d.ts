@@ -15,6 +15,7 @@ export type FilterElement<T extends FilterName> = FilterMetaData & { value: T };
 export type FilterBag<N extends FilterName> = Record<N, FilterContext>;
 export type FilterDictionary<N extends FilterName> = Record<N, FilterElement<N>>;
 export type PrimitiveFilterDictionary = Record<FilterName, PrimitiveValue>;
+export type ValueFilterDictionary = Record<FilterName, FilterValue>;
 
 export interface PlainFilterChip {
   label: FilterLabel;

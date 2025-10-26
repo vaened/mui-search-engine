@@ -1,5 +1,5 @@
 import type { RegisteredField, RegisteredFieldDictionary } from "@/context";
-import type { FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
+import type { FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue, ValueFilterDictionary } from "@/types";
 
 export class FieldsCollection implements Iterable<RegisteredField> {
   #values: RegisteredFieldDictionary;
@@ -18,7 +18,7 @@ export class FieldsCollection implements Iterable<RegisteredField> {
 
   public toRecord = (): Record<FilterName, RegisteredField> => Object.fromEntries(this.#values);
 
-  public values = (): Record<FilterName, FilterValue> => {
+  public values = (): ValueFilterDictionary => {
     return this.#collect((field) => field.value);
   };
 
