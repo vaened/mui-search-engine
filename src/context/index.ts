@@ -5,17 +5,17 @@
 
 import type { FieldsCollection } from "@/context/FieldsCollection";
 import type { FieldStore } from "@/context/FieldStore";
-import type { Field, FilterName, FilterValue, SearchParams, SerializedValue } from "@/types";
+import type { Field, FilterName, FilterValue, PrimitiveValue, SearchParams } from "@/types";
 import { createContext, useContext } from "react";
 
-export type RegisteredField<V extends FilterValue = FilterValue, S extends SerializedValue = SerializedValue> = Field<V, S> &
+export type RegisteredField<V extends FilterValue = FilterValue, P extends PrimitiveValue = PrimitiveValue> = Field<V, P> &
   Readonly<{
     defaultValue: V;
   }>;
 
-export type RegisteredFieldDictionary<V extends FilterValue = FilterValue, S extends SerializedValue = SerializedValue> = Map<
+export type RegisteredFieldDictionary<V extends FilterValue = FilterValue, P extends PrimitiveValue = PrimitiveValue> = Map<
   FilterName,
-  RegisteredField<V, S>
+  RegisteredField<V, P>
 >;
 
 export interface SearchEngineContextState<P extends SearchParams = SearchParams> {

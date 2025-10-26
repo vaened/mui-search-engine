@@ -3,10 +3,10 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { SerializedFilterDictionary } from "@/types";
+import type { PrimitiveFilterDictionary } from "@/types";
 
 export interface PersistenceAdapter {
-  read(): SerializedFilterDictionary;
-  write(values: SerializedFilterDictionary): void;
+  read(): PrimitiveFilterDictionary;
+  write(values: PrimitiveFilterDictionary): void;
   subscribe(callback: () => void): () => void;
 }

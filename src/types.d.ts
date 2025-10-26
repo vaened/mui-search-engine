@@ -14,7 +14,7 @@ export type FilterContext = FilterLabel | FilterMetaData;
 export type FilterElement<T extends FilterName> = FilterMetaData & { value: T };
 export type FilterBag<N extends FilterName> = Record<N, FilterContext>;
 export type FilterDictionary<N extends FilterName> = Record<N, FilterElement<N>>;
-export type SerializedFilterDictionary = Record<FilterName, SerializedValue>;
+export type PrimitiveFilterDictionary = Record<FilterName, PrimitiveValue>;
 
 export interface PlainFilterChip {
   label: FilterLabel;
@@ -25,15 +25,15 @@ export interface IndexedFilterChip extends PlainFilterChip {
 }
 
 export type HumanizedValue = IndexedFilterChip[] | FilterLabel;
-export type SerializedValue = null | string | string[];
+export type PrimitiveValue = null | string | string[];
 
-export interface Field<V extends FilterValue, S extends SerializedValue> {
+export interface Field<V extends FilterValue, P extends PrimitiveValue> {
   name: FilterName;
   value: V;
   submittable?: boolean;
   humanize?: (value: V) => HumanizedValue | null;
-  serialize?: (value: V) => S | null;
-  unserialize?: (value: S) => V;
+  serialize?: (value: V) => P | null;
+  unserialize?: (value: P) => V;
 }
 
 export type FieldDictionary = Record<FilterName, Field<FilterValue>>;

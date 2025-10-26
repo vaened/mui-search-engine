@@ -4,7 +4,7 @@
  */
 
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
-import type { SerializedFilterDictionary } from "@/types";
+import type { PrimitiveFilterDictionary } from "@/types";
 
 export class UrlPersistenceAdapter implements PersistenceAdapter {
   constructor() {
@@ -13,10 +13,10 @@ export class UrlPersistenceAdapter implements PersistenceAdapter {
     }
   }
 
-  read = (): SerializedFilterDictionary => {
+  read = (): PrimitiveFilterDictionary => {
     const params = new URLSearchParams(window.location.search);
     const keys = new Set(params.keys());
-    const values: SerializedFilterDictionary = {};
+    const values: PrimitiveFilterDictionary = {};
 
     keys.forEach((key) => {
       if (key.endsWith("[]")) {
@@ -31,7 +31,7 @@ export class UrlPersistenceAdapter implements PersistenceAdapter {
     return values;
   };
 
-  write = (values: SerializedFilterDictionary) => {
+  write = (values: PrimitiveFilterDictionary) => {
     const params = new URLSearchParams();
 
     Object.entries(values).forEach(([key, value]) => {

@@ -5,7 +5,7 @@
 
 import type { RegisteredField, RegisteredFieldDictionary } from "@/context";
 import { FieldsCollection } from "@/context/FieldsCollection";
-import type { Field, FilterName, FilterValue, SerializedFilterDictionary, SerializedValue } from "@/types";
+import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
 
 export type FieldStoreState = Readonly<{
   collection: FieldsCollection;
@@ -15,11 +15,11 @@ export type FieldStoreState = Readonly<{
 
 export class FieldStore {
   #listeners: Set<() => void> = new Set();
-  #persisted: SerializedFilterDictionary;
+  #persisted: PrimitiveFilterDictionary;
   #fields: RegisteredFieldDictionary;
   #state: FieldStoreState = { collection: FieldsCollection.empty(), touched: [], operation: null };
 
-  constructor(values: SerializedFilterDictionary) {
+  constructor(values: PrimitiveFilterDictionary) {
     this.#persisted = values;
     this.#fields = new Map();
   }
@@ -33,7 +33,7 @@ export class FieldStore {
     return () => this.#listeners.delete(listener);
   };
 
-  rehydrate = (newValues: SerializedFilterDictionary): FieldsCollection | undefined => {
+  rehydrate = (newValues: PrimitiveFilterDictionary): FieldsCollection | undefined => {
     this.#persisted = newValues;
     const touched: FilterName[] = [];
     let changed = false;
@@ -59,13 +59,13 @@ export class FieldStore {
     return collection;
   };
 
-  register = <V extends FilterValue, S extends SerializedValue>(field: Field<V, S>) => {
+  register = <V extends FilterValue, P extends PrimitiveValue>(field: Field<V, P>) => {
     if (this.exists(field.name)) {
       throw new Error(`Field "${field.name}" is already registered`);
     }
 
     const registered = {
-      ...(field as unknown as Field<FilterValue, SerializedValue>),
+      ...(field as unknown as Field<FilterValue, PrimitiveValue>),
       defaultValue: field.value,
     };
 
@@ -118,17 +118,17 @@ export class FieldStore {
     this.#listeners.forEach((listener) => listener());
   };
 
-  #parse = <V extends FilterValue, S extends SerializedValue>(field: RegisteredField<V, S>): FilterValue => {
+  #parse = <V extends FilterValue, P extends PrimitiveValue>(field: RegisteredField<V, P>): FilterValue => {
     const initial = this.#persisted[field.name];
 
     if (!FieldsCollection.isValidValue(initial)) {
       return field.defaultValue;
     }
 
-    return field.unserialize ? field.unserialize(initial as S) : initial;
+    return field.unserialize ? field.unserialize(initial as P) : initial;
   };
 }
 
-export function createFieldsStore(values: SerializedFilterDictionary): FieldStore {
+export function createFieldsStore(values: PrimitiveFilterDictionary): FieldStore {
   return new FieldStore(values);
 }

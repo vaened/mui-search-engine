@@ -7,7 +7,7 @@ import { SearchEngineContext } from "@/context";
 import { createFieldsStore, FieldStore } from "@/context/FieldStore";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import { UrlPersistenceAdapter } from "@/persistence/UrlPersistenceAdapter";
-import type { Field, FilterName, FilterValue, PersistenceMode, SearchParams, SerializedFilterDictionary, SerializedValue } from "@/types";
+import type { Field, FilterName, FilterValue, PersistenceMode, PrimitiveFilterDictionary, PrimitiveValue, SearchParams } from "@/types";
 import Grid from "@mui/material/Grid";
 import React, { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 
@@ -131,9 +131,9 @@ export function SearchBuilder<P extends SearchParams>({
   );
 }
 
-function collect<N extends FilterName, V extends SerializedValue | FilterValue, R = Record<N, V>>(
-  fields: Record<FilterName, Field<FilterValue, SerializedValue>>,
-  resolve: (field: (typeof fields)[keyof typeof fields]) => V | undefined
+function collect<N extends FilterName, P extends PrimitiveValue | FilterValue, R = Record<N, P>>(
+  fields: Record<FilterName, Field<FilterValue, PrimitiveValue>>,
+  resolve: (field: (typeof fields)[keyof typeof fields]) => P | undefined
 ): R {
   return Object.values(fields).reduce((acc, field) => {
     const value = resolve(field);
@@ -150,8 +150,8 @@ function collect<N extends FilterName, V extends SerializedValue | FilterValue, 
 }
 
 function createSerializeDictionaryFrom<N extends FilterName>(
-  fields: Record<N, Field<FilterValue, SerializedValue>>
-): SerializedFilterDictionary {
-  return collect(fields, (field) => (field.serialize ? field.serialize(field.value) : (field.value as SerializedValue | undefined)));
+  fields: Record<N, Field<FilterValue, PrimitiveValue>>
+): PrimitiveFilterDictionary {
+  return collect(fields, (field) => (field.serialize ? field.serialize(field.value) : (field.value as PrimitiveValue | undefined)));
 }
 export default SearchBuilder;

@@ -1,5 +1,5 @@
 import type { RegisteredField, RegisteredFieldDictionary } from "@/context";
-import type { FilterName, FilterValue, SerializedValue } from "@/types";
+import type { FilterName, FilterValue, PrimitiveValue } from "@/types";
 
 export class FieldsCollection implements Iterable<RegisteredField> {
   #values: RegisteredFieldDictionary;
@@ -22,16 +22,16 @@ export class FieldsCollection implements Iterable<RegisteredField> {
     return this.#collect((field) => field.value);
   };
 
-  public serialized = (): Record<FilterName, SerializedValue> => {
-    return this.#collect((field) => (field.serialize ? field.serialize(field.value) : (field.value as SerializedValue)));
+  public serialized = (): Record<FilterName, PrimitiveValue> => {
+    return this.#collect((field) => (field.serialize ? field.serialize(field.value) : (field.value as PrimitiveValue)));
   };
 
   public has = (name: FilterName): boolean => {
     return this.#values.has(name);
   };
 
-  public get = <V extends FilterValue, S extends SerializedValue>(name: FilterName): RegisteredField<V, S> | undefined => {
-    return this.#values.get(name) as unknown as RegisteredField<V, S> | undefined;
+  public get = <V extends FilterValue, P extends PrimitiveValue>(name: FilterName): RegisteredField<V, P> | undefined => {
+    return this.#values.get(name) as unknown as RegisteredField<V, P> | undefined;
   };
 
   public map = <V extends unknown>(mapper: (field: RegisteredField) => V): V[] => {

@@ -4,16 +4,16 @@
  */
 
 import { useSearchEngineField } from "@/hooks/useSearchEngineField";
-import type { Field, FilterValue, SerializedValue } from "@/types";
+import type { Field, FilterValue, PrimitiveValue } from "@/types";
 import { Select, type SelectProps } from "@mui/material";
 import type { SelectChangeEvent } from "node_modules/@mui/material";
 
-export type OptionSelectProps<V extends FilterValue, S extends SerializedValue> = Omit<SelectProps<V>, "value" | "name"> &
-  Omit<Field<V, S>, "value"> & {
+export type OptionSelectProps<V extends FilterValue, P extends PrimitiveValue> = Omit<SelectProps<V>, "value" | "name"> &
+  Omit<Field<V, P>, "value"> & {
     defaultValue: V;
   };
 
-export function OptionSelect<V extends FilterValue, S extends SerializedValue>({
+export function OptionSelect<V extends FilterValue, P extends PrimitiveValue>({
   name,
   defaultValue,
   children,
@@ -23,7 +23,7 @@ export function OptionSelect<V extends FilterValue, S extends SerializedValue>({
   serialize,
   unserialize,
   ...props
-}: OptionSelectProps<V, S>) {
+}: OptionSelectProps<V, P>) {
   const { value, set } = useSearchEngineField({
     name,
     defaultValue,
