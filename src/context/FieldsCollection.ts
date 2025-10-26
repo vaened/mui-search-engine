@@ -1,5 +1,5 @@
 import type { RegisteredField, RegisteredFieldDictionary } from "@/context";
-import type { FilterName, FilterValue, PrimitiveValue } from "@/types";
+import type { FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
 
 export class FieldsCollection implements Iterable<RegisteredField> {
   #values: RegisteredFieldDictionary;
@@ -22,7 +22,7 @@ export class FieldsCollection implements Iterable<RegisteredField> {
     return this.#collect((field) => field.value);
   };
 
-  public serialized = (): Record<FilterName, PrimitiveValue> => {
+  public serialized = (): PrimitiveFilterDictionary => {
     return this.#collect((field) => (field.serialize ? field.serialize(field.value) : (field.value as PrimitiveValue)));
   };
 
