@@ -36,7 +36,6 @@ export class FieldStore {
   rehydrate = (newValues: PrimitiveFilterDictionary): FieldsCollection | undefined => {
     this.#persisted = newValues;
     const touched: FilterName[] = [];
-    let changed = false;
 
     this.#fields.forEach((field) => {
       const newValue = this.#parse(field);
@@ -44,11 +43,10 @@ export class FieldStore {
       if (!Object.is(field.value, newValue)) {
         this.#fields.set(field.name, { ...field, value: newValue });
         touched.push(field.name);
-        changed = true;
       }
     });
 
-    if (!changed) {
+    if (touched.length === 0) {
       return;
     }
 
