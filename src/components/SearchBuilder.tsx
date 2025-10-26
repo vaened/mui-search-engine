@@ -41,14 +41,14 @@ export function SearchBuilder<P extends SearchParams>({
   }
 
   const store = storeInstance.current;
-  const { fields, touched: touchedFieldNames } = useSyncExternalStore(store.subscribe, store.state, store.state);
-  const values: P = useMemo(() => collect(fields, (field) => field.value), [fields]);
+  const { collection: fields, touched: touchedFieldNames } = useSyncExternalStore(store.subscribe, store.state, store.state);
+  const values = useMemo(() => fields.values() as P, [fields]);
   const isAutostartable = !autostarted.current && !manualStart;
 
   useEffect(() => {
     onChange?.(values);
 
-    if (isAutostartable || !touchedFieldNames.some((name) => fields[name]?.submittable)) {
+    if (isAutostartable || !touchedFieldNames.some((name) => fields.get(name)?.submittable)) {
       return;
     }
 
@@ -81,7 +81,7 @@ export function SearchBuilder<P extends SearchParams>({
         return;
       }
 
-      onSearch?.(collect(newFields, (field) => field.value));
+      onSearch?.(newFields.values() as P);
     };
 
     const unsubscribe = persistenceAdapter.subscribe(handleExternalUpdate);
@@ -111,7 +111,7 @@ export function SearchBuilder<P extends SearchParams>({
 
   function dispatch(values: P) {
     onSearch?.(values);
-    persistenceAdapter?.write(createSerializeDictionaryFrom(fields));
+    persistenceAdapter?.write(fields.serialized());
   }
 
   return (

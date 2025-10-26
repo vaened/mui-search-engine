@@ -26,7 +26,7 @@ export function useSearchEngineField<V extends FilterValue, S extends Serialized
 }: UseSearchEngineFieldProps<V, S>): UseSearchEngineFieldResult<V, S> {
   const { store, fields, submitOnChange } = useSearchEngine();
 
-  const field = useMemo(() => fields[name] as unknown as Field<V, S> | undefined, [fields, name]);
+  const field = useMemo(() => fields.get<V, S>(name), [fields, name]);
   const value = useMemo(() => field?.value, [field?.value]);
   const isSubmitOnChangeEnabled = submittable === undefined ? submitOnChange : submittable;
 

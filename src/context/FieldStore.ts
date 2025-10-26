@@ -3,16 +3,12 @@
  * @link https://vaened.dev DevFolio
  */
 
+import type { RegisteredField, RegisteredFieldDictionary } from "@/context";
+import { FieldsCollection } from "@/context/FieldsCollection";
 import type { Field, FilterName, FilterValue, SerializedFilterDictionary, SerializedValue } from "@/types";
 
-export interface RegisteredField<V extends FilterValue, S extends SerializedValue> extends Field<V, S> {
-  readonly defaultValue: V;
-}
-
-export type RegisteredFieldDictionary<V extends FilterValue, S extends SerializedValue> = Record<FilterName, RegisteredField<V, S>>;
-
 export type FieldStoreState = Readonly<{
-  fields: Readonly<RegisteredFieldDictionary<FilterValue, SerializedValue>>;
+  collection: FieldsCollection;
   operation: "set" | "unregister" | "register" | "rehydrate" | null;
   touched: FilterName[];
 }>;
@@ -20,43 +16,47 @@ export type FieldStoreState = Readonly<{
 export class FieldStore {
   #listeners: Set<() => void> = new Set();
   #persisted: SerializedFilterDictionary;
-  #state: FieldStoreState = { fields: {}, touched: [], operation: null };
+  #fields: RegisteredFieldDictionary;
+  #state: FieldStoreState = { collection: FieldsCollection.empty(), touched: [], operation: null };
 
   constructor(values: SerializedFilterDictionary) {
     this.#persisted = values;
+    this.#fields = new Map();
   }
 
   state = () => this.#state;
 
-  exists = (name: FilterName) => !!this.#state.fields[name];
+  exists = (name: FilterName) => this.#fields.has(name);
 
   subscribe = (listener: () => void) => {
     this.#listeners.add(listener);
     return () => this.#listeners.delete(listener);
   };
 
-  rehydrate = (newValues: SerializedFilterDictionary): RegisteredFieldDictionary<FilterValue, SerializedValue> | undefined => {
+  rehydrate = (newValues: SerializedFilterDictionary): FieldsCollection | undefined => {
     this.#persisted = newValues;
-    const newFields = { ...this.#state.fields };
     const touched: FilterName[] = [];
     let changed = false;
 
-    for (const [name, field] of Object.entries(this.#state.fields)) {
+    this.#fields.forEach((field) => {
       const newValue = this.#parse(field);
 
       if (!Object.is(field.value, newValue)) {
-        newFields[name] = { ...field, value: newValue };
-        touched.push(name);
+        this.#fields.set(field.name, { ...field, value: newValue });
+        touched.push(field.name);
         changed = true;
       }
-    }
+    });
 
     if (!changed) {
       return;
     }
 
-    this.#commit({ operation: "rehydrate", fields: newFields, touched });
-    return newFields;
+    const collection = new FieldsCollection(this.#fields);
+
+    this.#commit({ operation: "rehydrate", collection, touched });
+
+    return collection;
   };
 
   register = <V extends FilterValue, S extends SerializedValue>(field: Field<V, S>) => {
@@ -69,15 +69,14 @@ export class FieldStore {
       defaultValue: field.value,
     };
 
+    this.#fields.set(field.name, {
+      ...registered,
+      value: this.#parse(registered),
+    });
+
     this.#commit({
       operation: "register",
-      fields: {
-        ...this.#state.fields,
-        [field.name]: {
-          ...registered,
-          value: this.#parse(registered),
-        },
-      },
+      collection: new FieldsCollection(this.#fields),
     });
   };
 
@@ -86,42 +85,28 @@ export class FieldStore {
       return;
     }
 
-    const { [name]: _, ...rest } = this.#state.fields;
+    this.#fields.delete(name);
 
     this.#commit({
       operation: "unregister",
-      fields: {
-        ...rest,
-      },
+      collection: new FieldsCollection(this.#fields),
     });
   };
 
   set = <V extends FilterValue>(name: FilterName, value: V) => {
-    const field = this.#state.fields[name];
+    const field = this.#fields.get(name);
 
     if (!field || Object.is(field.value, value)) {
       return;
     }
 
+    this.#fields.set(name, { ...field, value });
+
     this.#commit({
       operation: "set",
       touched: [name],
-      fields: {
-        ...this.#state.fields,
-        [name]: {
-          ...field,
-          value,
-        },
-      },
+      collection: new FieldsCollection(this.#fields),
     });
-  };
-
-  get = <V extends FilterValue, S extends SerializedValue>(name: FilterName): Field<V, S> | undefined => {
-    return this.#state.fields[name] as unknown as Field<V, S> | undefined;
-  };
-
-  value = <V extends FilterValue>(name: FilterName): V | undefined => {
-    return this.get<V, SerializedValue>(name)?.value as V | undefined;
   };
 
   #commit = (state: Partial<FieldStoreState>) => {
@@ -136,15 +121,11 @@ export class FieldStore {
   #parse = <V extends FilterValue, S extends SerializedValue>(field: RegisteredField<V, S>): FilterValue => {
     const initial = this.#persisted[field.name];
 
-    if (!this.#isValid(initial)) {
+    if (!FieldsCollection.isValidValue(initial)) {
       return field.defaultValue;
     }
 
     return field.unserialize ? field.unserialize(initial as S) : initial;
-  };
-
-  #isValid = (value: unknown) => {
-    return value !== undefined && value !== null;
   };
 }
 
