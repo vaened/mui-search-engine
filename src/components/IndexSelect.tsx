@@ -47,7 +47,6 @@ export function IndexSelect<N extends FilterName>({
     name,
     defaultValue,
     submittable,
-    humanize: (index) => dictionary[index].label,
     serialize: (index) => index,
     unserialize: (index) => index,
   });
