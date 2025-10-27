@@ -14,8 +14,8 @@ export type FieldStoreState = Readonly<{
 }>;
 
 export class FieldStore {
+  readonly #persisted: PrimitiveFilterDictionary;
   #listeners: Set<() => void> = new Set();
-  #persisted: PrimitiveFilterDictionary;
   #fields: RegisteredFieldDictionary;
   #state: FieldStoreState = { collection: FieldsCollection.empty(), touched: [], operation: null };
 
@@ -34,11 +34,10 @@ export class FieldStore {
   };
 
   rehydrate = (newValues: PrimitiveFilterDictionary): FieldsCollection | undefined => {
-    this.#persisted = newValues;
     const touched: FilterName[] = [];
 
     this.#fields.forEach((field) => {
-      const newValue = this.#parse(field);
+      const newValue = this.#parse(newValues[field.name], field);
 
       if (!Object.is(field.value, newValue)) {
         this.#fields.set(field.name, { ...field, value: newValue });
@@ -69,7 +68,7 @@ export class FieldStore {
 
     this.#fields.set(field.name, {
       ...registered,
-      value: this.#parse(registered),
+      value: this.#parse(this.#persisted[field.name], registered),
     });
 
     this.#commit({
@@ -116,14 +115,12 @@ export class FieldStore {
     this.#listeners.forEach((listener) => listener());
   };
 
-  #parse = <V extends FilterValue, P extends PrimitiveValue>(field: RegisteredField<V, P>): FilterValue => {
-    const initial = this.#persisted[field.name];
-
-    if (!FieldsCollection.isValidValue(initial)) {
+  #parse = (newValue: PrimitiveValue | undefined, field: RegisteredField): FilterValue => {
+    if (!FieldsCollection.isValidValue(newValue)) {
       return field.defaultValue;
     }
 
-    return field.unserialize ? field.unserialize(initial as P) : initial;
+    return field.unserialize ? field.unserialize(newValue) : newValue;
   };
 }
 
