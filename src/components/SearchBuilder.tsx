@@ -4,10 +4,11 @@
  */
 
 import { SearchEngineContext } from "@/context";
+import type { FieldsCollection } from "@/context/FieldsCollection";
 import { createFieldsStore, FieldStore } from "@/context/FieldStore";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import { UrlPersistenceAdapter } from "@/persistence/UrlPersistenceAdapter";
-import type { PersistenceMode, SearchParams } from "@/types";
+import type { PersistenceMode, PrimitiveFilterDictionary, SearchParams } from "@/types";
 import Grid from "@mui/material/Grid";
 import React, { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 
@@ -18,8 +19,8 @@ export type SearchEngineContextProviderProps<P extends SearchParams> = {
   manualStart?: boolean;
   autoStartDelay?: number;
   submitOnChange?: boolean;
-  onSearch?: (params: P) => void;
-  onChange?: (params: P) => void;
+  onSearch?: (params: FieldsCollection) => void;
+  onChange?: (params: FieldsCollection) => void;
 };
 
 export function SearchBuilder<P extends SearchParams>({
@@ -46,14 +47,14 @@ export function SearchBuilder<P extends SearchParams>({
   const isAutostartable = !autostarted.current && !manualStart;
 
   useEffect(() => {
-    onChange?.(values);
+    onChange?.(fields);
 
     if (isAutostartable || !touchedFieldNames.some((name) => fields.get(name)?.submittable)) {
       return;
     }
 
-    dispatch(values);
-  }, [values, submitOnChange]);
+    dispatch(fields);
+  }, [fields, submitOnChange]);
 
   useEffect(() => {
     if (!isAutostartable) {
@@ -61,12 +62,12 @@ export function SearchBuilder<P extends SearchParams>({
     }
 
     const timmer = setTimeout(() => {
-      dispatch(values);
+      dispatch(fields);
       autostarted.current = true;
     }, autoStartDelay);
 
     return () => clearTimeout(timmer);
-  }, [values, autoStartDelay]);
+  }, [fields, autoStartDelay]);
 
   useEffect(() => {
     if (!persistenceAdapter?.subscribe) {
@@ -81,7 +82,7 @@ export function SearchBuilder<P extends SearchParams>({
         return;
       }
 
-      onSearch?.(newFields.values() as P);
+      onSearch?.(newFields);
     };
 
     const unsubscribe = persistenceAdapter.subscribe(handleExternalUpdate);
@@ -91,7 +92,7 @@ export function SearchBuilder<P extends SearchParams>({
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    dispatch(values);
+    dispatch(fields);
   }
 
   function resolverPersistenceAdapter(mode: PersistenceMode): PersistenceAdapter | null {
@@ -105,11 +106,17 @@ export function SearchBuilder<P extends SearchParams>({
     throw new Error("Unsupported persistence mode");
   }
 
-  function refresh(params: SearchParams) {
-    dispatch(params as P);
+  function refresh(dictionary: PrimitiveFilterDictionary) {
+    const newFields = store.rehydrate(dictionary);
+
+    if (!newFields) {
+      return;
+    }
+
+    onSearch?.(newFields);
   }
 
-  function dispatch(values: P) {
+  function dispatch(values: FieldsCollection) {
     onSearch?.(values);
     persistenceAdapter?.write(fields.serialized());
   }

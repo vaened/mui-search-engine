@@ -5,7 +5,7 @@
 
 import type { FieldsCollection } from "@/context/FieldsCollection";
 import type { FieldStore } from "@/context/FieldStore";
-import type { Field, FilterName, FilterValue, PrimitiveValue, SearchParams } from "@/types";
+import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue, SearchParams } from "@/types";
 import { createContext, useContext } from "react";
 
 export type RegisteredField<V extends FilterValue = FilterValue, P extends PrimitiveValue = PrimitiveValue> = Readonly<Field<V, P>> &
@@ -24,7 +24,7 @@ export interface SearchEngineContextState<P extends SearchParams = SearchParams>
   values: P;
   fields: FieldsCollection;
   isLoading: boolean;
-  refresh: (params: P) => void;
+  refresh: (params: PrimitiveFilterDictionary) => void;
 }
 
 export const SearchEngineContext = createContext<SearchEngineContextState | undefined>(undefined);
