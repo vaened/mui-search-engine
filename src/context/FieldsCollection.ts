@@ -26,6 +26,10 @@ export class FieldsCollection implements Iterable<RegisteredField> {
     return this.#collect((field) => (field.serialize ? field.serialize(field.value) : (field.value as PrimitiveValue)));
   };
 
+  public onlyActives = (): RegisteredField[] => {
+    return this.filter((field) => FieldsCollection.isValidValue(field.value));
+  };
+
   public has = (name: FilterName): boolean => {
     return this.#values.has(name);
   };
@@ -39,6 +43,18 @@ export class FieldsCollection implements Iterable<RegisteredField> {
 
     for (const field of this) {
       values.push(mapper(field));
+    }
+
+    return values;
+  };
+
+  public filter = (predicate: (field: RegisteredField) => boolean): RegisteredField[] => {
+    const values: RegisteredField[] = [];
+
+    for (const field of this) {
+      if (predicate(field)) {
+        values.push(field);
+      }
     }
 
     return values;
