@@ -24,7 +24,7 @@ export interface PlainFilterChip {
 }
 
 export interface IndexedFilterChip<V extends InputValue[] = InputValue[]> extends PlainFilterChip {
-  name: V[number];
+  value: V[number];
 }
 
 export type HumanizedValue<V extends InputValue[] = InputValue[]> = IndexedFilterChip<V>[] | FilterLabel;

@@ -67,7 +67,7 @@ export function FlagsSelect<N extends FilterName>({
     name,
     defaultValue,
     submittable,
-    humanize: (flags) => flags.map((flag) => ({ name: flag, label: labeled(dictionary, flag) ?? flag })),
+    humanize: (flags) => flags.map((flag) => ({ value: flag, label: labeled(dictionary, flag) ?? flag })),
     serialize: (flags) => flags,
     unserialize: (flags) => flags,
   });
