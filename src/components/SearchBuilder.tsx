@@ -54,7 +54,7 @@ export function SearchBuilder<P extends SearchParams>({
     }
 
     dispatch(fields);
-  }, [fields, submitOnChange]);
+  }, [fields]);
 
   useEffect(() => {
     if (!isAutostartable) {
