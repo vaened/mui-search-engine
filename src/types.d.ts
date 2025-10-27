@@ -32,7 +32,7 @@ export interface Field<V extends FilterValue, P extends PrimitiveValue> {
   name: FilterName;
   value: V;
   submittable?: boolean;
-  humanize?: (value: V) => HumanizedValue | null;
+  humanize?: (value: V) => HumanizedValue | null | undefined;
   serialize?: (value: V) => P | null;
   unserialize?: (value: P) => V;
 }
