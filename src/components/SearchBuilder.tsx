@@ -43,7 +43,7 @@ export function SearchBuilder<P extends SearchParams>({
 
   const store = storeInstance.current;
   const { collection: fields, touched: touchedFieldNames } = useSyncExternalStore(store.subscribe, store.state, store.state);
-  const values = useMemo(() => fields.values() as P, [fields]);
+  const values = useMemo(() => fields.toValues() as P, [fields]);
   const isAutostartable = !autostarted.current && !manualStart;
 
   useEffect(() => {
@@ -118,7 +118,7 @@ export function SearchBuilder<P extends SearchParams>({
 
   function dispatch(values: FieldsCollection) {
     onSearch?.(values);
-    persistenceAdapter?.write(fields.serialized());
+    persistenceAdapter?.write(fields.toPrimitives());
   }
 
   return (

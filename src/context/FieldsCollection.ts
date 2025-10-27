@@ -18,11 +18,11 @@ export class FieldsCollection implements Iterable<RegisteredField> {
 
   public toRecord = (): Record<FilterName, RegisteredField> => Object.fromEntries(this.#values);
 
-  public values = (): ValueFilterDictionary => {
+  public toValues = (): ValueFilterDictionary => {
     return this.#collect((field) => field.value);
   };
 
-  public serialized = (): PrimitiveFilterDictionary => {
+  public toPrimitives = (): PrimitiveFilterDictionary => {
     return this.#collect((field) => (field.serialize ? field.serialize(field.value) : (field.value as PrimitiveValue)));
   };
 
