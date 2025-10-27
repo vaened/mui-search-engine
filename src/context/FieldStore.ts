@@ -14,13 +14,13 @@ export type FieldStoreState = Readonly<{
 }>;
 
 export class FieldStore {
-  readonly #persisted: PrimitiveFilterDictionary;
+  readonly #initial: PrimitiveFilterDictionary;
   #listeners: Set<() => void> = new Set();
   #fields: RegisteredFieldDictionary;
   #state: FieldStoreState = { collection: FieldsCollection.empty(), touched: [], operation: null };
 
-  constructor(values: PrimitiveFilterDictionary) {
-    this.#persisted = values;
+  constructor(initial: PrimitiveFilterDictionary) {
+    this.#initial = initial;
     this.#fields = new Map();
   }
 
@@ -68,7 +68,7 @@ export class FieldStore {
 
     this.#fields.set(field.name, {
       ...registered,
-      value: this.#parse(this.#persisted[field.name], registered),
+      value: this.#parse(this.#initial[field.name], registered),
     });
 
     this.#commit({
