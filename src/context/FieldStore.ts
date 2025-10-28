@@ -9,7 +9,7 @@ import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, Primiti
 
 export type FieldStoreState = Readonly<{
   collection: FieldsCollection;
-  operation: "set" | "unregister" | "register" | "rehydrate" | null;
+  operation: "set" | "unregister" | "register" | "rehydrate" | "reset" | null;
   touched: FilterName[];
 }>;
 
@@ -104,6 +104,27 @@ export class FieldStore {
       touched: [name],
       collection: new FieldsCollection(this.#fields),
     });
+  };
+
+  reset = () => {
+    const touched: FilterName[] = [];
+
+    this.#fields.forEach((field) => {
+      this.#fields.set(field.name, { ...field, value: field.defaultValue });
+
+      if (!Object.is(field.value, field.defaultValue)) {
+        this.#fields.set(field.name, { ...field, value: field.defaultValue });
+        touched.push(field.name);
+      }
+    });
+
+    if (touched.length === 0) {
+      return;
+    }
+
+    const collection = new FieldsCollection(this.#fields);
+
+    this.#commit({ operation: "reset", collection, touched });
   };
 
   #commit = (state: Partial<FieldStoreState>) => {
