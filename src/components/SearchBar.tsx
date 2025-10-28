@@ -6,7 +6,7 @@
 import FlagsSelect, { type FlagsBag } from "@/components/FlagsSelect";
 import IndexSelect from "@/components/IndexSelect";
 import { useSearchEngine } from "@/context";
-import { useSearchEngineField } from "@/hooks/useSearchEngineField";
+import { useSearchField } from "@/hooks/useSearchField";
 import type { FilterBag, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
 import Box from "@mui/material/Box";
@@ -144,7 +144,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   });
 
   const { isLoading } = useSearchEngine();
-  const { value, isSubmitOnChangeEnabled, set } = useSearchEngineField({
+  const { value, isSubmitOnChangeEnabled, set } = useSearchField({
     name: name?.query || "q",
     defaultValue: defaultValue || null,
     submittable: submittable?.query,

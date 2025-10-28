@@ -4,7 +4,7 @@
  */
 
 import DropdownMenu from "@/components/DropdownMenu";
-import { useSearchEngineField } from "@/hooks/useSearchEngineField";
+import { useSearchField } from "@/hooks/useSearchField";
 import type { FilterBag, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom, dictionaryToFilterElements } from "@/utils";
 import Box from "@mui/material/Box";
@@ -43,7 +43,7 @@ export function IndexSelect<N extends FilterName>({
   const elements = useMemo(() => dictionaryToFilterElements(dictionary), [dictionary]);
 
   const [open, setMenuOpenStatus] = useState(false);
-  const { value, set } = useSearchEngineField({
+  const { value, set } = useSearchField({
     name,
     defaultValue,
     submittable,

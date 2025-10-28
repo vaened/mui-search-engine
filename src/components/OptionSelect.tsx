@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { useSearchEngineField } from "@/hooks/useSearchEngineField";
+import { useSearchField } from "@/hooks/useSearchField";
 import type { Field, FilterValue, PrimitiveValue } from "@/types";
 import { Select, type SelectProps } from "@mui/material";
 import type { SelectChangeEvent } from "node_modules/@mui/material";
@@ -24,7 +24,7 @@ export function OptionSelect<V extends FilterValue, P extends PrimitiveValue>({
   unserialize,
   ...props
 }: OptionSelectProps<V, P>) {
-  const { value, set } = useSearchEngineField({
+  const { value, set } = useSearchField({
     name,
     defaultValue,
     submittable,
