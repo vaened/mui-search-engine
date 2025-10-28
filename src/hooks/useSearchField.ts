@@ -30,7 +30,8 @@ export function useSearchField<V extends FilterValue, P extends PrimitiveValue, 
   const { store, fields, submitOnChange } = useSearchEngine();
 
   const field = useMemo(() => fields.get<V, P>(name), [fields, name]);
-  const value = useMemo(() => field?.value, [field?.value]);
+
+  const value = field?.value;
   const isSubmitOnChangeEnabled = submittable === undefined ? submitOnChange : submittable;
 
   useEffect(() => {
