@@ -5,8 +5,8 @@
 
 import { SearchEngineContext, type Events } from "@/context";
 import type { FieldsCollection } from "@/context/FieldsCollection";
-import { createFieldsStore, FieldStore } from "@/context/FieldStore";
-import { createEventEmitter, type EventEmitter } from "@/event-emitter";
+import { createFieldsStore } from "@/context/FieldStore";
+import { createEventEmitter } from "@/event-emitter";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import { UrlPersistenceAdapter } from "@/persistence/UrlPersistenceAdapter";
 import type { PersistenceMode, PrimitiveFilterDictionary, SearchParams } from "@/types";
@@ -35,20 +35,9 @@ export function SearchBuilder<P extends SearchParams>({
   onChange,
 }: SearchEngineContextProviderProps<P>) {
   const autostarted = useRef(false);
-  const emitterInstance = useRef<EventEmitter<Events> | null>(null);
-  const storeInstance = useRef<FieldStore | null>(null);
   const persistenceAdapter = useMemo(() => resolverPersistenceAdapter(persistence), [persistence]);
-
-  if (!storeInstance.current) {
-    storeInstance.current = createFieldsStore(persistenceAdapter?.read() ?? {});
-  }
-
-  if (!emitterInstance.current) {
-    emitterInstance.current = createEventEmitter<Events>();
-  }
-
-  const store = storeInstance.current;
-  const emitter = emitterInstance.current;
+  const store = useSingleton(() => createFieldsStore(persistenceAdapter?.read() ?? {}));
+  const emitter = useSingleton(() => createEventEmitter<Events>());
 
   const {
     collection: fields,
@@ -151,6 +140,16 @@ export function SearchBuilder<P extends SearchParams>({
       </Grid>
     </SearchEngineContext.Provider>
   );
+}
+
+function useSingleton<T>(factory: () => T): T {
+  const ref = useRef<T | null>(null);
+
+  if (!ref.current) {
+    ref.current = factory();
+  }
+
+  return ref.current;
 }
 
 export default SearchBuilder;
