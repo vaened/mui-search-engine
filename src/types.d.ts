@@ -18,6 +18,7 @@ export type FilterBag<N extends FilterName> = Record<N, FilterContext>;
 export type FilterDictionary<N extends FilterName> = Record<N, FilterElement<N>>;
 export type PrimitiveFilterDictionary = Record<FilterName, PrimitiveValue>;
 export type ValueFilterDictionary = Record<FilterName, FilterValue>;
+export type PrimitiveValue = null | string | string[];
 
 export interface PlainFilterChip {
   label: FilterLabel;
@@ -26,9 +27,6 @@ export interface PlainFilterChip {
 export interface IndexedFilterChip<V extends InputValue[] = InputValue[]> extends PlainFilterChip {
   value: V[number];
 }
-
-export type HumanizedValue<V extends InputValue[] = InputValue[]> = IndexedFilterChip<V>[] | FilterLabel;
-export type PrimitiveValue = null | string | string[];
 
 type InferHumanizeReturn<V extends FilterValue> = V extends (infer T extends InputValue)[] ? IndexedFilterChip<T[]>[] : FilterLabel;
 type InferSerializeReturn<V extends FilterValue> = V extends InputValue[] ? string[] : string;
