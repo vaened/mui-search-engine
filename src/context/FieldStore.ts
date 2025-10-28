@@ -7,9 +7,11 @@ import type { RegisteredField, RegisteredFieldDictionary } from "@/context";
 import { FieldsCollection } from "@/context/FieldsCollection";
 import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
 
+export type FieldOperation = "set" | "unregister" | "register" | "rehydrate" | "reset" | null;
+
 export type FieldStoreState = Readonly<{
   collection: FieldsCollection;
-  operation: "set" | "unregister" | "register" | "rehydrate" | "reset" | null;
+  operation: FieldOperation;
   touched: FilterName[];
 }>;
 
