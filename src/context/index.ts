@@ -4,9 +4,18 @@
  */
 
 import type { FieldsCollection } from "@/context/FieldsCollection";
-import type { FieldStore } from "@/context/FieldStore";
+import type { FieldOperation, FieldStore } from "@/context/FieldStore";
+import type { EventEmitter } from "@/event-emitter";
 import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue, SearchParams } from "@/types";
 import { createContext, useContext } from "react";
+
+export type Events = {
+  submit: FieldsCollection;
+  change: {
+    fields: FieldsCollection;
+    operation: FieldOperation;
+  };
+};
 
 export type RegisteredField<V extends FilterValue = FilterValue, P extends PrimitiveValue = PrimitiveValue> = Readonly<Field<V, P>> &
   Readonly<{
@@ -21,6 +30,7 @@ export type RegisteredFieldDictionary<V extends FilterValue = FilterValue, P ext
 
 export interface SearchEngineContextState<P extends SearchParams = SearchParams> {
   store: FieldStore;
+  emitter: EventEmitter<Events>;
   submitOnChange: boolean;
   values: P;
   fields: FieldsCollection;
