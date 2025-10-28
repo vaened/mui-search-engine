@@ -12,6 +12,8 @@ export class FieldsCollection implements Iterable<RegisteredField> {
 
   public static empty = () => FieldsCollection.from(new Map());
 
+  public size = () => this.#values.size;
+
   public toArray = (): Array<RegisteredField> => Array.from(this);
 
   public toMap = (): RegisteredFieldDictionary => new Map(this.#values);
