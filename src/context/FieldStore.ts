@@ -40,7 +40,7 @@ export class FieldStore {
       const newValue = this.#parse(newValues[field.name], field);
 
       if (!Object.is(field.value, newValue)) {
-        this.#fields.set(field.name, { ...field, value: newValue });
+        this.#override(field, newValue);
         touched.push(field.name);
       }
     });
@@ -64,12 +64,10 @@ export class FieldStore {
     const registered = {
       ...(field as unknown as Field<FilterValue, PrimitiveValue>),
       defaultValue: field.value,
+      updatedAt: Date.now(),
     };
 
-    this.#fields.set(field.name, {
-      ...registered,
-      value: this.#parse(this.#initial[field.name], registered),
-    });
+    this.#override(registered, this.#parse(this.#initial[field.name], registered));
 
     this.#commit({
       operation: "register",
@@ -97,7 +95,7 @@ export class FieldStore {
       return;
     }
 
-    this.#fields.set(name, { ...field, value });
+    this.#override(field, value);
 
     this.#commit({
       operation: "set",
@@ -110,10 +108,8 @@ export class FieldStore {
     const touched: FilterName[] = [];
 
     this.#fields.forEach((field) => {
-      this.#fields.set(field.name, { ...field, value: field.defaultValue });
-
       if (!Object.is(field.value, field.defaultValue)) {
-        this.#fields.set(field.name, { ...field, value: field.defaultValue });
+        this.#override(field, field.defaultValue);
         touched.push(field.name);
       }
     });
@@ -142,6 +138,10 @@ export class FieldStore {
     }
 
     return field.unserialize ? field.unserialize(newValue) : newValue;
+  };
+
+  #override = (field: RegisteredField<FilterValue, PrimitiveValue>, newValue: FilterValue) => {
+    this.#fields.set(field.name, { ...field, updatedAt: Date.now(), value: newValue });
   };
 }
 

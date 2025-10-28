@@ -11,6 +11,7 @@ import { createContext, useContext } from "react";
 export type RegisteredField<V extends FilterValue = FilterValue, P extends PrimitiveValue = PrimitiveValue> = Readonly<Field<V, P>> &
   Readonly<{
     defaultValue: V;
+    updatedAt: number;
   }>;
 
 export type RegisteredFieldDictionary<V extends FilterValue = FilterValue, P extends PrimitiveValue = PrimitiveValue> = Map<
