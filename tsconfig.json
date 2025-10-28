@@ -29,6 +29,6 @@
     }
   },
 
-  "include": ["src", "tsup.config.ts", "vite.config.ts", "playground"],
+  "include": ["src", "src/types.d.ts", "tsup.config.ts", "vite.config.ts", "playground"],
   "exclude": ["dist", "node_modules"]
 }
