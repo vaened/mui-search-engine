@@ -14,19 +14,12 @@ export type UseSearchFieldProps<V extends FilterValue, P extends PrimitiveValue,
   defaultValue: V;
 };
 
-export interface UseSearchFieldResult<V extends FilterValue, P extends PrimitiveValue> {
-  value?: V;
-  field?: Field<V, P>;
-  isSubmitOnChangeEnabled: boolean;
-  set: (value: V) => void;
-}
-
 export function useSearchField<V extends FilterValue, P extends PrimitiveValue, H extends InferHumanizeReturn<V>>({
   name,
   defaultValue,
   submittable,
   ...restOfProps
-}: UseSearchFieldProps<V, P, H>): UseSearchFieldResult<V, P> {
+}: UseSearchFieldProps<V, P, H>) {
   const { store, fields, submitOnChange } = useSearchEngine();
 
   const field = useMemo(() => fields.get<V, P>(name), [fields, name]);
