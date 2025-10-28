@@ -5,10 +5,10 @@
 
 import type { FieldsCollection } from "@/context/FieldsCollection";
 
-type InputValue = string | number | boolean | Date | Record<FilterName, unknown>;
+export type FilterName = string;
+type InputValue = null | string | FilterName | boolean | Date | Record<FilterName, unknown>;
 export type InputSize = "small" | "medium";
 export type PersistenceMode = "url" | undefined;
-export type FilterName = string;
 export type FilterLabel = string;
 export type FilterValue = null | InputValue | InputValue[];
 export type FilterMetaData = { label: FilterLabel; description?: string };
@@ -30,14 +30,21 @@ export interface IndexedFilterChip<V extends InputValue[] = InputValue[]> extend
 export type HumanizedValue<V extends InputValue[] = InputValue[]> = IndexedFilterChip<V>[] | FilterLabel;
 export type PrimitiveValue = null | string | string[];
 
-export interface Field<V extends FilterValue, P extends PrimitiveValue> {
+type InferHumanizeReturn<V extends FilterValue> = V extends (infer T extends InputValue)[] ? IndexedFilterChip<T[]>[] : FilterLabel;
+type InferSerializeReturn<V extends FilterValue> = V extends InputValue[] ? string[] : string;
+
+export type Field<
+  V extends FilterValue = FilterValue,
+  P extends PrimitiveValue = InferSerializeReturn<V>,
+  H extends InferHumanizeReturn<V> = InferHumanizeReturn<V>
+> = {
   name: FilterName;
   value: V;
   submittable?: boolean;
-  humanize?: (value: V, fields: FieldsCollection) => HumanizedValue<Extract<V, InputValue[]>> | null | undefined;
-  serialize?: (value: V) => P | null;
+  humanize?: (value: V, fields: FieldsCollection) => H;
+  serialize?: (value: V) => P;
   unserialize?: (value: P) => V;
-}
+};
 
 export type FieldDictionary = Record<FilterName, Field<FilterValue, PrimitiveValue>>;
 export type SearchParams = Partial<Record<FilterName, FilterValue>>;

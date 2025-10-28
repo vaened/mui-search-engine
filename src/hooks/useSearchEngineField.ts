@@ -4,10 +4,13 @@
  */
 
 import { useSearchEngine } from "@/context";
-import type { Field, FilterValue, PrimitiveValue } from "@/types";
+import type { Field, FilterValue, InferHumanizeReturn, PrimitiveValue } from "@/types";
 import { useEffect, useMemo } from "react";
 
-export type UseSearchEngineFieldProps<V extends FilterValue, P extends PrimitiveValue> = Omit<Field<V, P>, "value"> & {
+export type UseSearchEngineFieldProps<V extends FilterValue, P extends PrimitiveValue, H extends InferHumanizeReturn<V>> = Omit<
+  Field<V, P, H>,
+  "value"
+> & {
   defaultValue: V;
 };
 
@@ -18,12 +21,12 @@ export interface UseSearchEngineFieldResult<V extends FilterValue, P extends Pri
   set: (value: V) => void;
 }
 
-export function useSearchEngineField<V extends FilterValue, P extends PrimitiveValue>({
+export function useSearchEngineField<V extends FilterValue, P extends PrimitiveValue, H extends InferHumanizeReturn<V>>({
   name,
   defaultValue,
   submittable,
   ...restOfProps
-}: UseSearchEngineFieldProps<V, P>): UseSearchEngineFieldResult<V, P> {
+}: UseSearchEngineFieldProps<V, P, H>): UseSearchEngineFieldResult<V, P> {
   const { store, fields, submitOnChange } = useSearchEngine();
 
   const field = useMemo(() => fields.get<V, P>(name), [fields, name]);
