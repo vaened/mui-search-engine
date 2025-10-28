@@ -42,14 +42,18 @@ export function SearchBuilder<P extends SearchParams>({
   }
 
   const store = storeInstance.current;
-  const { collection: fields, touched: touchedFieldNames } = useSyncExternalStore(store.subscribe, store.state, store.state);
+  const {
+    collection: fields,
+    touched: touchedFieldNames,
+    operation: lastOperation,
+  } = useSyncExternalStore(store.subscribe, store.state, store.state);
   const values = useMemo(() => fields.toValues() as P, [fields]);
   const isAutostartable = !autostarted.current && !manualStart;
 
   useEffect(() => {
     onChange?.(fields);
 
-    if (isAutostartable || !touchedFieldNames.some((name) => fields.get(name)?.submittable)) {
+    if (lastOperation !== "reset" && (isAutostartable || !touchedFieldNames.some((name) => fields.get(name)?.submittable))) {
       return;
     }
 
