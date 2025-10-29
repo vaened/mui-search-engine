@@ -176,7 +176,9 @@ export function FlagsSelect<N extends FilterName>({
               <Typography component="span" display="flex" sx={{ fontSize: 12 }} textTransform="capitalize">
                 Restart
               </Typography>
-              <IconEraser size={13} style={{ marginLeft: 5 }} />
+              <span style={{ marginLeft: "5px" }}>
+                <IconEraser size={13} />
+              </span>
             </Button>
           </Divider>
         )}
