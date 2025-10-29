@@ -170,7 +170,7 @@ export function FlagsSelect<N extends FilterName>({
           ))}
 
         {dictionary.exclusives && (
-          <Divider textAlign="right" variant="middle" className="!my-0">
+          <Box display="flex" justifyContent="flex-end" alignItems="center" px={1.5}>
             <Button
               variant="text"
               size="small"
@@ -184,7 +184,7 @@ export function FlagsSelect<N extends FilterName>({
                 <IconEraser size={13} />
               </span>
             </Button>
-          </Divider>
+          </Box>
         )}
       </DropdownMenu>
     </>
