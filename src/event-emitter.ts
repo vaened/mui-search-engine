@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 export type Unsubscribe = () => void;
 
 export type EventEmitter<TEvents extends Record<string, unknown>> = {
