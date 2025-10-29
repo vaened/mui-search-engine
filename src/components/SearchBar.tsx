@@ -9,13 +9,13 @@ import { useSearchEngine } from "@/context";
 import { useSearchField } from "@/hooks/useSearchField";
 import type { FilterBag, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
+import { Button } from "@mui/material";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import InputBase from "@mui/material/InputBase";
 import InputLabel from "@mui/material/InputLabel";
 import MuiPaper, { type PaperProps } from "@mui/material/Paper";
-import { styled } from "@mui/material/styles";
+import { keyframes, styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { IconSearch } from "@tabler/icons-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
@@ -51,6 +51,38 @@ type PanelProps = PaperProps & { size: InputSize };
 const Container = styled(Box)<{ size: InputSize }>(() => ({
   position: "relative",
 }));
+
+const animation = keyframes`
+  0% { 
+    transform: scale(1) rotate(0deg); 
+  }
+  5%, 10% {
+    transform: scale3d(.9,.9,.9) rotate(-5deg); 
+  }
+  15%, 25%, 35%, 45% { 
+    transform: scale3d(1.1,1.1,1.1) rotate(5deg); 
+  }
+  20%, 30%, 40% {
+    transform: scale3d(1.1, 1.1, 1.1) rotate(-5deg);
+  }
+  50% { 
+    transform: scale(1) rotate(0deg); 
+  }
+`;
+
+const AnimateIcon = styled("span")<{
+  active?: boolean;
+}>(({ active = false }) =>
+  active
+    ? {
+        transition: "all .15s",
+        animation: `2.5s infinite both ${animation}`,
+        display: "inline-flex",
+      }
+    : {
+        display: "inline-flex",
+      }
+);
 
 const Panel = styled(MuiPaper, {
   shouldForwardProp: (p) => p !== "size",
@@ -242,7 +274,9 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
             />
 
             <Button loading={isLoading} size={size} type="submit" aria-label="search" sx={{ minWidth: "34px" }}>
-              <IconSearch />
+              <AnimateIcon>
+                <IconSearch />
+              </AnimateIcon>
             </Button>
 
             {flags && (
