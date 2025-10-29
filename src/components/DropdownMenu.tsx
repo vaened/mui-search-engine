@@ -45,16 +45,16 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({ open, title, childre
       anchorEl={anchorRef.current}
       role={undefined}
       placement={placement}
-      transition
-      disablePortal
       modifiers={[
         {
           name: "offset",
           options: {
-            offset: [0, 6],
+            offset: [0, 4],
           },
         },
       ]}
+      transition
+      disablePortal
       sx={{ zIndex: (theme) => theme.zIndex.modal }}>
       {({ TransitionProps, placement }) => (
         <Grow
