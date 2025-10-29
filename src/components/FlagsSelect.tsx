@@ -210,7 +210,7 @@ function MenuItemAction({
     <ListItem sx={{ p: 0 }} dense>
       <ListItemButton sx={{ p: 1 }} onClick={onClick}>
         <ListItemIcon sx={{ minWidth: "44px" }}>{control}</ListItemIcon>
-        <ListItemText sx={{ m: 0 }} primary={label} secondary={description} />
+        <ListItemText sx={{ m: 0, pr: 0.5 }} primary={label} secondary={description} />
       </ListItemButton>
     </ListItem>
   );
