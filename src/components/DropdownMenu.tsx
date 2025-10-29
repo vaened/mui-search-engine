@@ -69,6 +69,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({ open, title, childre
                 onKeyDown={handleListKeyDown}
                 sx={{
                   minWidth: 130,
+                  maxWidth: 310,
                   borderRadius: (theme) => theme.shape.borderRadius,
                 }}>
                 {title && <ListSubheader sx={{ lineHeight: 2.5 }}>{title}</ListSubheader>}
