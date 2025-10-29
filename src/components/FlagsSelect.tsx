@@ -7,18 +7,20 @@ import DropdownMenu from "@/components/DropdownMenu";
 import { useSearchField } from "@/hooks/useSearchField";
 import type { FilterBag, FilterDictionary, FilterElement, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
-import { Box } from "@mui/material";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import Divider from "@mui/material/Divider";
-import FormControlLabel, { type FormControlLabelProps } from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
-import MenuItem from "@mui/material/MenuItem";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 import Radio from "@mui/material/Radio";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { IconEraser, IconFilter, IconFilterOff } from "@tabler/icons-react";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 
 export type AdditiveFilterFlagBag<N extends FilterName> = Record<N, boolean>;
 
@@ -136,21 +138,23 @@ export function FlagsSelect<N extends FilterName>({
         </Tooltip>
       </Box>
 
-      <DropdownMenu open={open} anchorRef={anchorRef} onClose={closeMenu} title="Available Flags">
+      <DropdownMenu open={open} anchorRef={anchorRef} placement="bottom-end" onClose={closeMenu} title="Available Flags">
         {dictionary.additives &&
           Object.values<FilterElement<N>>(dictionary.additives).map(({ value, label, description }, index) => (
             <MenuItemAction
               key={`${value}-${index}`}
               label={label}
               description={description}
-              control={<Checkbox size="small" name={value} checked={filters.additives[value] ?? false} autoFocus={index === 0} />}
+              control={
+                <Checkbox size="small" sx={{ py: 0 }} name={value} checked={filters.additives[value] ?? false} autoFocus={index === 0} />
+              }
               onClick={() => {
                 onAdditivesChange({ name: value, checked: !filters.additives[value] });
               }}
             />
           ))}
 
-        {dictionary.additives && dictionary.exclusives && <Divider className="!my-0" />}
+        {dictionary.additives && dictionary.exclusives && <Divider sx={{ my: 1 }} />}
 
         {dictionary.exclusives &&
           Object.values<FilterElement<N>>(dictionary.exclusives).map(({ value, label, description }, index) => (
@@ -158,7 +162,7 @@ export function FlagsSelect<N extends FilterName>({
               key={`${value}-${index}`}
               label={label}
               description={description}
-              control={<Radio size="small" value={value} checked={filters.exclusive === value} />}
+              control={<Radio size="small" sx={{ py: 0 }} value={value} checked={filters.exclusive === value} />}
               onClick={() => {
                 onExclusivesChange(value);
               }}
@@ -191,13 +195,24 @@ function labeled<N extends FilterName>(bag: FlagDictionary<N>, name: N): string 
   return compact(bag.additives) ?? compact(bag.exclusives);
 }
 
-function MenuItemAction(props: Omit<FormControlLabelProps, "onClick"> & { description?: string; onClick: () => void }) {
+function MenuItemAction({
+  control,
+  label,
+  description,
+  onClick,
+}: {
+  label: string;
+  description?: string;
+  control: ReactNode;
+  onClick: () => void;
+}) {
   return (
-    <MenuItem sx={{ p: 0 }} onClick={props.onClick} dense>
-      <Tooltip title={props.description} placement="left" arrow>
-        <FormControlLabel {...props} sx={{ mx: 1, minWidth: "100%", pointerEvents: "none" }} />
-      </Tooltip>
-    </MenuItem>
+    <ListItem sx={{ p: 0 }} dense>
+      <ListItemButton sx={{ p: 1 }} onClick={onClick}>
+        <ListItemIcon sx={{ minWidth: "44px" }}>{control}</ListItemIcon>
+        <ListItemText sx={{ m: 0 }} primary={label} secondary={description} />
+      </ListItemButton>
+    </ListItem>
   );
 }
 
