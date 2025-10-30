@@ -21,11 +21,11 @@ export type ActiveFiltersBarProps = {
 
 export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ labels, chipProps: { onRemove, ...restOfProps } = {} }) => {
   const { translate, icon } = useSearchEngineConfig();
-  const { actives, hasActives, refresh, clearAll } = useActiveFilters();
+  const { actives, hasActives, syncFromStore, clearAll } = useActiveFilters();
   const { headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);
 
   function onFilterChipRemove(field: RegisteredField) {
-    refresh();
+    syncFromStore();
     onRemove?.(field);
   }
 

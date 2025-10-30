@@ -43,7 +43,7 @@ export function useActiveFilters() {
     setActives(fields.filter(onlyHumanizables));
   }
 
-  function refresh() {
+  function syncFromStore() {
     setActivesFrom(fields);
   }
 
@@ -51,5 +51,5 @@ export function useActiveFilters() {
     store.reset();
   }
 
-  return { actives, hasActives, refresh, clearAll };
+  return { actives, hasActives, syncFromStore, clearAll };
 }
