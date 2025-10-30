@@ -7,6 +7,7 @@ import FlagsSelect, { type FlagsBag } from "@/components/FlagsSelect";
 import IndexSelect from "@/components/IndexSelect";
 import { useSearchEngine } from "@/context";
 import { useSearchField } from "@/hooks/useSearchField";
+import { useTranslation } from "@/hooks/useTranslation";
 import type { FilterBag, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
 import { Button } from "@mui/material";
@@ -155,7 +156,7 @@ const FloatingLabel = styled(InputLabel)<{ size: "small" | "medium" }>(({ size }
 
 export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<FilterName>>({
   id,
-  label = "Search for matches by",
+  label,
   size = "medium",
   indexes,
   flags,
@@ -190,6 +191,9 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
 
   const [queryString, setQueryString] = useState(value);
   const debouncedTerm = useDebounce(queryString || "", debounceDelay);
+
+  const inputLabel = useTranslation("searchBar.defaultLabel", { text: label });
+  const inputAriaLabel = useTranslation("searchBar.searchAriaLabel");
 
   const description = dictionary && index ? dictionary[index].description : null;
   const isQuerySynced = queryString === value;
@@ -238,13 +242,13 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
     <>
       <Container size={size}>
         <FloatingLabel size={size} htmlFor={inputId}>
-          {label}
+          {inputLabel}
         </FloatingLabel>
 
         <Panel elevation={0} size={size}>
           <fieldset className="outline" aria-hidden>
             <legend className="outline-label">
-              <span>{label}</span>
+              <span>{inputLabel}</span>
             </legend>
           </fieldset>
 
@@ -273,7 +277,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
               onChange={onQueryStringChange}
             />
 
-            <Button loading={isLoading} size={size} type="submit" aria-label="search" sx={{ minWidth: "34px" }}>
+            <Button loading={isLoading} size={size} type="submit" aria-label={inputAriaLabel} sx={{ minWidth: "34px" }}>
               <AnimateIcon>
                 <IconSearch />
               </AnimateIcon>

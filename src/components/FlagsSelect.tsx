@@ -5,6 +5,7 @@
 
 import DropdownMenu from "@/components/DropdownMenu";
 import { useSearchField } from "@/hooks/useSearchField";
+import { useTranslation } from "@/hooks/useTranslation";
 import type { FilterBag, FilterDictionary, FilterElement, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
 import Box from "@mui/material/Box";
@@ -44,6 +45,7 @@ export type FlagsBag<N extends FilterName> = FilterBag<N> | FlagConfiguration<N>
 export interface FlagsSelectProps<N extends FilterName> {
   name?: FilterName;
   tooltip?: string;
+  title?: string;
   size?: InputSize;
   options: FlagsBag<N>;
   submittable?: boolean;
@@ -57,7 +59,8 @@ export function FlagsSelect<N extends FilterName>({
   options,
   submittable,
   size = "medium",
-  tooltip = "Select Filters",
+  tooltip,
+  title,
   defaultValue = [],
   onChange,
 }: FlagsSelectProps<N>) {
@@ -73,6 +76,10 @@ export function FlagsSelect<N extends FilterName>({
     serialize: (flags) => flags,
     unserialize: (flags) => flags,
   });
+
+  const dropdownTitle = useTranslation("flagsSelect.dropdownTitle", { text: title });
+  const restartButton = useTranslation("flagsSelect.restartButton");
+  const tooltipMessage = useTranslation("flagsSelect.tooltip", { text: tooltip });
 
   const filters: FlagFilterValue<N> = useMemo(() => parseValue(value, dictionary), [value]);
   const hasFilter = value && value.length;
@@ -124,7 +131,7 @@ export function FlagsSelect<N extends FilterName>({
   return (
     <>
       <Box ref={anchorRef} sx={{ display: "inline-flex" }}>
-        <Tooltip title={tooltip} disableHoverListener={open}>
+        <Tooltip title={tooltipMessage} disableHoverListener={open}>
           <IconButton
             onClick={openMenu}
             size={size}
@@ -138,7 +145,7 @@ export function FlagsSelect<N extends FilterName>({
         </Tooltip>
       </Box>
 
-      <DropdownMenu open={open} anchorRef={anchorRef} placement="bottom-end" onClose={closeMenu} title="Available Flags">
+      <DropdownMenu open={open} anchorRef={anchorRef} placement="bottom-end" onClose={closeMenu} title={dropdownTitle}>
         {dictionary.additives &&
           Object.values<FilterElement<N>>(dictionary.additives).map(({ value, label, description }, index) => (
             <MenuItemAction
@@ -178,7 +185,7 @@ export function FlagsSelect<N extends FilterName>({
               disabled={!filters.exclusive}
               color={!filters.exclusive ? "inherit" : "info"}>
               <Typography component="span" display="flex" sx={{ fontSize: 12 }} textTransform="capitalize">
-                Restart
+                {restartButton}
               </Typography>
               <span style={{ marginLeft: "5px" }}>
                 <IconEraser size={13} />
