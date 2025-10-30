@@ -20,7 +20,6 @@ import ListItemText from "@mui/material/ListItemText";
 import Radio from "@mui/material/Radio";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { IconEraser, IconFilter, IconFilterOff } from "@tabler/icons-react";
 import { useMemo, useRef, useState, type ReactNode } from "react";
 
 export type AdditiveFilterFlagBag<N extends FilterName> = Record<N, boolean>;
@@ -67,6 +66,7 @@ export function FlagsSelect<N extends FilterName>({
   defaultValue = [],
   onChange,
 }: FlagsSelectProps<N>) {
+  const { icon } = useSearchEngineConfig();
   const anchorRef = useRef<HTMLButtonElement>(null);
   const dictionary = useMemo(() => createDictionary(options), [options]);
 
@@ -141,7 +141,7 @@ export function FlagsSelect<N extends FilterName>({
             aria-controls={open ? "composition-menu" : undefined}
             aria-expanded={open ? "true" : undefined}
             aria-haspopup="true">
-            {hasFilter ? <IconFilter /> : <IconFilterOff />}
+            {hasFilter ? icon("flagsFilterActiveIcon") : icon("flagsFilterInactiveIcon")}
           </IconButton>
         </Tooltip>
       </Box>
@@ -188,9 +188,7 @@ export function FlagsSelect<N extends FilterName>({
               <Typography component="span" display="flex" sx={{ fontSize: 12 }} textTransform="capitalize">
                 {clearSelectionButtonTooltip}
               </Typography>
-              <span style={{ marginLeft: "5px" }}>
-                <IconEraser size={13} />
-              </span>
+              <span style={{ marginLeft: "5px" }}>{icon("flagsRestartIcon")}</span>
             </Button>
           </Box>
         )}

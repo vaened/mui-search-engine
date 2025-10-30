@@ -6,6 +6,7 @@
 import type { Paths, PathValue } from "@/internal";
 import type { IconSet, Locale, TranslationKey, TranslationStrings } from "@/types";
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { default as iconsSet } from "./icons";
 import { default as translations } from "./translations";
 
 export type TranslateOptions<D extends string | undefined> = {
@@ -15,6 +16,7 @@ export type TranslateOptions<D extends string | undefined> = {
 };
 
 export type SearchEngineConfigContextState = {
+  icon: (key: keyof IconSet) => ReactNode;
   translate: (key: TranslationKey, options?: TranslateOptions<string | undefined>) => string | undefined;
 };
 
@@ -40,6 +42,7 @@ function translateFrom(
 }
 
 export const SearchEngineConfigContext = createContext<SearchEngineConfigContextState>({
+  icon: (key: keyof IconSet) => iconsSet[key],
   translate: (key: TranslationKey, options?: TranslateOptions<string | undefined>) => {
     return translateFrom(translations["en"], key, options);
   },
@@ -50,16 +53,28 @@ export const useSearchEngineConfig = () => useContext(SearchEngineConfigContext)
 export function SearchEngineConfigProvider({
   locale,
   translation: labels,
-  icons,
+  icons: userIcons,
   children,
 }: SearchEngineConfigProviderProps): React.ReactElement {
   const [translation, setTraslation] = useState<TranslationStrings>(() => {
     return labels ?? translations[locale ?? "en"];
   });
+  const [availableIcons, setAvailableIcons] = useState<IconSet>(() => ({
+    ...iconsSet,
+    ...userIcons,
+  }));
 
   useEffect(() => {
     setTraslation(labels ?? translations[locale ?? "en"]);
   }, [locale, translations]);
+
+  useEffect(() => {
+    setAvailableIcons({ ...iconsSet, ...userIcons });
+  }, [userIcons]);
+
+  function icon(key: keyof IconSet): ReactNode {
+    return availableIcons[key];
+  }
 
   function translate(key: TranslationKey, options?: TranslateOptions<string | undefined>): string | undefined {
     return translateFrom(translation, key, options);
@@ -68,6 +83,7 @@ export function SearchEngineConfigProvider({
   return (
     <SearchEngineConfigContext.Provider
       value={{
+        icon,
         translate,
       }}>
       {children}

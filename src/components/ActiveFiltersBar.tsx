@@ -8,7 +8,6 @@ import { useSearchEngineConfig } from "@/config";
 import type { RegisteredField } from "@/context";
 import { useActiveFilters } from "@/hooks/useActiveFilters";
 import { Box, Grid, IconButton, Tooltip, Typography } from "@mui/material";
-import { IconRestore } from "@tabler/icons-react";
 import React, { useMemo } from "react";
 
 export type ActiveFiltersBarProps = {
@@ -21,6 +20,7 @@ export type ActiveFiltersBarProps = {
 };
 
 export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ labels, chipProps: { onRemove, ...restOfProps } = {} }) => {
+  const { icon } = useSearchEngineConfig();
   const { actives, hasActives, refresh, clearAll } = useActiveFilters();
   const { headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(labels);
 
@@ -52,7 +52,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ labels, chip
           <Tooltip title={clearAllButtonTooltip} placement="left" arrow>
             <span>
               <IconButton onClick={clearAll} aria-label="delete" disabled={!hasActives}>
-                <IconRestore size={16} />
+                {icon("activeFiltersClearAllIcon")}
               </IconButton>
             </span>
           </Tooltip>

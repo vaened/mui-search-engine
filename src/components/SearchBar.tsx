@@ -18,7 +18,6 @@ import InputLabel from "@mui/material/InputLabel";
 import MuiPaper, { type PaperProps } from "@mui/material/Paper";
 import { keyframes, styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import { IconSearch } from "@tabler/icons-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 const HEIGHT = { small: 40, medium: 56 } as const;
@@ -175,6 +174,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   onChange,
 }: SearchBarProps<IB, FB>) {
   const inputId = id || useId();
+  const { icon } = useSearchEngineConfig();
   const inputSearch = useRef<HTMLInputElement>(undefined);
   const dictionary = useMemo(() => createFilterDictionaryFrom<KeysOf<IB>>(indexes), [indexes]);
   const [index, setIndex] = useState<KeysOf<IB> | undefined>(() => {
@@ -281,9 +281,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
             />
 
             <Button loading={isLoading} size={size} type="submit" aria-label={searchAriaLabel} sx={{ minWidth: "34px" }}>
-              <AnimateIcon>
-                <IconSearch />
-              </AnimateIcon>
+              <AnimateIcon>{icon("searchBarSearchIcon")}</AnimateIcon>
             </Button>
 
             {flags && (

@@ -13,7 +13,7 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
-import { IconChevronDown, IconPrompt } from "@tabler/icons-react";
+import { IconChevronDown } from "@tabler/icons-react";
 import React, { useMemo, useState, type ReactNode } from "react";
 
 type IndexLabels = {
@@ -45,6 +45,7 @@ export function IndexSelect<N extends FilterName>({
   uncaret,
   onChange,
 }: IndexSelectProps<N>) {
+  const { icon } = useSearchEngineConfig();
   const anchorRef = React.useRef<HTMLButtonElement>(null);
   const dictionary = useMemo(() => createFilterDictionaryFrom(options), [options]);
   const elements = useMemo(() => dictionaryToFilterElements(dictionary), [dictionary]);
@@ -98,7 +99,7 @@ export function IndexSelect<N extends FilterName>({
             aria-controls={open ? "composition-menu" : undefined}
             aria-expanded={open ? "true" : undefined}
             aria-haspopup="true">
-            {mobileIcon ?? <IconPrompt />}
+            {mobileIcon ?? icon("indexSelectMobileIcon")}
           </IconButton>
         </Tooltip>
       </Box>
