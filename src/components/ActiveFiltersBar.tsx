@@ -4,7 +4,7 @@
  */
 
 import FilterChip, { type FilterChipProps } from "@/components/FilterChip";
-import { useSearchEngineConfig } from "@/config";
+import { useSearchEngineConfig, type Translator } from "@/config";
 import type { RegisteredField } from "@/context";
 import { useActiveFilters } from "@/hooks/useActiveFilters";
 import { Box, Grid, IconButton, Tooltip, Typography } from "@mui/material";
@@ -20,9 +20,9 @@ export type ActiveFiltersBarProps = {
 };
 
 export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ labels, chipProps: { onRemove, ...restOfProps } = {} }) => {
-  const { icon } = useSearchEngineConfig();
+  const { translate, icon } = useSearchEngineConfig();
   const { actives, hasActives, refresh, clearAll } = useActiveFilters();
-  const { headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(labels);
+  const { headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);
 
   function onFilterChipRemove(field: RegisteredField) {
     refresh();
@@ -62,9 +62,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ labels, chip
   );
 };
 
-function useFilterBarTranslations(labels: ActiveFiltersBarProps["labels"]) {
-  const { translate } = useSearchEngineConfig();
-
+function useFilterBarTranslations(translate: Translator, labels: ActiveFiltersBarProps["labels"]) {
   return useMemo(
     () => ({
       headerTitle: translate("activeFiltersBar.title", {

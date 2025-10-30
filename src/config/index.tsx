@@ -15,9 +15,11 @@ export type TranslateOptions<D extends string | undefined> = {
   fallback: D;
 };
 
+export type Translator = (key: TranslationKey, options?: TranslateOptions<string | undefined>) => string | undefined;
+
 export type SearchEngineConfigContextState = {
   icon: (key: keyof IconSet) => ReactNode;
-  translate: (key: TranslationKey, options?: TranslateOptions<string | undefined>) => string | undefined;
+  translate: Translator;
 };
 
 export type SearchEngineConfigProviderProps = {

@@ -4,7 +4,7 @@
  */
 
 import DropdownMenu from "@/components/DropdownMenu";
-import { useSearchEngineConfig } from "@/config";
+import { useSearchEngineConfig, type Translator } from "@/config";
 import { useSearchField } from "@/hooks/useSearchField";
 import type { FilterBag, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom, dictionaryToFilterElements } from "@/utils";
@@ -45,7 +45,7 @@ export function IndexSelect<N extends FilterName>({
   uncaret,
   onChange,
 }: IndexSelectProps<N>) {
-  const { icon } = useSearchEngineConfig();
+  const { icon, translate } = useSearchEngineConfig();
   const anchorRef = React.useRef<HTMLButtonElement>(null);
   const dictionary = useMemo(() => createFilterDictionaryFrom(options), [options]);
   const elements = useMemo(() => dictionaryToFilterElements(dictionary), [dictionary]);
@@ -60,7 +60,7 @@ export function IndexSelect<N extends FilterName>({
   });
 
   const current = useMemo(() => (value ? dictionary[value] : null), [value]);
-  const { defaultActionLabel, dropdownHeaderTitle, triggerTooltipMessage } = useIndexSelectTranslations(labels);
+  const { defaultActionLabel, dropdownHeaderTitle, triggerTooltipMessage } = useIndexSelectTranslations(translate, labels);
 
   const openMenu = () => setMenuOpenStatus(true);
   const closeMenu = () => setMenuOpenStatus(false);
@@ -115,9 +115,7 @@ export function IndexSelect<N extends FilterName>({
   );
 }
 
-function useIndexSelectTranslations(labels?: IndexLabels) {
-  const { translate } = useSearchEngineConfig();
-
+function useIndexSelectTranslations(translate: Translator, labels?: IndexLabels) {
   return useMemo(
     () => ({
       defaultActionLabel: translate("indexSelect.defaultLabel", {

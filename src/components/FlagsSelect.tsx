@@ -4,7 +4,7 @@
  */
 
 import DropdownMenu from "@/components/DropdownMenu";
-import { useSearchEngineConfig } from "@/config";
+import { useSearchEngineConfig, type Translator } from "@/config";
 import { useSearchField } from "@/hooks/useSearchField";
 import type { FilterBag, FilterDictionary, FilterElement, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
@@ -66,7 +66,7 @@ export function FlagsSelect<N extends FilterName>({
   defaultValue = [],
   onChange,
 }: FlagsSelectProps<N>) {
-  const { icon } = useSearchEngineConfig();
+  const { icon, translate } = useSearchEngineConfig();
   const anchorRef = useRef<HTMLButtonElement>(null);
   const dictionary = useMemo(() => createDictionary(options), [options]);
 
@@ -80,7 +80,7 @@ export function FlagsSelect<N extends FilterName>({
     unserialize: (flags) => flags,
   });
 
-  const { dropdownHeaderTitle, triggerTooltipMessage, clearSelectionButtonTooltip } = useFlagsSelectTranslations(labels);
+  const { dropdownHeaderTitle, triggerTooltipMessage, clearSelectionButtonTooltip } = useFlagsSelectTranslations(translate, labels);
 
   const filters: FlagFilterValue<N> = useMemo(() => parseValue(value, dictionary), [value]);
   const hasFilter = value && value.length;
@@ -197,9 +197,7 @@ export function FlagsSelect<N extends FilterName>({
   );
 }
 
-function useFlagsSelectTranslations(labels?: FlagsLabels) {
-  const { translate } = useSearchEngineConfig();
-
+function useFlagsSelectTranslations(translate: Translator, labels?: FlagsLabels) {
   return useMemo(
     () => ({
       dropdownHeaderTitle: translate("flagsSelect.dropdownTitle", {

@@ -5,7 +5,7 @@
 
 import FlagsSelect, { type FlagsBag } from "@/components/FlagsSelect";
 import IndexSelect from "@/components/IndexSelect";
-import { useSearchEngineConfig } from "@/config";
+import { useSearchEngineConfig, type Translator } from "@/config";
 import { useSearchEngine } from "@/context";
 import { useSearchField } from "@/hooks/useSearchField";
 import type { FilterBag, FilterName, InputSize } from "@/types";
@@ -174,7 +174,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   onChange,
 }: SearchBarProps<IB, FB>) {
   const inputId = id || useId();
-  const { icon } = useSearchEngineConfig();
+  const { icon, translate } = useSearchEngineConfig();
   const inputSearch = useRef<HTMLInputElement>(undefined);
   const dictionary = useMemo(() => createFilterDictionaryFrom<KeysOf<IB>>(indexes), [indexes]);
   const [index, setIndex] = useState<KeysOf<IB> | undefined>(() => {
@@ -196,7 +196,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
 
   const [queryString, setQueryString] = useState(value);
   const debouncedTerm = useDebounce(queryString || "", debounceDelay);
-  const { defaultIndexLabel, searchAriaLabel } = useSearchBarTranslations(labels);
+  const { defaultIndexLabel, searchAriaLabel } = useSearchBarTranslations(translate, labels);
 
   const description = dictionary && index ? dictionary[index].description : null;
   const isQuerySynced = queryString === value;
@@ -302,9 +302,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   );
 }
 
-function useSearchBarTranslations(labels?: SearchBarLabels) {
-  const { translate } = useSearchEngineConfig();
-
+function useSearchBarTranslations(translate: Translator, labels?: SearchBarLabels) {
   return useMemo(
     () => ({
       defaultIndexLabel: translate("searchBar.defaultLabel", {
