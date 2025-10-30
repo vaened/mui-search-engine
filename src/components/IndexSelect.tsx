@@ -4,8 +4,8 @@
  */
 
 import DropdownMenu from "@/components/DropdownMenu";
+import { useSearchEngineConfig } from "@/config";
 import { useSearchField } from "@/hooks/useSearchField";
-import { useTranslation } from "@/hooks/useTranslation";
 import type { FilterBag, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom, dictionaryToFilterElements } from "@/utils";
 import Box from "@mui/material/Box";
@@ -16,13 +16,17 @@ import Tooltip from "@mui/material/Tooltip";
 import { IconChevronDown, IconPrompt } from "@tabler/icons-react";
 import React, { useMemo, useState, type ReactNode } from "react";
 
+type IndexLabels = {
+  defaultActionLabel?: string;
+  dropdownHeaderTitle?: string;
+  triggerTooltipMessage?: string;
+};
+
 interface IndexSelectProps<N extends FilterName> {
   name?: FilterName;
   size?: InputSize;
   options: FilterBag<N>;
-  tooltip?: string;
-  label?: string;
-  title?: string;
+  labels?: IndexLabels;
   submittable?: boolean;
   mobileIcon?: ReactNode;
   defaultValue: N;
@@ -34,12 +38,10 @@ export function IndexSelect<N extends FilterName>({
   name = "index",
   size = "medium",
   options,
+  labels,
   submittable,
   defaultValue,
   mobileIcon,
-  tooltip,
-  label,
-  title,
   uncaret,
   onChange,
 }: IndexSelectProps<N>) {
@@ -57,9 +59,7 @@ export function IndexSelect<N extends FilterName>({
   });
 
   const current = useMemo(() => (value ? dictionary[value] : null), [value]);
-  const tooltipMessage = useTranslation("indexSelect.tooltip", { text: tooltip });
-  const defaultLabel = useTranslation("indexSelect.defaultLabel", { text: label });
-  const dropdownTitle = useTranslation("indexSelect.dropdownTitle", { text: title });
+  const { defaultActionLabel, dropdownHeaderTitle, triggerTooltipMessage } = useIndexSelectTranslations(labels);
 
   const openMenu = () => setMenuOpenStatus(true);
   const closeMenu = () => setMenuOpenStatus(false);
@@ -73,7 +73,7 @@ export function IndexSelect<N extends FilterName>({
   return (
     <>
       <Box ref={anchorRef} sx={{ display: "inline-flex" }}>
-        <Tooltip title={tooltipMessage} disableHoverListener={open}>
+        <Tooltip title={triggerTooltipMessage} disableHoverListener={open}>
           <Button
             onClick={openMenu}
             size={size}
@@ -83,11 +83,14 @@ export function IndexSelect<N extends FilterName>({
             aria-controls={open ? "composition-menu" : undefined}
             aria-expanded={open ? "true" : undefined}
             aria-haspopup="true">
-            {current?.label ?? defaultLabel}
+            {current?.label ?? defaultActionLabel}
           </Button>
         </Tooltip>
 
-        <Tooltip title={current?.label ?? tooltipMessage} sx={{ display: { xs: "inline-flex", sm: "none" } }} disableHoverListener={open}>
+        <Tooltip
+          title={current?.label ?? triggerTooltipMessage}
+          sx={{ display: { xs: "inline-flex", sm: "none" } }}
+          disableHoverListener={open}>
           <IconButton
             onClick={openMenu}
             size={size}
@@ -100,7 +103,7 @@ export function IndexSelect<N extends FilterName>({
         </Tooltip>
       </Box>
 
-      <DropdownMenu title={dropdownTitle} open={open} anchorRef={anchorRef} onClose={closeMenu}>
+      <DropdownMenu title={dropdownHeaderTitle} open={open} anchorRef={anchorRef} onClose={closeMenu}>
         {elements.map((element, index) => (
           <MenuItem key={`${index}-${element.value}`} value={element.value} onClick={() => onIndexChange(element.value)}>
             {element.label}
@@ -108,6 +111,28 @@ export function IndexSelect<N extends FilterName>({
         ))}
       </DropdownMenu>
     </>
+  );
+}
+
+function useIndexSelectTranslations(labels?: IndexLabels) {
+  const { translate } = useSearchEngineConfig();
+
+  return useMemo(
+    () => ({
+      defaultActionLabel: translate("indexSelect.defaultLabel", {
+        text: labels?.defaultActionLabel,
+        fallback: "Select Index",
+      }),
+      dropdownHeaderTitle: translate("indexSelect.dropdownTitle", {
+        text: labels?.dropdownHeaderTitle,
+        fallback: "Index",
+      }),
+      triggerTooltipMessage: translate("indexSelect.tooltip", {
+        text: labels?.triggerTooltipMessage,
+        fallback: "Search by",
+      }),
+    }),
+    [labels]
   );
 }
 

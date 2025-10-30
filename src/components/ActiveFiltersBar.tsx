@@ -4,20 +4,25 @@
  */
 
 import FilterChip, { type FilterChipProps } from "@/components/FilterChip";
+import { useSearchEngineConfig } from "@/config";
 import type { RegisteredField } from "@/context";
 import { useActiveFilters } from "@/hooks/useActiveFilters";
-import { useTranslation } from "@/hooks/useTranslation";
 import { Box, Grid, IconButton, Tooltip, Typography } from "@mui/material";
 import { IconRestore } from "@tabler/icons-react";
-import React from "react";
+import React, { useMemo } from "react";
 
-export type ActiveFiltersBarProps = Omit<FilterChipProps, "field">;
+export type ActiveFiltersBarProps = {
+  chipProps?: Omit<FilterChipProps, "field">;
+  labels?: {
+    headerTitle?: string;
+    emptyStateMessage?: string;
+    clearAllButtonTooltip?: string;
+  };
+};
 
-export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ onRemove, ...restOfProps }) => {
+export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ labels, chipProps: { onRemove, ...restOfProps } = {} }) => {
   const { actives, hasActives, refresh, clearAll } = useActiveFilters();
-  const headerTitle = useTranslation("activeFiltersBar.title");
-  const noFiltersMessage = useTranslation("activeFiltersBar.noFilters");
-  const clearAllTooltip = useTranslation("activeFiltersBar.clearAllTooltip");
+  const { headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(labels);
 
   function onFilterChipRemove(field: RegisteredField) {
     refresh();
@@ -33,7 +38,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ onRemove, ..
       </Grid>
 
       <Grid display="grid" gridTemplateColumns="1fr auto" width="100%" alignItems="center" container>
-        {!hasActives && <Typography>{noFiltersMessage}</Typography>}
+        {!hasActives && <Typography>{emptyStateMessage}</Typography>}
 
         {hasActives && (
           <Box display="flex" flexWrap="wrap" gap={1}>
@@ -44,7 +49,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ onRemove, ..
         )}
 
         <Box>
-          <Tooltip title={clearAllTooltip} placement="left" arrow>
+          <Tooltip title={clearAllButtonTooltip} placement="left" arrow>
             <span>
               <IconButton onClick={clearAll} aria-label="delete" disabled={!hasActives}>
                 <IconRestore size={16} />
@@ -56,5 +61,27 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ onRemove, ..
     </Grid>
   );
 };
+
+function useFilterBarTranslations(labels: ActiveFiltersBarProps["labels"]) {
+  const { translate } = useSearchEngineConfig();
+
+  return useMemo(
+    () => ({
+      headerTitle: translate("activeFiltersBar.title", {
+        text: labels?.headerTitle,
+        fallback: "Active Filters",
+      }),
+      emptyStateMessage: translate("activeFiltersBar.noFilters", {
+        text: labels?.emptyStateMessage,
+        fallback: "No filters have been applied yet.",
+      }),
+      clearAllButtonTooltip: translate("activeFiltersBar.clearAllTooltip", {
+        text: labels?.clearAllButtonTooltip,
+        fallback: "Clear all filters",
+      }),
+    }),
+    [labels]
+  );
+}
 
 export default ActiveFiltersBar;

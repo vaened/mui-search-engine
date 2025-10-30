@@ -4,8 +4,8 @@
  */
 
 import DropdownMenu from "@/components/DropdownMenu";
+import { useSearchEngineConfig } from "@/config";
 import { useSearchField } from "@/hooks/useSearchField";
-import { useTranslation } from "@/hooks/useTranslation";
 import type { FilterBag, FilterDictionary, FilterElement, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
 import Box from "@mui/material/Box";
@@ -42,25 +42,28 @@ export interface FlagDictionary<N extends FilterName> {
 
 export type FlagsBag<N extends FilterName> = FilterBag<N> | FlagConfiguration<N>;
 
+type FlagsLabels = {
+  dropdownHeaderTitle?: string;
+  triggerTooltipMessage?: string;
+  clearSelectionButtonTooltip?: string;
+};
+
 export interface FlagsSelectProps<N extends FilterName> {
   name?: FilterName;
-  tooltip?: string;
-  title?: string;
   size?: InputSize;
+  labels?: FlagsLabels;
   options: FlagsBag<N>;
   submittable?: boolean;
   defaultValue?: N[];
-  compact?: boolean;
   onChange?: (flags: N[]) => void;
 }
 
 export function FlagsSelect<N extends FilterName>({
   name = "flags",
   options,
+  labels,
   submittable,
   size = "medium",
-  tooltip,
-  title,
   defaultValue = [],
   onChange,
 }: FlagsSelectProps<N>) {
@@ -77,9 +80,7 @@ export function FlagsSelect<N extends FilterName>({
     unserialize: (flags) => flags,
   });
 
-  const dropdownTitle = useTranslation("flagsSelect.dropdownTitle", { text: title });
-  const restartButton = useTranslation("flagsSelect.restartButton");
-  const tooltipMessage = useTranslation("flagsSelect.tooltip", { text: tooltip });
+  const { dropdownHeaderTitle, triggerTooltipMessage, clearSelectionButtonTooltip } = useFlagsSelectTranslations(labels);
 
   const filters: FlagFilterValue<N> = useMemo(() => parseValue(value, dictionary), [value]);
   const hasFilter = value && value.length;
@@ -131,7 +132,7 @@ export function FlagsSelect<N extends FilterName>({
   return (
     <>
       <Box ref={anchorRef} sx={{ display: "inline-flex" }}>
-        <Tooltip title={tooltipMessage} disableHoverListener={open}>
+        <Tooltip title={triggerTooltipMessage} disableHoverListener={open}>
           <IconButton
             onClick={openMenu}
             size={size}
@@ -145,7 +146,7 @@ export function FlagsSelect<N extends FilterName>({
         </Tooltip>
       </Box>
 
-      <DropdownMenu open={open} anchorRef={anchorRef} placement="bottom-end" onClose={closeMenu} title={dropdownTitle}>
+      <DropdownMenu open={open} anchorRef={anchorRef} placement="bottom-end" onClose={closeMenu} title={dropdownHeaderTitle}>
         {dictionary.additives &&
           Object.values<FilterElement<N>>(dictionary.additives).map(({ value, label, description }, index) => (
             <MenuItemAction
@@ -185,7 +186,7 @@ export function FlagsSelect<N extends FilterName>({
               disabled={!filters.exclusive}
               color={!filters.exclusive ? "inherit" : "info"}>
               <Typography component="span" display="flex" sx={{ fontSize: 12 }} textTransform="capitalize">
-                {restartButton}
+                {clearSelectionButtonTooltip}
               </Typography>
               <span style={{ marginLeft: "5px" }}>
                 <IconEraser size={13} />
@@ -197,6 +198,29 @@ export function FlagsSelect<N extends FilterName>({
     </>
   );
 }
+
+function useFlagsSelectTranslations(labels?: FlagsLabels) {
+  const { translate } = useSearchEngineConfig();
+
+  return useMemo(
+    () => ({
+      dropdownHeaderTitle: translate("flagsSelect.dropdownTitle", {
+        text: labels?.dropdownHeaderTitle,
+        fallback: "Available Flags",
+      }),
+      triggerTooltipMessage: translate("flagsSelect.tooltip", {
+        text: labels?.triggerTooltipMessage,
+        fallback: "Select Filters",
+      }),
+      clearSelectionButtonTooltip: translate("flagsSelect.restartButton", {
+        text: labels?.clearSelectionButtonTooltip,
+        fallback: "Restart",
+      }),
+    }),
+    [labels]
+  );
+}
+
 function labeled<N extends FilterName>(bag: FlagDictionary<N>, name: N): string | undefined {
   const compact = (bag: FilterDictionary<N> | undefined) => bag?.[name]?.label;
   return compact(bag.additives) ?? compact(bag.exclusives);

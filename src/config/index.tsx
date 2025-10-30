@@ -9,8 +9,9 @@ import React, { createContext, useContext, useEffect, useState, type ReactNode }
 import { default as translations } from "./translations";
 
 export type TranslateOptions<D extends string | undefined> = {
+  text?: string;
   params?: Record<string, string>;
-  defaultValue: D;
+  fallback: D;
 };
 
 export type SearchEngineConfigContextState = {
@@ -32,7 +33,7 @@ function translateFrom(
   const label = getByPath(translation, key);
 
   if (!label) {
-    return options?.defaultValue;
+    return options?.fallback;
   }
 
   return options?.params ? label.replace(/\{(\w+)\}/g, (_, k) => String(options.params?.[k] ?? "")) : label;

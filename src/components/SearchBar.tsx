@@ -5,9 +5,9 @@
 
 import FlagsSelect, { type FlagsBag } from "@/components/FlagsSelect";
 import IndexSelect from "@/components/IndexSelect";
+import { useSearchEngineConfig } from "@/config";
 import { useSearchEngine } from "@/context";
 import { useSearchField } from "@/hooks/useSearchField";
-import { useTranslation } from "@/hooks/useTranslation";
 import type { FilterBag, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
 import { Button } from "@mui/material";
@@ -31,11 +31,16 @@ export type FlagsKeysOf<T> = FromAdditives<T> | FromExclusives<T> | KeysOf<T>;
 export type SearchBarName = { query?: string; index?: string; flags?: string };
 export type SubmmitableFields = { query?: boolean; index?: boolean; flags?: boolean };
 
+type SearchBarLabels = {
+  defaultIndexLabel?: string;
+  searchAriaLabel?: string;
+};
+
 interface SearchBarProps<IB extends FilterBag<FilterName>, FB extends FlagsBag<FilterName>> {
   id?: string;
-  label?: string;
   size?: InputSize;
   placeholder?: string;
+  labels?: SearchBarLabels;
   indexes?: IB;
   flags?: FB;
   name?: SearchBarName;
@@ -156,7 +161,6 @@ const FloatingLabel = styled(InputLabel)<{ size: "small" | "medium" }>(({ size }
 
 export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<FilterName>>({
   id,
-  label,
   size = "medium",
   indexes,
   flags,
@@ -164,6 +168,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   submittable,
   debounceDelay = 400,
   placeholder,
+  labels,
   defaultIndex,
   defaultFlags,
   defaultValue,
@@ -191,9 +196,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
 
   const [queryString, setQueryString] = useState(value);
   const debouncedTerm = useDebounce(queryString || "", debounceDelay);
-
-  const inputLabel = useTranslation("searchBar.defaultLabel", { text: label });
-  const inputAriaLabel = useTranslation("searchBar.searchAriaLabel");
+  const { defaultIndexLabel, searchAriaLabel } = useSearchBarTranslations(labels);
 
   const description = dictionary && index ? dictionary[index].description : null;
   const isQuerySynced = queryString === value;
@@ -242,13 +245,13 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
     <>
       <Container size={size}>
         <FloatingLabel size={size} htmlFor={inputId}>
-          {inputLabel}
+          {defaultIndexLabel}
         </FloatingLabel>
 
         <Panel elevation={0} size={size}>
           <fieldset className="outline" aria-hidden>
             <legend className="outline-label">
-              <span>{inputLabel}</span>
+              <span>{defaultIndexLabel}</span>
             </legend>
           </fieldset>
 
@@ -271,13 +274,13 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
               disabled={isLoading}
               sx={{ ml: 1, flex: 1 }}
               placeholder={placeholder}
-              inputProps={{ "aria-label": label }}
+              inputProps={{ "aria-label": searchAriaLabel }}
               value={queryString ?? ""}
               onKeyDown={onQueryStringKeyDown}
               onChange={onQueryStringChange}
             />
 
-            <Button loading={isLoading} size={size} type="submit" aria-label={inputAriaLabel} sx={{ minWidth: "34px" }}>
+            <Button loading={isLoading} size={size} type="submit" aria-label={searchAriaLabel} sx={{ minWidth: "34px" }}>
               <AnimateIcon>
                 <IconSearch />
               </AnimateIcon>
@@ -298,6 +301,24 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
         </Typography>
       )}
     </>
+  );
+}
+
+function useSearchBarTranslations(labels?: SearchBarLabels) {
+  const { translate } = useSearchEngineConfig();
+
+  return useMemo(
+    () => ({
+      defaultIndexLabel: translate("searchBar.defaultLabel", {
+        text: labels?.defaultIndexLabel,
+        fallback: "Search for matches by",
+      }),
+      searchAriaLabel: translate("searchBar.searchAriaLabel", {
+        text: labels?.searchAriaLabel,
+        fallback: "search",
+      }),
+    }),
+    [labels]
   );
 }
 
