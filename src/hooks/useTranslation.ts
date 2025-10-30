@@ -15,9 +15,7 @@ export type TranslationValue = {
 
 export function useTranslation(label: TranslationKey, value: TranslationValue = {}): string | undefined {
   const { translate } = useSearchEngineConfig();
+  const { text, params, fallback } = value;
 
-  return useMemo(() => {
-    const { text, params, fallback } = value;
-    return text ?? translate(label, { defaultValue: fallback, params });
-  }, [label, value]);
+  return useMemo(() => text ?? translate(label, { defaultValue: fallback, params }), [label, text, params, fallback]);
 }
