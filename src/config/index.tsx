@@ -5,7 +5,7 @@
 
 import type { Paths, PathValue } from "@/internal";
 import type { IconSet, Locale, TranslationKey, TranslationStrings } from "@/types";
-import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import React, { createContext, useContext, useMemo, type ReactNode } from "react";
 import { default as iconsSet } from "./icons";
 import { default as translations } from "./translations";
 
@@ -58,39 +58,22 @@ export function SearchEngineConfigProvider({
   icons: userIcons,
   children,
 }: SearchEngineConfigProviderProps): React.ReactElement {
-  const [translation, setTraslation] = useState<TranslationStrings>(() => {
-    return labels ?? translations[locale ?? "en"];
-  });
-  const [availableIcons, setAvailableIcons] = useState<IconSet>(() => ({
-    ...iconsSet,
-    ...userIcons,
-  }));
+  const translation = useMemo(() => labels ?? translations[locale ?? "en"], [labels, locale]);
+  const availableIcons = useMemo(() => ({ ...iconsSet, ...userIcons }), [userIcons]);
 
-  useEffect(() => {
-    setTraslation(labels ?? translations[locale ?? "en"]);
-  }, [locale, translations]);
+  const value = useMemo<SearchEngineConfigContextState>(() => {
+    function icon(key: keyof IconSet): ReactNode {
+      return availableIcons[key];
+    }
 
-  useEffect(() => {
-    setAvailableIcons({ ...iconsSet, ...userIcons });
-  }, [userIcons]);
+    function translate(key: TranslationKey, options?: TranslateOptions<string | undefined>): string | undefined {
+      return translateFrom(translation, key, options);
+    }
 
-  function icon(key: keyof IconSet): ReactNode {
-    return availableIcons[key];
-  }
+    return { icon, translate };
+  }, [availableIcons, translation]);
 
-  function translate(key: TranslationKey, options?: TranslateOptions<string | undefined>): string | undefined {
-    return translateFrom(translation, key, options);
-  }
-
-  return (
-    <SearchEngineConfigContext.Provider
-      value={{
-        icon,
-        translate,
-      }}>
-      {children}
-    </SearchEngineConfigContext.Provider>
-  );
+  return <SearchEngineConfigContext.Provider value={value}>{children}</SearchEngineConfigContext.Provider>;
 }
 
 function isIndexable(x: unknown): x is Record<string, unknown> {
