@@ -3,7 +3,9 @@
  * @link https://vaened.dev DevFolio
  */
 
+import type translations from "@/config/translations";
 import type { FieldsCollection } from "@/context/FieldsCollection";
+import type { Paths } from "@/internal";
 
 export type FilterName = string;
 type InputValue = null | string | FilterName | boolean | Date | Record<FilterName, unknown>;
@@ -28,8 +30,8 @@ export interface IndexedFilterChip<V extends InputValue[] = InputValue[]> extend
   value: V[number];
 }
 
-type InferHumanizeReturn<V extends FilterValue> = V extends (infer T extends InputValue)[] ? IndexedFilterChip<T[]>[] : FilterLabel;
-type InferSerializeReturn<V extends FilterValue> = V extends InputValue[] ? string[] : string;
+export type InferHumanizeReturn<V extends FilterValue> = V extends (infer T extends InputValue)[] ? IndexedFilterChip<T[]>[] : FilterLabel;
+export type InferSerializeReturn<V extends FilterValue> = V extends InputValue[] ? string[] : string;
 
 export type Field<
   V extends FilterValue = FilterValue,
@@ -46,3 +48,39 @@ export type Field<
 
 export type FieldDictionary = Record<FilterName, Field<FilterValue, PrimitiveValue>>;
 export type SearchParams = Partial<Record<FilterName, FilterValue>>;
+export type Locale = keyof typeof translations;
+
+export type TranslationStrings = {
+  searchBar: {
+    defaultLabel: string;
+    searchAriaLabel: string;
+  };
+  indexSelect: {
+    tooltip: string;
+    defaultLabel: string;
+    dropdownTitle: string;
+  };
+  flagsSelect: {
+    tooltip: string;
+    dropdownTitle: string;
+    restartButton: string;
+  };
+  activeFiltersBar: {
+    title: string;
+    noFilters: string;
+    clearAllTooltip: string;
+    clearAllAriaLabel: string;
+  };
+};
+
+export type IconSet = {
+  searchBarSearchIcon: React.ReactNode;
+  indexSelectMobileIcon: React.ReactNode;
+  flagsFilterActiveIcon: React.ReactNode;
+  flagsFilterInactiveIcon: React.ReactNode;
+  flagsRestartIcon: React.ReactNode;
+  activeFiltersClearAllIcon: React.ReactNode;
+};
+
+export type TranslationDictionary = Record<string, TranslationStrings>;
+export type TranslationKey = Paths<TranslationStrings>;
