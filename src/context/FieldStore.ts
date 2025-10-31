@@ -37,7 +37,7 @@ export class FieldStore {
 
   exists = (name: FilterName) => this.#fields.has(name);
 
-  collection = () => this.state().collection;
+  collection = () => this.#state.collection;
 
   subscribe = (listener: () => void): Unsubscribe => {
     this.#listeners.add(listener);
