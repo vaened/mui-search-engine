@@ -26,10 +26,10 @@ export class FieldStore {
   #fields: RegisteredFieldDictionary;
   #state: FieldStoreState = { collection: FieldsCollection.empty(), touched: [], operation: null };
 
-  constructor(persistence: PersistenceAdapter) {
-    this.#persistence = persistence;
+  constructor(persistence: PersistenceAdapter, emitter: EventEmitter<Events> | null = null) {
     this.#fields = new Map();
-    this.#emitter = createEventEmitter<Events>();
+    this.#persistence = persistence;
+    this.#emitter = emitter ?? createEventEmitter<Events>();
     this.#initial = persistence.read() ?? {};
   }
 
