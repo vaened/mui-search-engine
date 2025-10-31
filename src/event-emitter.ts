@@ -5,11 +5,11 @@
 
 export type Unsubscribe = () => void;
 
-export type EventEmitter<TEvents extends Record<string, unknown>> = {
+export interface EventEmitter<TEvents extends Record<string, unknown>> {
   on<K extends keyof TEvents>(type: K, handler: (p: TEvents[K]) => void): Unsubscribe;
   off<K extends keyof TEvents>(type: K, handler: (p: TEvents[K]) => void): void;
   emit<K extends keyof TEvents>(type: K, payload: TEvents[K]): void;
-};
+}
 
 export function createEventEmitter<TEvents extends Record<string, unknown>>(): EventEmitter<TEvents> {
   const map = new Map<keyof TEvents, Set<Function>>();

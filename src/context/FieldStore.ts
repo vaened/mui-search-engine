@@ -3,8 +3,9 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { RegisteredField, RegisteredFieldDictionary } from "@/context";
+import type { Events, RegisteredField, RegisteredFieldDictionary } from "@/context";
 import { FieldsCollection } from "@/context/FieldsCollection";
+import { createEventEmitter, type EventEmitter, type Unsubscribe } from "@/event-emitter";
 import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
 
 export type FieldOperation = "set" | "unregister" | "register" | "rehydrate" | "reset" | null;
@@ -15,8 +16,10 @@ export type FieldStoreState = Readonly<{
   touched: FilterName[];
 }>;
 
-export class FieldStore {
+export class FieldStore implements EventEmitter<Events> {
   readonly #initial: PrimitiveFilterDictionary;
+  readonly #emitter: EventEmitter<Events>;
+
   #listeners: Set<() => void> = new Set();
   #fields: RegisteredFieldDictionary;
   #state: FieldStoreState = { collection: FieldsCollection.empty(), touched: [], operation: null };
@@ -24,6 +27,7 @@ export class FieldStore {
   constructor(initial: PrimitiveFilterDictionary) {
     this.#initial = initial;
     this.#fields = new Map();
+    this.#emitter = createEventEmitter<Events>();
   }
 
   state = () => this.#state;
@@ -123,6 +127,18 @@ export class FieldStore {
     const collection = new FieldsCollection(this.#fields);
 
     this.#commit({ operation: "reset", collection, touched });
+  };
+
+  on = <K extends keyof Events>(type: K, handler: (p: Events[K]) => void): Unsubscribe => {
+    return this.#emitter.on(type, handler);
+  };
+
+  off = <K extends keyof Events>(type: K, handler: (p: Events[K]) => void): void => {
+    this.#emitter.off(type, handler);
+  };
+
+  emit = <K extends keyof Events>(type: K, payload: Events[K]): void => {
+    this.#emitter.emit(type, payload);
   };
 
   #commit = (state: Partial<FieldStoreState>) => {

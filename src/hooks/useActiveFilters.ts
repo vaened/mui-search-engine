@@ -26,14 +26,14 @@ function onlyHumanizables(field: RegisteredField): boolean {
 }
 
 export function useActiveFilters() {
-  const { store, fields, emitter: emmiter } = useSearchEngine();
+  const { store, fields } = useSearchEngine();
   const [actives, setActives] = useState<RegisteredField[]>([]);
   const hasActives = actives.length > 0;
 
   useEffect(() => {
-    const unsubscribe = emmiter.on("submit", setActivesFrom);
+    const unsubscribe = store.on("submit", setActivesFrom);
     return () => unsubscribe();
-  }, [emmiter]);
+  }, [store]);
 
   useEffect(() => {
     console.log({ actives: [...actives], hasActives });

@@ -3,10 +3,9 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { SearchEngineContext, type Events } from "@/context";
+import { SearchEngineContext } from "@/context";
 import type { FieldsCollection } from "@/context/FieldsCollection";
 import { createFieldsStore } from "@/context/FieldStore";
-import { createEventEmitter } from "@/event-emitter";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import { UrlPersistenceAdapter } from "@/persistence/UrlPersistenceAdapter";
 import type { PersistenceMode, PrimitiveFilterDictionary, SearchParams } from "@/types";
@@ -37,7 +36,6 @@ export function SearchBuilder<P extends SearchParams>({
   const autostarted = useRef(false);
   const persistenceAdapter = useMemo(() => resolverPersistenceAdapter(persistence), [persistence]);
   const store = useSingleton(() => createFieldsStore(persistenceAdapter?.read() ?? {}));
-  const emitter = useSingleton(() => createEventEmitter<Events>());
 
   const {
     collection: fields,
@@ -49,7 +47,7 @@ export function SearchBuilder<P extends SearchParams>({
 
   useEffect(() => {
     onChange?.(fields);
-    emitter.emit("change", { fields, operation: lastOperation });
+    store.emit("change", { fields, operation: lastOperation });
 
     if (lastOperation !== "reset" && (isAutostartable || !touchedFieldNames.some((name) => fields.get(name)?.submittable))) {
       return;
@@ -120,7 +118,7 @@ export function SearchBuilder<P extends SearchParams>({
 
   function dispatch(values: FieldsCollection) {
     onSearch?.(values);
-    emitter.emit("submit", values);
+    store.emit("submit", values);
     persistenceAdapter?.write(fields.toPrimitives());
   }
 
@@ -128,7 +126,6 @@ export function SearchBuilder<P extends SearchParams>({
     <SearchEngineContext.Provider
       value={{
         store,
-        emitter,
         submitOnChange,
         fields,
         values,
