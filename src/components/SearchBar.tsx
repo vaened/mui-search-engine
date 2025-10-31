@@ -3,6 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
+import DebounceInputSearch from "@/components/DebounceInputSearch";
 import FlagsSelect, { type FlagsBag } from "@/components/FlagsSelect";
 import IndexSelect from "@/components/IndexSelect";
 import { useSearchEngineConfig, type Translator } from "@/config";
@@ -13,12 +14,11 @@ import { createFilterDictionaryFrom } from "@/utils";
 import { Button } from "@mui/material";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
-import InputBase from "@mui/material/InputBase";
 import InputLabel from "@mui/material/InputLabel";
 import MuiPaper, { type PaperProps } from "@mui/material/Paper";
 import { keyframes, styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 
 const HEIGHT = { small: 40, medium: 56 } as const;
 const INPUT_PY = { small: 8.5, medium: 16.5 } as const;
@@ -194,47 +194,14 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
     unserialize: (v) => v,
   });
 
-  const [queryString, setQueryString] = useState(value);
-  const debouncedTerm = useDebounce(queryString || "", debounceDelay);
   const { defaultIndexLabel, searchAriaLabel } = useSearchBarTranslations(translate, labels);
 
   const isSubmitOnChangeEnabled = submittable?.query === undefined ? submitOnChange : submittable?.query;
   const description = dictionary && index ? dictionary[index].description : null;
-  const isQuerySynced = queryString === value;
-
-  useEffect(() => {
-    setQueryString(value);
-  }, [value]);
-
-  useEffect(() => {
-    if (isQuerySynced) {
-      return;
-    }
-
-    apply(debouncedTerm);
-  }, [debouncedTerm]);
 
   function apply(query?: string | null) {
     set(query ?? "");
     onChange?.(query ?? "");
-  }
-
-  function onQueryStringKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key !== "Enter" || isQuerySynced) {
-      return;
-    }
-
-    if (!isSubmitOnChangeEnabled) {
-      apply(queryString);
-      return;
-    }
-
-    event.preventDefault();
-    apply(queryString);
-  }
-
-  function onQueryStringChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setQueryString(event.target.value);
   }
 
   function onIndexChange(string: KeysOf<IB> | undefined) {
@@ -268,17 +235,16 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
               />
             )}
 
-            <InputBase
+            <DebounceInputSearch
               id={inputId}
               inputRef={inputSearch}
-              fullWidth
               disabled={isLoading}
-              sx={{ ml: 1, flex: 1 }}
+              delay={debounceDelay}
               placeholder={placeholder}
               inputProps={{ "aria-label": searchAriaLabel }}
-              value={queryString ?? ""}
-              onKeyDown={onQueryStringKeyDown}
-              onChange={onQueryStringChange}
+              value={value ?? ""}
+              submitOnChange={isSubmitOnChangeEnabled}
+              onChange={apply}
             />
 
             <Button loading={isLoading} size={size} type="submit" aria-label={searchAriaLabel} sx={{ minWidth: "34px" }}>
@@ -317,22 +283,6 @@ function useSearchBarTranslations(translate: Translator, labels?: SearchBarLabel
     }),
     [labels]
   );
-}
-
-function useDebounce(queryString: string, delay: number) {
-  const [debounced, setValue] = useState(queryString);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setValue(queryString);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [queryString, delay]);
-
-  return debounced;
 }
 
 export default SearchBar;
