@@ -45,10 +45,12 @@ export function SearchBuilder({
   useEffect(() => {
     onChange?.(fields);
 
-    if (
-      lastOperation !== "reset" &&
-      (isAutostartable || (!submitOnChange && !touchedFieldNames.some((name) => fields.get(name)?.submittable)))
-    ) {
+    const isSubmittableOperation = lastOperation === "reset";
+    const isSubmittableTouched = touchedFieldNames.some((name) => fields.get(name)?.submittable);
+    const isAutoSubmitEnable = !isAutostartable && (submitOnChange || isSubmittableTouched);
+    const canBeSubmitted = isSubmittableOperation || isAutoSubmitEnable;
+
+    if (!canBeSubmitted) {
       return;
     }
 
