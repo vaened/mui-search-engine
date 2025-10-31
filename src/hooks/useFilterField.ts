@@ -14,7 +14,7 @@ export type UseSearchFieldProps<V extends FilterValue, P extends PrimitiveValue,
   defaultValue: V;
 };
 
-export function useSearchField<V extends FilterValue, P extends PrimitiveValue, H extends InferHumanizeReturn<V>>({
+export function useFilterField<V extends FilterValue, P extends PrimitiveValue, H extends InferHumanizeReturn<V>>({
   name,
   defaultValue,
   submittable,

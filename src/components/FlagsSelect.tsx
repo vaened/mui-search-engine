@@ -5,7 +5,7 @@
 
 import DropdownMenu from "@/components/DropdownMenu";
 import { useSearchEngineConfig, type Translator } from "@/config";
-import { useSearchField } from "@/hooks/useSearchField";
+import { useFilterField } from "@/hooks/useFilterField";
 import type { FilterBag, FilterDictionary, FilterElement, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
 import Box from "@mui/material/Box";
@@ -71,7 +71,7 @@ export function FlagsSelect<N extends FilterName>({
   const dictionary = useMemo(() => createDictionary(options), [options]);
 
   const [open, setMenuOpenStatus] = useState(false);
-  const { value, set } = useSearchField({
+  const { value, set } = useFilterField({
     name,
     defaultValue,
     submittable,
