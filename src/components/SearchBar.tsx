@@ -174,7 +174,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   onChange,
 }: SearchBarProps<IB, FB>) {
   const inputId = id || useId();
-  const { store, isLoading } = useSearchEngine();
+  const { store, submitOnChange, isLoading } = useSearchEngine();
   const { icon, translate } = useSearchEngineConfig();
   const inputSearch = useRef<HTMLInputElement>(undefined);
   const dictionary = useMemo(() => createFilterDictionaryFrom<KeysOf<IB>>(indexes), [indexes]);
@@ -182,7 +182,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
     return dictionary && !defaultIndex ? (Object.keys(dictionary)[0] as KeysOf<IB>) : defaultIndex;
   });
 
-  const { value, isSubmitOnChangeEnabled, set } = useFilterField(store, {
+  const { value, set } = useFilterField(store, {
     name: name?.query || "q",
     defaultValue: defaultValue || null,
     submittable: submittable?.query,
@@ -198,6 +198,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   const debouncedTerm = useDebounce(queryString || "", debounceDelay);
   const { defaultIndexLabel, searchAriaLabel } = useSearchBarTranslations(translate, labels);
 
+  const isSubmitOnChangeEnabled = submittable?.query === undefined ? submitOnChange : submittable?.query;
   const description = dictionary && index ? dictionary[index].description : null;
   const isQuerySynced = queryString === value;
 

@@ -45,7 +45,10 @@ export function SearchBuilder({
   useEffect(() => {
     onChange?.(fields);
 
-    if (lastOperation !== "reset" && (isAutostartable || !touchedFieldNames.some((name) => fields.get(name)?.submittable))) {
+    if (
+      lastOperation !== "reset" &&
+      (isAutostartable || (!submitOnChange && !touchedFieldNames.some((name) => fields.get(name)?.submittable)))
+    ) {
       return;
     }
 

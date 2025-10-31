@@ -11,18 +11,14 @@ export type UseSearchFieldProps<V extends FilterValue, P extends PrimitiveValue,
 
 export function useFilterField<V extends FilterValue, P extends PrimitiveValue, H extends InferHumanizeReturn<V>>(
   store: FieldStore,
-  { name, defaultValue, submittable, ...restOfProps }: UseSearchFieldProps<V, P, H>
+  { name, defaultValue, ...restOfProps }: UseSearchFieldProps<V, P, H>
 ) {
   const field = useMemo(() => store.collection().get<V, P>(name), [store.collection(), name]);
-
-  const value = field?.value;
-  const isSubmitOnChangeEnabled = submittable === undefined ? false : submittable;
 
   useEffect(() => {
     store.register({
       name,
       value: defaultValue,
-      submittable: isSubmitOnChangeEnabled,
       ...restOfProps,
     });
 
@@ -36,7 +32,6 @@ export function useFilterField<V extends FilterValue, P extends PrimitiveValue, 
   return {
     set,
     field,
-    value,
-    isSubmitOnChangeEnabled,
+    value: field?.value,
   };
 }
