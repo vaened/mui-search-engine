@@ -153,8 +153,8 @@ export class FieldStore {
     return this.#emitter.on("submit", listener);
   };
 
-  onFieldChange = (listener: (fields: FieldsCollection, operation: FieldOperation) => void): Unsubscribe => {
-    return this.#emitter.on("change", ({ fields, operation }) => listener(fields, operation));
+  onFieldChange = (listener: (state: FieldStoreState) => void): Unsubscribe => {
+    return this.#emitter.on("change", (state) => listener(state));
   };
 
   #fillFieldsFrom = (newValues: PrimitiveFilterDictionary): FilterName[] | undefined => {
@@ -185,7 +185,7 @@ export class FieldStore {
     this.#listeners.forEach((listener) => listener());
 
     if (state.hasOwnProperty("collection")) {
-      this.#emitter.emit("change", { fields: this.#state.collection, operation: this.#state.operation });
+      this.#emitter.emit("change", this.#state);
     }
   };
 

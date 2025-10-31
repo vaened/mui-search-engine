@@ -4,16 +4,13 @@
  */
 
 import type { FieldsCollection } from "@/context/FieldsCollection";
-import type { FieldOperation, FieldStore } from "@/context/FieldStore";
-import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue, ValueFilterDictionary } from "@/types";
+import type { FieldStore, FieldStoreState } from "@/context/FieldStore";
+import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
 import { createContext, useContext } from "react";
 
 export type Events = {
   submit: FieldsCollection;
-  change: {
-    fields: FieldsCollection;
-    operation: FieldOperation;
-  };
+  change: FieldStoreState;
 };
 
 export type RegisteredField<V extends FilterValue = FilterValue, P extends PrimitiveValue = PrimitiveValue> = Readonly<Field<V, P>> &
