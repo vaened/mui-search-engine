@@ -39,7 +39,7 @@ export function SearchBuilder({
     const unsubscribe = store.onFieldChange(({ collection: fields, operation: lastOperation, touched: touchedFieldNames }) => {
       onChange?.(fields);
 
-      const isSubmittableOperation = lastOperation === "reset";
+      const isSubmittableOperation = ["sync", "reset", "set"].includes(lastOperation ?? "");
       const isSubmittableTouched = touchedFieldNames.some((name) => fields.get(name)?.submittable);
       const isAutoSubmitEnable = !isAutostartable && (submitOnChange || isSubmittableTouched);
       const canBeSubmitted = isSubmittableOperation || isAutoSubmitEnable;
