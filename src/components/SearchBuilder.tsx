@@ -8,11 +8,11 @@ import type { FieldsCollection } from "@/context/FieldsCollection";
 import { createFieldsStore } from "@/context/FieldStore";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import { UrlPersistenceAdapter } from "@/persistence/UrlPersistenceAdapter";
-import type { PersistenceMode, PrimitiveFilterDictionary, SearchParams } from "@/types";
+import type { PersistenceMode, PrimitiveFilterDictionary } from "@/types";
 import Grid from "@mui/material/Grid";
 import React, { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 
-export type SearchEngineContextProviderProps<P extends SearchParams> = {
+export type SearchEngineContextProviderProps = {
   children: ReactNode;
   loading: boolean;
   persistence?: PersistenceMode;
@@ -23,7 +23,7 @@ export type SearchEngineContextProviderProps<P extends SearchParams> = {
   onChange?: (params: FieldsCollection) => void;
 };
 
-export function SearchBuilder<P extends SearchParams>({
+export function SearchBuilder({
   children,
   loading,
   persistence,
@@ -32,7 +32,7 @@ export function SearchBuilder<P extends SearchParams>({
   submitOnChange = false,
   onSearch,
   onChange,
-}: SearchEngineContextProviderProps<P>) {
+}: SearchEngineContextProviderProps) {
   const autostarted = useRef(false);
   const persistenceAdapter = useMemo(() => resolverPersistenceAdapter(persistence), [persistence]);
   const store = useSingleton(() => createFieldsStore(persistenceAdapter?.read() ?? {}));
@@ -42,7 +42,7 @@ export function SearchBuilder<P extends SearchParams>({
     touched: touchedFieldNames,
     operation: lastOperation,
   } = useSyncExternalStore(store.subscribe, store.state, store.state);
-  const values = useMemo(() => fields.toValues() as P, [fields]);
+  const values = useMemo(() => fields.toValues(), [fields]);
   const isAutostartable = !autostarted.current && !manualStart;
 
   useEffect(() => {

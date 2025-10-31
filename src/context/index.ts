@@ -5,7 +5,7 @@
 
 import type { FieldsCollection } from "@/context/FieldsCollection";
 import type { FieldOperation, FieldStore } from "@/context/FieldStore";
-import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue, SearchParams } from "@/types";
+import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue, ValueFilterDictionary } from "@/types";
 import { createContext, useContext } from "react";
 
 export type Events = {
@@ -27,10 +27,10 @@ export type RegisteredFieldDictionary<V extends FilterValue = FilterValue, P ext
   RegisteredField<V, P>
 >;
 
-export interface SearchEngineContextState<P extends SearchParams = SearchParams> {
+export interface SearchEngineContextState {
   store: FieldStore;
   submitOnChange: boolean;
-  values: P;
+  values: ValueFilterDictionary;
   fields: FieldsCollection;
   isLoading: boolean;
   refresh: (params: PrimitiveFilterDictionary) => void;
