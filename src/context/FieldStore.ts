@@ -46,7 +46,7 @@ export class FieldStore {
 
   sync = (): FieldsCollection | undefined => {
     const newValues = this.#persistence.read();
-    const touched = this.#updateFieldsFrom(newValues);
+    const touched = this.#fillFieldsFrom(newValues);
 
     if (!touched) {
       return;
@@ -66,7 +66,7 @@ export class FieldStore {
   };
 
   rehydrate = (newValues: PrimitiveFilterDictionary): FieldsCollection | undefined => {
-    const touched = this.#updateFieldsFrom(newValues);
+    const touched = this.#fillFieldsFrom(newValues);
 
     if (!touched) {
       return;
@@ -162,7 +162,7 @@ export class FieldStore {
     this.#emitter.emit(type, payload);
   };
 
-  #updateFieldsFrom = (newValues: PrimitiveFilterDictionary): FilterName[] | undefined => {
+  #fillFieldsFrom = (newValues: PrimitiveFilterDictionary): FilterName[] | undefined => {
     const touched: FilterName[] = [];
 
     this.#fields.forEach((field) => {
