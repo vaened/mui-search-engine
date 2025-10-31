@@ -6,6 +6,7 @@
 import type { Events, RegisteredField, RegisteredFieldDictionary } from "@/context";
 import { FieldsCollection } from "@/context/FieldsCollection";
 import { createEventEmitter, type EventEmitter, type Unsubscribe } from "@/context/event-emitter";
+import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
 
 export type FieldOperation = "set" | "unregister" | "register" | "rehydrate" | "reset" | null;
@@ -16,27 +17,46 @@ export type FieldStoreState = Readonly<{
   touched: FilterName[];
 }>;
 
-export class FieldStore implements EventEmitter<Events> {
-  readonly #initial: PrimitiveFilterDictionary;
+export class FieldStore {
+  readonly #persistence: PersistenceAdapter;
   readonly #emitter: EventEmitter<Events>;
 
+  #initial: PrimitiveFilterDictionary;
   #listeners: Set<() => void> = new Set();
   #fields: RegisteredFieldDictionary;
   #state: FieldStoreState = { collection: FieldsCollection.empty(), touched: [], operation: null };
 
-  constructor(initial: PrimitiveFilterDictionary) {
-    this.#initial = initial;
+  constructor(persistence: PersistenceAdapter) {
+    this.#persistence = persistence;
     this.#fields = new Map();
     this.#emitter = createEventEmitter<Events>();
+    this.#initial = persistence.read() ?? {};
   }
 
   state = () => this.#state;
 
   exists = (name: FilterName) => this.#fields.has(name);
 
-  subscribe = (listener: () => void) => {
+  subscribe = (listener: () => void): Unsubscribe => {
     this.#listeners.add(listener);
     return () => this.#listeners.delete(listener);
+  };
+
+  sync = (): FieldsCollection | undefined => {
+    const newValues = this.#persistence.read();
+    const newFields = this.rehydrate(newValues);
+
+    if (!newFields) {
+      return;
+    }
+
+    return newFields;
+  };
+
+  persist = () => {
+    const collection = this.#state.collection;
+    this.#persistence.write(collection.toPrimitives());
+    this.#emit("submit", collection);
   };
 
   rehydrate = (newValues: PrimitiveFilterDictionary): FieldsCollection | undefined => {
@@ -129,15 +149,19 @@ export class FieldStore implements EventEmitter<Events> {
     this.#commit({ operation: "reset", collection, touched });
   };
 
-  on = <K extends keyof Events>(type: K, handler: (p: Events[K]) => void): Unsubscribe => {
-    return this.#emitter.on(type, handler);
+  onPersistenceChange = (listener: (fields: FieldsCollection | undefined) => void): Unsubscribe => {
+    return this.#persistence.subscribe(() => listener(this.sync()));
   };
 
-  off = <K extends keyof Events>(type: K, handler: (p: Events[K]) => void): void => {
-    this.#emitter.off(type, handler);
+  onFieldSubmit = (listener: (fields: FieldsCollection) => void): Unsubscribe => {
+    return this.#emitter.on("submit", listener);
   };
 
-  emit = <K extends keyof Events>(type: K, payload: Events[K]): void => {
+  onFieldChange = (listener: (fields: FieldsCollection, operation: FieldOperation) => void): Unsubscribe => {
+    return this.#emitter.on("change", ({ fields, operation }) => listener(fields, operation));
+  };
+
+  #emit = <K extends keyof Events>(type: K, payload: Events[K]): void => {
     this.#emitter.emit(type, payload);
   };
 
@@ -148,6 +172,7 @@ export class FieldStore implements EventEmitter<Events> {
     };
 
     this.#listeners.forEach((listener) => listener());
+    this.#emit("change", { fields: this.#state.collection, operation: this.#state.operation });
   };
 
   #parse = (newValue: PrimitiveValue | undefined, field: RegisteredField): FilterValue => {
@@ -161,8 +186,4 @@ export class FieldStore implements EventEmitter<Events> {
   #override = (field: RegisteredField<FilterValue, PrimitiveValue>, newValue: FilterValue) => {
     this.#fields.set(field.name, { ...field, updatedAt: Date.now(), value: newValue });
   };
-}
-
-export function createFieldsStore(values: PrimitiveFilterDictionary): FieldStore {
-  return new FieldStore(values);
 }

@@ -31,7 +31,7 @@ export function useActiveFilters() {
   const hasActives = actives.length > 0;
 
   useEffect(() => {
-    const unsubscribe = store.on("submit", setActivesFrom);
+    const unsubscribe = store.onFieldSubmit(setActivesFrom);
     return () => unsubscribe();
   }, [store]);
 

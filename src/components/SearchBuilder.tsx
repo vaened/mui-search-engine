@@ -5,15 +5,14 @@
 
 import { SearchEngineContext } from "@/context";
 import type { FieldsCollection } from "@/context/FieldsCollection";
-import { createFieldsStore } from "@/context/FieldStore";
-import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
-import { UrlPersistenceAdapter } from "@/persistence/UrlPersistenceAdapter";
+import { FieldStore } from "@/context/FieldStore";
 import type { PersistenceMode, PrimitiveFilterDictionary } from "@/types";
 import Grid from "@mui/material/Grid";
 import React, { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 
 export type SearchEngineContextProviderProps = {
   children: ReactNode;
+  store: FieldStore;
   loading: boolean;
   persistence?: PersistenceMode;
   manualStart?: boolean;
@@ -25,8 +24,8 @@ export type SearchEngineContextProviderProps = {
 
 export function SearchBuilder({
   children,
+  store,
   loading,
-  persistence,
   manualStart,
   autoStartDelay = 200,
   submitOnChange = false,
@@ -34,8 +33,6 @@ export function SearchBuilder({
   onChange,
 }: SearchEngineContextProviderProps) {
   const autostarted = useRef(false);
-  const persistenceAdapter = useMemo(() => resolverPersistenceAdapter(persistence), [persistence]);
-  const store = useSingleton(() => createFieldsStore(persistenceAdapter?.read() ?? {}));
 
   const {
     collection: fields,
@@ -47,7 +44,6 @@ export function SearchBuilder({
 
   useEffect(() => {
     onChange?.(fields);
-    store.emit("change", { fields, operation: lastOperation });
 
     if (lastOperation !== "reset" && (isAutostartable || !touchedFieldNames.some((name) => fields.get(name)?.submittable))) {
       return;
@@ -70,14 +66,7 @@ export function SearchBuilder({
   }, [fields, autoStartDelay]);
 
   useEffect(() => {
-    if (!persistenceAdapter?.subscribe) {
-      return;
-    }
-
-    const handleExternalUpdate = () => {
-      const newValues = persistenceAdapter.read();
-      const newFields = store.rehydrate(newValues);
-
+    const handleExternalUpdate = (newFields: FieldsCollection | undefined) => {
       if (!newFields || submitOnChange) {
         return;
       }
@@ -85,25 +74,14 @@ export function SearchBuilder({
       onSearch?.(newFields);
     };
 
-    const unsubscribe = persistenceAdapter.subscribe(handleExternalUpdate);
+    const unsubscribe = store.onPersistenceChange(handleExternalUpdate);
 
     return () => unsubscribe();
-  }, [persistenceAdapter, store]);
+  }, [store]);
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     dispatch(fields);
-  }
-
-  function resolverPersistenceAdapter(mode: PersistenceMode): PersistenceAdapter | null {
-    switch (true) {
-      case mode === "url":
-        return new UrlPersistenceAdapter();
-      case mode === undefined:
-        return null;
-    }
-
-    throw new Error("Unsupported persistence mode");
   }
 
   function refresh(dictionary: PrimitiveFilterDictionary) {
@@ -118,8 +96,7 @@ export function SearchBuilder({
 
   function dispatch(values: FieldsCollection) {
     onSearch?.(values);
-    store.emit("submit", values);
-    persistenceAdapter?.write(fields.toPrimitives());
+    store.persist();
   }
 
   return (
@@ -137,16 +114,6 @@ export function SearchBuilder({
       </Grid>
     </SearchEngineContext.Provider>
   );
-}
-
-function useSingleton<T>(factory: () => T): T {
-  const ref = useRef<T | null>(null);
-
-  if (!ref.current) {
-    ref.current = factory();
-  }
-
-  return ref.current;
 }
 
 export default SearchBuilder;
