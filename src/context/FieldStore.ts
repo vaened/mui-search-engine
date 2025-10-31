@@ -87,7 +87,6 @@ export class FieldStore {
     const registered = {
       ...(field as unknown as Field<FilterValue, PrimitiveValue>),
       defaultValue: field.value,
-      updatedAt: Date.now(),
     };
 
     this.#override(registered, this.#parse(this.#initial[field.name], registered));
@@ -187,7 +186,10 @@ export class FieldStore {
     this.#emitter.emit("change", { fields: this.#state.collection, operation: this.#state.operation });
   };
 
-  #parse = (newValue: PrimitiveValue | undefined, field: RegisteredField): FilterValue => {
+  #parse = (
+    newValue: PrimitiveValue | undefined,
+    field: Pick<RegisteredField<FilterValue, PrimitiveValue>, "unserialize" | "defaultValue">
+  ): FilterValue => {
     if (!FieldsCollection.isValidValue(newValue)) {
       return field.defaultValue;
     }
@@ -195,7 +197,7 @@ export class FieldStore {
     return field.unserialize ? field.unserialize(newValue) : newValue;
   };
 
-  #override = (field: RegisteredField<FilterValue, PrimitiveValue>, newValue: FilterValue) => {
+  #override = (field: Omit<RegisteredField<FilterValue, PrimitiveValue>, "updatedAt" | "value">, newValue: FilterValue) => {
     this.#fields.set(field.name, { ...field, updatedAt: Date.now(), value: newValue });
   };
 }
