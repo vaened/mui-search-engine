@@ -42,7 +42,7 @@ export function SearchBuilder({
       const isSubmittableOperation = ["sync", "reset", "set"].includes(lastOperation ?? "");
       const isSubmittableTouched = touchedFieldNames.some((name) => fields.get(name)?.submittable);
       const isAutoSubmitEnable = !isAutostartable && (submitOnChange || isSubmittableTouched);
-      const canBeSubmitted = isSubmittableOperation || isAutoSubmitEnable;
+      const canBeSubmitted = isSubmittableOperation && isAutoSubmitEnable;
 
       if (!canBeSubmitted) {
         return;
