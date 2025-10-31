@@ -52,7 +52,7 @@ export function SearchBuilder({
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [submitOnChange, isAutostartable]);
 
   useEffect(() => {
     if (!isAutostartable) {
