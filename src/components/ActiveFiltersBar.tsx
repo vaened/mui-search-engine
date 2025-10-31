@@ -13,6 +13,8 @@ import React, { useMemo } from "react";
 
 export type ActiveFiltersBarProps = {
   chipProps?: Omit<FilterChipProps, "field">;
+  untitled?: boolean;
+  unstyled?: boolean;
   sx?: SxProps<Theme>;
   labels?: {
     headerTitle?: string;
@@ -21,7 +23,13 @@ export type ActiveFiltersBarProps = {
   };
 };
 
-export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ labels, sx, chipProps: { onRemove, ...restOfProps } = {} }) => {
+export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
+  labels,
+  untitled,
+  unstyled,
+  sx,
+  chipProps: { onRemove, ...restOfProps } = {},
+}) => {
   const { translate, icon } = useSearchEngineConfig();
   const { actives, hasActives, syncFromStore, clearAll } = useActiveFilters();
   const { headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);
@@ -32,12 +40,20 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ labels, sx, 
   }
 
   return (
-    <Grid size={12} borderLeft={5} borderColor="#cbcfd5" pl={1.5} sx={sx} container>
-      <Grid lineHeight={1}>
-        <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary" }}>
-          {headerTitle}
-        </Typography>
-      </Grid>
+    <Grid
+      size={12}
+      borderLeft={unstyled ? undefined : 5}
+      borderColor={unstyled ? undefined : "#cbcfd5"}
+      pl={unstyled ? undefined : 1.5}
+      sx={sx}
+      container>
+      {untitled || (
+        <Grid lineHeight={1}>
+          <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary" }}>
+            {headerTitle}
+          </Typography>
+        </Grid>
+      )}
 
       <Grid display="grid" gridTemplateColumns="1fr auto" width="100%" alignItems="center" container>
         {!hasActives && <Typography>{emptyStateMessage}</Typography>}
