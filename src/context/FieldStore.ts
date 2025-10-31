@@ -9,7 +9,7 @@ import { createEventEmitter, type EventEmitter, type Unsubscribe } from "@/conte
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
 
-export type FieldOperation = "set" | "unregister" | "register" | "rehydrate" | "reset" | null;
+export type FieldOperation = "set" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
 
 export type FieldStoreState = Readonly<{
   collection: FieldsCollection;
@@ -44,13 +44,17 @@ export class FieldStore {
 
   sync = (): FieldsCollection | undefined => {
     const newValues = this.#persistence.read();
-    const newFields = this.rehydrate(newValues);
+    const touched = this.#updateFieldsFrom(newValues);
 
-    if (!newFields) {
+    if (!touched) {
       return;
     }
 
-    return newFields;
+    const collection = new FieldsCollection(this.#fields);
+
+    this.#commit({ operation: "sync", collection, touched });
+
+    return collection;
   };
 
   persist = () => {
@@ -60,18 +64,9 @@ export class FieldStore {
   };
 
   rehydrate = (newValues: PrimitiveFilterDictionary): FieldsCollection | undefined => {
-    const touched: FilterName[] = [];
+    const touched = this.#updateFieldsFrom(newValues);
 
-    this.#fields.forEach((field) => {
-      const newValue = this.#parse(newValues[field.name], field);
-
-      if (!Object.is(field.value, newValue)) {
-        this.#override(field, newValue);
-        touched.push(field.name);
-      }
-    });
-
-    if (touched.length === 0) {
+    if (!touched) {
       return;
     }
 
@@ -163,6 +158,25 @@ export class FieldStore {
 
   #emit = <K extends keyof Events>(type: K, payload: Events[K]): void => {
     this.#emitter.emit(type, payload);
+  };
+
+  #updateFieldsFrom = (newValues: PrimitiveFilterDictionary): FilterName[] | undefined => {
+    const touched: FilterName[] = [];
+
+    this.#fields.forEach((field) => {
+      const newValue = this.#parse(newValues[field.name], field);
+
+      if (!Object.is(field.value, newValue)) {
+        this.#override(field, newValue);
+        touched.push(field.name);
+      }
+    });
+
+    if (touched.length === 0) {
+      return;
+    }
+
+    return touched;
   };
 
   #commit = (state: Partial<FieldStoreState>) => {
