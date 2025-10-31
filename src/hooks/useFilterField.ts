@@ -1,6 +1,6 @@
 import type { FieldStore } from "@/context/FieldStore";
 import type { Field, FilterValue, InferHumanizeReturn, PrimitiveValue } from "@/types";
-import { useEffect, useMemo } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 export type UseSearchFieldProps<V extends FilterValue, P extends PrimitiveValue, H extends InferHumanizeReturn<V>> = Omit<
   Field<V, P, H>,
@@ -13,7 +13,7 @@ export function useFilterField<V extends FilterValue, P extends PrimitiveValue, 
   store: FieldStore,
   { name, defaultValue, ...restOfProps }: UseSearchFieldProps<V, P, H>
 ) {
-  const field = useMemo(() => store.collection().get<V, P>(name), [store.collection(), name]);
+  const field = useSyncExternalStore(store.subscribe, store.listen<V, P>(name), store.listen<V, P>(name));
 
   useEffect(() => {
     store.register({

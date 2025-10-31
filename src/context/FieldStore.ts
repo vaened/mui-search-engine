@@ -44,6 +44,10 @@ export class FieldStore {
     return () => this.#listeners.delete(listener);
   };
 
+  listen = <V extends FilterValue, P extends PrimitiveValue>(name: FilterName): (() => Field<V, P> | undefined) => {
+    return () => this.#state.collection.get<V, P>(name);
+  };
+
   sync = (): FieldsCollection | undefined => {
     const newValues = this.#persistence.read();
     const touched = this.#fillFieldsFrom(newValues);
