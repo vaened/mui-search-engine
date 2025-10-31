@@ -5,7 +5,7 @@
 
 import type { Events, RegisteredField, RegisteredFieldDictionary } from "@/context";
 import { FieldsCollection } from "@/context/FieldsCollection";
-import { createEventEmitter, type EventEmitter, type Unsubscribe } from "@/event-emitter";
+import { createEventEmitter, type EventEmitter, type Unsubscribe } from "@/context/event-emitter";
 import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
 
 export type FieldOperation = "set" | "unregister" | "register" | "rehydrate" | "reset" | null;
