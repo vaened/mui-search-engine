@@ -62,7 +62,7 @@ export class FieldStore {
   persist = () => {
     const collection = this.#state.collection;
     this.#persistence.write(collection.toPrimitives());
-    this.#emit("submit", collection);
+    this.#emitter.emit("submit", collection);
   };
 
   rehydrate = (newValues: PrimitiveFilterDictionary): FieldsCollection | undefined => {
@@ -158,10 +158,6 @@ export class FieldStore {
     return this.#emitter.on("change", ({ fields, operation }) => listener(fields, operation));
   };
 
-  #emit = <K extends keyof Events>(type: K, payload: Events[K]): void => {
-    this.#emitter.emit(type, payload);
-  };
-
   #fillFieldsFrom = (newValues: PrimitiveFilterDictionary): FilterName[] | undefined => {
     const touched: FilterName[] = [];
 
@@ -188,7 +184,7 @@ export class FieldStore {
     };
 
     this.#listeners.forEach((listener) => listener());
-    this.#emit("change", { fields: this.#state.collection, operation: this.#state.operation });
+    this.#emitter.emit("change", { fields: this.#state.collection, operation: this.#state.operation });
   };
 
   #parse = (newValue: PrimitiveValue | undefined, field: RegisteredField): FilterValue => {
