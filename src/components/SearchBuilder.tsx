@@ -8,7 +8,7 @@ import type { FieldsCollection } from "@/context/FieldsCollection";
 import { FieldStore } from "@/context/FieldStore";
 import type { PrimitiveFilterDictionary } from "@/types";
 import Grid from "@mui/material/Grid";
-import React, { useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, type ReactNode } from "react";
 
 export type SearchEngineContextProviderProps = {
   children: ReactNode;
@@ -33,27 +33,26 @@ export function SearchBuilder({
 }: SearchEngineContextProviderProps) {
   const autostarted = useRef(false);
 
-  const {
-    collection: fields,
-    touched: touchedFieldNames,
-    operation: lastOperation,
-  } = useSyncExternalStore(store.subscribe, store.state, store.state);
   const isAutostartable = !autostarted.current && !manualStart;
 
   useEffect(() => {
-    onChange?.(fields);
+    const unsubscribe = store.onFieldChange(({ collection: fields, operation: lastOperation, touched: touchedFieldNames }) => {
+      onChange?.(fields);
 
-    const isSubmittableOperation = lastOperation === "reset";
-    const isSubmittableTouched = touchedFieldNames.some((name) => fields.get(name)?.submittable);
-    const isAutoSubmitEnable = !isAutostartable && (submitOnChange || isSubmittableTouched);
-    const canBeSubmitted = isSubmittableOperation || isAutoSubmitEnable;
+      const isSubmittableOperation = lastOperation === "reset";
+      const isSubmittableTouched = touchedFieldNames.some((name) => fields.get(name)?.submittable);
+      const isAutoSubmitEnable = !isAutostartable && (submitOnChange || isSubmittableTouched);
+      const canBeSubmitted = isSubmittableOperation || isAutoSubmitEnable;
 
-    if (!canBeSubmitted) {
-      return;
-    }
+      if (!canBeSubmitted) {
+        return;
+      }
 
-    dispatch(fields);
-  }, [fields]);
+      dispatch(fields);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     if (!isAutostartable) {
@@ -61,12 +60,12 @@ export function SearchBuilder({
     }
 
     const timmer = setTimeout(() => {
-      dispatch(fields);
+      dispatch(store.collection());
       autostarted.current = true;
     }, autoStartDelay);
 
     return () => clearTimeout(timmer);
-  }, [fields, autoStartDelay]);
+  }, [store.collection(), autoStartDelay]);
 
   useEffect(() => {
     const handleExternalUpdate = (newFields: FieldsCollection | undefined) => {
@@ -82,12 +81,15 @@ export function SearchBuilder({
     return () => unsubscribe();
   }, [store]);
 
-  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    dispatch(fields);
-  }
+  const onSubmit = useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      dispatch(store.collection());
+    },
+    [store.collection()]
+  );
 
-  function refresh(dictionary: PrimitiveFilterDictionary) {
+  const refresh = useCallback((dictionary: PrimitiveFilterDictionary) => {
     const newFields = store.rehydrate(dictionary);
 
     if (!newFields) {
@@ -95,21 +97,28 @@ export function SearchBuilder({
     }
 
     onSearch?.(newFields);
-  }
+  }, []);
 
-  function dispatch(values: FieldsCollection) {
-    onSearch?.(values);
-    store.persist();
-  }
+  const dispatch = useCallback(
+    (values: FieldsCollection) => {
+      onSearch?.(values);
+      store.persist();
+    },
+    [store]
+  );
+
+  const value = useMemo(
+    () => ({
+      store,
+      isLoading: loading,
+      submitOnChange,
+      refresh,
+    }),
+    [store, loading, submitOnChange, refresh]
+  );
 
   return (
-    <SearchEngineContext.Provider
-      value={{
-        store,
-        submitOnChange,
-        isLoading: loading,
-        refresh,
-      }}>
+    <SearchEngineContext.Provider value={value}>
       <Grid component="form" onSubmit={onSubmit} spacing={2} container>
         {children}
       </Grid>
