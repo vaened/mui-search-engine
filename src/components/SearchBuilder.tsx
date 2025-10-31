@@ -8,7 +8,7 @@ import type { FieldsCollection } from "@/context/FieldsCollection";
 import { FieldStore } from "@/context/FieldStore";
 import type { PrimitiveFilterDictionary } from "@/types";
 import Grid from "@mui/material/Grid";
-import React, { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
+import React, { useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
 
 export type SearchEngineContextProviderProps = {
   children: ReactNode;
@@ -38,7 +38,6 @@ export function SearchBuilder({
     touched: touchedFieldNames,
     operation: lastOperation,
   } = useSyncExternalStore(store.subscribe, store.state, store.state);
-  const values = useMemo(() => fields.toValues(), [fields]);
   const isAutostartable = !autostarted.current && !manualStart;
 
   useEffect(() => {
@@ -108,8 +107,6 @@ export function SearchBuilder({
       value={{
         store,
         submitOnChange,
-        fields,
-        values,
         isLoading: loading,
         refresh,
       }}>

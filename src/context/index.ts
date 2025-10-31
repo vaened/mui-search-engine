@@ -30,8 +30,6 @@ export type RegisteredFieldDictionary<V extends FilterValue = FilterValue, P ext
 export interface SearchEngineContextState {
   store: FieldStore;
   submitOnChange: boolean;
-  values: ValueFilterDictionary;
-  fields: FieldsCollection;
   isLoading: boolean;
   refresh: (params: PrimitiveFilterDictionary) => void;
 }
