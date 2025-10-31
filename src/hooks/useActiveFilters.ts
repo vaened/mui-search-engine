@@ -35,10 +35,6 @@ export function useActiveFilters() {
     return () => unsubscribe();
   }, [store]);
 
-  useEffect(() => {
-    console.log({ actives: [...actives], hasActives });
-  }, [actives, hasActives]);
-
   function setActivesFrom(fields: FieldsCollection) {
     setActives(fields.filter(onlyHumanizables));
   }
