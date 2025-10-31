@@ -10,7 +10,6 @@ import type { Paths } from "@/internal";
 export type FilterName = string;
 type InputValue = null | string | FilterName | boolean | Date | Record<FilterName, unknown>;
 export type InputSize = "small" | "medium";
-export type PersistenceMode = "url" | undefined;
 export type FilterLabel = string;
 export type FilterValue = null | InputValue | InputValue[];
 export type FilterMetaData = { label: FilterLabel; description?: string };

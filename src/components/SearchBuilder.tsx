@@ -6,7 +6,7 @@
 import { SearchEngineContext } from "@/context";
 import type { FieldsCollection } from "@/context/FieldsCollection";
 import { FieldStore } from "@/context/FieldStore";
-import type { PersistenceMode, PrimitiveFilterDictionary } from "@/types";
+import type { PrimitiveFilterDictionary } from "@/types";
 import Grid from "@mui/material/Grid";
 import React, { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 
@@ -14,7 +14,6 @@ export type SearchEngineContextProviderProps = {
   children: ReactNode;
   store: FieldStore;
   loading: boolean;
-  persistence?: PersistenceMode;
   manualStart?: boolean;
   autoStartDelay?: number;
   submitOnChange?: boolean;
