@@ -19,9 +19,9 @@ function isIndexedChipArray(value: unknown): value is IndexedFilterChip<InputVal
 }
 
 export const FilterChip: React.FC<FilterChipProps> = ({ field, readonly, onRemove, ...restOfProps }) => {
-  const { store, fields } = useSearchEngine();
+  const { store } = useSearchEngine();
 
-  const humanized = field.humanize?.(field.value, fields);
+  const humanized = field.humanize?.(field.value, store.collection());
 
   if (humanized === undefined || humanized === null || humanized.length === 0) {
     return null;

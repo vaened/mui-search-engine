@@ -26,7 +26,7 @@ function onlyHumanizables(field: RegisteredField): boolean {
 }
 
 export function useActiveFilters() {
-  const { store, fields } = useSearchEngine();
+  const { store } = useSearchEngine();
   const [actives, setActives] = useState<RegisteredField[]>([]);
   const hasActives = actives.length > 0;
 
@@ -40,7 +40,7 @@ export function useActiveFilters() {
   }
 
   function syncFromStore() {
-    setActivesFrom(fields);
+    setActivesFrom(store.collection());
   }
 
   function clearAll() {
