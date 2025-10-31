@@ -6,7 +6,7 @@ export type UseSearchFieldProps<V extends FilterValue, P extends PrimitiveValue,
   Field<V, P, H>,
   "value"
 > & {
-  defaultValue: V;
+  defaultValue?: V;
 };
 
 export function useFilterField<V extends FilterValue, P extends PrimitiveValue, H extends InferHumanizeReturn<V>>(
@@ -18,7 +18,7 @@ export function useFilterField<V extends FilterValue, P extends PrimitiveValue, 
   useEffect(() => {
     store.register({
       name,
-      value: defaultValue,
+      value: (defaultValue ?? null) as V,
       ...restOfProps,
     });
 
@@ -32,6 +32,6 @@ export function useFilterField<V extends FilterValue, P extends PrimitiveValue, 
   return {
     set,
     field,
-    value: field?.value,
+    value: field?.value ?? null,
   };
 }

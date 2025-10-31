@@ -257,7 +257,7 @@ function isFlagConfiguration<N extends FilterName>(x: FlagsBag<N>): x is FlagCon
   return hasAdditive<N>(x) && hasExclusive<N>(x);
 }
 
-function parseValue<N extends FilterName>(value: N[] | undefined, bag: FlagConfiguration<N>): FlagFilterValue<N> {
+function parseValue<N extends FilterName>(value: N[] | null, bag: FlagConfiguration<N>): FlagFilterValue<N> {
   if (!value) {
     return { additives: {} as AdditiveFilterFlagBag<N>, exclusive: null };
   }
