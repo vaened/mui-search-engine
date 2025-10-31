@@ -183,7 +183,10 @@ export class FieldStore {
     };
 
     this.#listeners.forEach((listener) => listener());
-    this.#emitter.emit("change", { fields: this.#state.collection, operation: this.#state.operation });
+
+    if (state.hasOwnProperty("collection")) {
+      this.#emitter.emit("change", { fields: this.#state.collection, operation: this.#state.operation });
+    }
   };
 
   #parse = (
