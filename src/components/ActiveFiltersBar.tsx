@@ -7,11 +7,13 @@ import FilterChip, { type FilterChipProps } from "@/components/FilterChip";
 import { useSearchEngineConfig, type Translator } from "@/config";
 import type { RegisteredField } from "@/context";
 import { useActiveFilters } from "@/hooks/useActiveFilters";
-import { Box, Grid, IconButton, Tooltip, Typography } from "@mui/material";
+import type { Theme } from "@emotion/react";
+import { Box, Grid, IconButton, Tooltip, Typography, type SxProps } from "@mui/material";
 import React, { useMemo } from "react";
 
 export type ActiveFiltersBarProps = {
   chipProps?: Omit<FilterChipProps, "field">;
+  sx?: SxProps<Theme>;
   labels?: {
     headerTitle?: string;
     emptyStateMessage?: string;
@@ -19,7 +21,7 @@ export type ActiveFiltersBarProps = {
   };
 };
 
-export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ labels, chipProps: { onRemove, ...restOfProps } = {} }) => {
+export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ labels, sx, chipProps: { onRemove, ...restOfProps } = {} }) => {
   const { translate, icon } = useSearchEngineConfig();
   const { actives, hasActives, syncFromStore, clearAll } = useActiveFilters();
   const { headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);
@@ -30,7 +32,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({ labels, chip
   }
 
   return (
-    <Grid size={12} borderLeft={5} borderColor="#cbcfd5" pl={1.5} container>
+    <Grid size={12} borderLeft={5} borderColor="#cbcfd5" pl={1.5} sx={sx} container>
       <Grid lineHeight={1}>
         <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary" }}>
           {headerTitle}
