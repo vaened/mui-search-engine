@@ -7,24 +7,6 @@ import { useSearchBuilder, type RegisteredField } from "@/context";
 import type { FieldsCollection } from "@/context/FieldsCollection";
 import { useEffect, useState } from "react";
 
-function onlyHumanizables(field: RegisteredField): boolean {
-  const value = field.value;
-
-  if (field.humanize === undefined || value === null || value === undefined) {
-    return false;
-  }
-
-  if (Array.isArray(value) && value.length === 0) {
-    return false;
-  }
-
-  if (typeof value === "string" && value.trim() === "") {
-    return false;
-  }
-
-  return true;
-}
-
 export function useActiveFilters() {
   const { store } = useSearchBuilder();
   const [actives, setActives] = useState<RegisteredField[]>([]);
@@ -49,4 +31,22 @@ export function useActiveFilters() {
   }
 
   return { actives, hasActives, syncFromStore, clearAll };
+}
+
+function onlyHumanizables(field: RegisteredField): boolean {
+  const value = field.value;
+
+  if (field.humanize === undefined || value === null || value === undefined) {
+    return false;
+  }
+
+  if (Array.isArray(value) && value.length === 0) {
+    return false;
+  }
+
+  if (typeof value === "string" && value.trim() === "") {
+    return false;
+  }
+
+  return true;
 }
