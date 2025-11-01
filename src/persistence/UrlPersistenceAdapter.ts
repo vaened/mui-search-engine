@@ -36,7 +36,7 @@ export class UrlPersistenceAdapter implements PersistenceAdapter {
 
     Object.entries(values).forEach(([key, value]) => {
       if (Array.isArray(value)) {
-        const values = [...value].sort();
+        const values = [...new Set(value)].sort();
 
         values.forEach((v) => {
           if (!this.#isValid(v)) {
