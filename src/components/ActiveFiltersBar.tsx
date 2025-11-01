@@ -12,7 +12,8 @@ import { Box, Grid, IconButton, Tooltip, Typography, type SxProps } from "@mui/m
 import React, { useMemo } from "react";
 
 export type ActiveFiltersBarProps = {
-  chipProps?: Omit<FilterChipProps, "field">;
+  chipProps?: Omit<FilterChipProps, "field" | "readonly">;
+  readonly?: boolean;
   untitled?: boolean;
   unstyled?: boolean;
   sx?: SxProps<Theme>;
@@ -25,6 +26,7 @@ export type ActiveFiltersBarProps = {
 
 export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   labels,
+  readonly,
   untitled,
   unstyled,
   sx,
@@ -61,7 +63,13 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
         {hasActives && (
           <Box display="flex" flexWrap="wrap" gap={1}>
             {actives.map((field) => (
-              <FilterChip key={`filter-chip-group-${field.name}`} field={field} onRemove={onFilterChipRemove} {...restOfProps} />
+              <FilterChip
+                key={`filter-chip-group-${field.name}`}
+                field={field}
+                readonly={readonly}
+                onRemove={onFilterChipRemove}
+                {...restOfProps}
+              />
             ))}
           </Box>
         )}
