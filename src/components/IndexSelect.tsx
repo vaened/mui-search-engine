@@ -5,7 +5,7 @@
 
 import DropdownMenu from "@/components/DropdownMenu";
 import { useSearchEngineConfig, type Translator } from "@/config";
-import { useSearchEngine } from "@/context";
+import { useSearchBuilder } from "@/context";
 import { useFilterField } from "@/hooks/useFilterField";
 import type { FilterBag, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom, dictionaryToFilterElements } from "@/utils";
@@ -46,7 +46,7 @@ export function IndexSelect<N extends FilterName>({
   uncaret,
   onChange,
 }: IndexSelectProps<N>) {
-  const { store } = useSearchEngine();
+  const { store } = useSearchBuilder();
   const { icon, translate } = useSearchEngineConfig();
   const anchorRef = React.useRef<HTMLButtonElement>(null);
   const dictionary = useMemo(() => createFilterDictionaryFrom(options), [options]);

@@ -5,7 +5,7 @@
 
 import DropdownMenu from "@/components/DropdownMenu";
 import { useSearchEngineConfig, type Translator } from "@/config";
-import { useSearchEngine } from "@/context";
+import { useSearchBuilder } from "@/context";
 import { useFilterField } from "@/hooks/useFilterField";
 import type { FilterBag, FilterDictionary, FilterElement, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
@@ -67,7 +67,7 @@ export function FlagsSelect<N extends FilterName>({
   defaultValue = [],
   onChange,
 }: FlagsSelectProps<N>) {
-  const { store } = useSearchEngine();
+  const { store } = useSearchBuilder();
   const { icon, translate } = useSearchEngineConfig();
   const anchorRef = useRef<HTMLButtonElement>(null);
   const dictionary = useMemo(() => createDictionary(options), [options]);

@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { useSearchEngine, type RegisteredField } from "@/context";
+import { useSearchBuilder, type RegisteredField } from "@/context";
 import type { FilterValue, IndexedFilterChip, InputValue } from "@/types";
 import { Chip, type ChipProps } from "@mui/material";
 import React from "react";
@@ -19,7 +19,7 @@ function isIndexedChipArray(value: unknown): value is IndexedFilterChip<InputVal
 }
 
 export const FilterChip: React.FC<FilterChipProps> = ({ field, readonly, onRemove, ...restOfProps }) => {
-  const { store } = useSearchEngine();
+  const { store } = useSearchBuilder();
 
   const humanized = field.humanize?.(field.value, store.collection());
 

@@ -7,7 +7,7 @@ import DebounceInputSearch from "@/components/DebounceInputSearch";
 import FlagsSelect, { type FlagsBag } from "@/components/FlagsSelect";
 import IndexSelect from "@/components/IndexSelect";
 import { useSearchEngineConfig, type Translator } from "@/config";
-import { useSearchEngine } from "@/context";
+import { useSearchBuilder } from "@/context";
 import { useFilterField } from "@/hooks/useFilterField";
 import type { FilterBag, FilterName, InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
@@ -174,7 +174,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   onChange,
 }: SearchBarProps<IB, FB>) {
   const inputId = id || useId();
-  const { store, submitOnChange, isLoading } = useSearchEngine();
+  const { store, submitOnChange, isLoading } = useSearchBuilder();
   const { icon, translate } = useSearchEngineConfig();
   const inputSearch = useRef<HTMLInputElement>(undefined);
   const dictionary = useMemo(() => createFilterDictionaryFrom<KeysOf<IB>>(indexes), [indexes]);

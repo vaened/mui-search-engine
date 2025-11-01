@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { useSearchEngine, type RegisteredField } from "@/context";
+import { useSearchBuilder, type RegisteredField } from "@/context";
 import type { FieldsCollection } from "@/context/FieldsCollection";
 import { useEffect, useState } from "react";
 
@@ -26,7 +26,7 @@ function onlyHumanizables(field: RegisteredField): boolean {
 }
 
 export function useActiveFilters() {
-  const { store } = useSearchEngine();
+  const { store } = useSearchBuilder();
   const [actives, setActives] = useState<RegisteredField[]>([]);
   const hasActives = actives.length > 0;
 

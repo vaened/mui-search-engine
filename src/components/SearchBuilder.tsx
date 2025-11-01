@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { SearchEngineContext, SearchFieldsStoreContext } from "@/context";
+import { SearchBuilderContext, SearchFieldsStoreContext } from "@/context";
 import type { FieldsCollection } from "@/context/FieldsCollection";
 import { FieldStore } from "@/context/FieldStore";
 import type { PrimitiveFilterDictionary } from "@/types";
@@ -123,13 +123,13 @@ export function SearchBuilder({
   );
 
   return (
-    <SearchEngineContext.Provider value={value}>
+    <SearchBuilderContext.Provider value={value}>
       <SearchStoreContextProvider store={store}>
         <Grid component="form" onSubmit={onSubmit} spacing={2} container>
           {children}
         </Grid>
       </SearchStoreContextProvider>
-    </SearchEngineContext.Provider>
+    </SearchBuilderContext.Provider>
   );
 }
 

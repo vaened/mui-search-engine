@@ -24,7 +24,7 @@ export type RegisteredFieldDictionary<V extends FilterValue = FilterValue, P ext
   RegisteredField<V, P>
 >;
 
-export interface SearchEngineContextState {
+export interface SearchBuilderContextState {
   store: FieldStore;
   submitOnChange: boolean;
   isLoading: boolean;
@@ -35,11 +35,11 @@ export interface SearchStoreState {
   state: FieldStoreState;
 }
 
-export const SearchEngineContext = createContext<SearchEngineContextState | undefined>(undefined);
+export const SearchBuilderContext = createContext<SearchBuilderContextState | undefined>(undefined);
 export const SearchFieldsStoreContext = createContext<SearchStoreState | undefined>(undefined);
 
-export const useSearchEngine = (): SearchEngineContextState => {
-  const context = useContext(SearchEngineContext);
+export const useSearchBuilder = (): SearchBuilderContextState => {
+  const context = useContext(SearchBuilderContext);
 
   if (!context) {
     throw new Error("useSearchEngine must be used within a SearchBuilder");

@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { useSearchEngine } from "@/context";
+import { useSearchBuilder } from "@/context";
 import { useFilterField } from "@/hooks/useFilterField";
 import type { Field, FilterValue, PrimitiveValue } from "@/types";
 import { Select, type SelectProps } from "@mui/material";
@@ -25,7 +25,7 @@ export function OptionSelect<V extends FilterValue, P extends PrimitiveValue>({
   unserialize,
   ...props
 }: OptionSelectProps<V, P>) {
-  const { store } = useSearchEngine();
+  const { store } = useSearchBuilder();
   const { value, set } = useFilterField(store, {
     name,
     defaultValue,
