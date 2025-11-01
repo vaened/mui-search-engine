@@ -32,18 +32,21 @@ export interface IndexedFilterChip<V extends InputValue[] = InputValue[]> extend
 export type InferHumanizeReturn<V extends FilterValue> = V extends (infer T extends InputValue)[] ? IndexedFilterChip<T[]>[] : FilterLabel;
 export type InferSerializeReturn<V extends FilterValue> = V extends InputValue[] ? string[] : string;
 
-export type Field<
+export interface FieldOptions {
+  submittable?: boolean;
+}
+
+export interface Field<
   V extends FilterValue = FilterValue,
   P extends PrimitiveValue = InferSerializeReturn<V>,
   H extends InferHumanizeReturn<V> = InferHumanizeReturn<V>
-> = {
+> extends FieldOptions {
   name: FilterName;
   value: V;
-  submittable?: boolean;
   humanize?: (value: V, fields: FieldsCollection) => H;
   serialize?: (value: V) => P;
   unserialize?: (value: P) => V;
-};
+}
 
 export type FieldDictionary = Record<FilterName, Field<FilterValue, PrimitiveValue>>;
 export type SearchParams = Partial<Record<FilterName, FilterValue>>;

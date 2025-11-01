@@ -8,9 +8,9 @@ import { FieldsCollection } from "@/context/FieldsCollection";
 import { createEventEmitter, type EventEmitter, type Unsubscribe } from "@/context/event-emitter";
 import { url } from "@/persistence";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
-import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
+import type { Field, FieldOptions, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
 
-export type FieldOperation = "set" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
+export type FieldOperation = "set" | "update" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
 
 export type FieldStoreState = Readonly<{
   collection: FieldsCollection;
@@ -111,6 +111,26 @@ export class FieldStore {
 
     this.#commit({
       operation: "unregister",
+      collection: new FieldsCollection(this.#fields),
+    });
+  };
+
+  update = (name: FilterName, meta: Partial<FieldOptions>) => {
+    if (Object.keys(meta).length === 0) {
+      return;
+    }
+
+    const field = this.#fields.get(name);
+
+    if (!field) {
+      throw new Error(`Field "${name}" does not exist`);
+    }
+
+    this.#fields.set(name, { ...field, ...meta });
+
+    this.#commit({
+      operation: "update",
+      touched: [name],
       collection: new FieldsCollection(this.#fields),
     });
   };
