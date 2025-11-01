@@ -19,11 +19,11 @@ export type FilterFieldControllerProps<V extends FilterValue, P extends InferSer
   control: Control<V>;
 };
 
-export function FilterFieldController<V extends FilterValue, P extends InferSerializeReturn<V>, H extends InferHumanizeReturn<V>>({
-  store,
-  control,
-  ...restOfProps
-}: FilterFieldControllerProps<V, P, H>) {
+export function FilterFieldController<
+  V extends FilterValue,
+  P extends InferSerializeReturn<V>,
+  H extends InferHumanizeReturn<V> = InferHumanizeReturn<V>
+>({ store, control, ...restOfProps }: FilterFieldControllerProps<V, P, H>) {
   const { value, set } = useFilterField(store, restOfProps);
 
   return control({ value, set });
