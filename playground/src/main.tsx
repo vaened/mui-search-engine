@@ -1,9 +1,9 @@
-import React from "react";
+import { SearchEngineConfigProvider } from "@/config";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+  <SearchEngineConfigProvider locale="es">
     <App />
-  </React.StrictMode>
+  </SearchEngineConfigProvider>
 );
