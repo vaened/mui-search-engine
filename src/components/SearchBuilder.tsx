@@ -3,12 +3,12 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { SearchEngineContext } from "@/context";
+import { SearchEngineContext, SearchFieldsStoreContext } from "@/context";
 import type { FieldsCollection } from "@/context/FieldsCollection";
 import { FieldStore } from "@/context/FieldStore";
 import type { PrimitiveFilterDictionary } from "@/types";
 import Grid from "@mui/material/Grid";
-import React, { useCallback, useEffect, useMemo, useRef, type ReactNode } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 
 export type SearchEngineContextProviderProps = {
   children: ReactNode;
@@ -20,6 +20,11 @@ export type SearchEngineContextProviderProps = {
   onSearch?: (params: FieldsCollection) => void;
   onChange?: (params: FieldsCollection) => void;
 };
+
+function SearchStoreContextProvider({ store, children }: { store: FieldStore; children: ReactNode }) {
+  const state = useSyncExternalStore(store.subscribe, store.state, store.state);
+  return <SearchFieldsStoreContext.Provider value={{ state }}>{children}</SearchFieldsStoreContext.Provider>;
+}
 
 export function SearchBuilder({
   children,
@@ -119,9 +124,11 @@ export function SearchBuilder({
 
   return (
     <SearchEngineContext.Provider value={value}>
-      <Grid component="form" onSubmit={onSubmit} spacing={2} container>
-        {children}
-      </Grid>
+      <SearchStoreContextProvider store={store}>
+        <Grid component="form" onSubmit={onSubmit} spacing={2} container>
+          {children}
+        </Grid>
+      </SearchStoreContextProvider>
     </SearchEngineContext.Provider>
   );
 }
