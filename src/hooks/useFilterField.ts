@@ -43,6 +43,6 @@ export function useFilterField<V extends FilterValue, P extends PrimitiveValue, 
   return {
     set,
     field,
-    value: field?.value ?? null,
+    value: field?.value ?? defaultValue ?? null,
   };
 }
