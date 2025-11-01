@@ -3,11 +3,10 @@
  * @link https://vaened.dev DevFolio
  */
 
+import FilterFieldController from "@/components/FilterFieldController";
 import { useSearchBuilder } from "@/context";
-import { useFilterField } from "@/hooks/useFilterField";
-import type { Field, FilterValue, PrimitiveValue } from "@/types";
+import type { Field, FilterValue, InferSerializeReturn, PrimitiveValue } from "@/types";
 import { Select, type SelectProps } from "@mui/material";
-import type { SelectChangeEvent } from "node_modules/@mui/material";
 
 export type OptionSelectProps<V extends FilterValue, P extends PrimitiveValue> = Omit<SelectProps<V>, "value" | "name"> &
   Omit<Field<V, P>, "value"> & {
@@ -17,7 +16,6 @@ export type OptionSelectProps<V extends FilterValue, P extends PrimitiveValue> =
 export function OptionSelect<V extends FilterValue, P extends PrimitiveValue>({
   name,
   defaultValue,
-  children,
   multiple,
   submittable,
   humanize,
@@ -26,26 +24,19 @@ export function OptionSelect<V extends FilterValue, P extends PrimitiveValue>({
   ...props
 }: OptionSelectProps<V, P>) {
   const { store } = useSearchBuilder();
-  const { value, set } = useFilterField(store, {
-    name,
-    defaultValue,
-    submittable,
-    humanize,
-    serialize,
-    unserialize,
-  });
-
-  function onOptionChange(event: SelectChangeEvent<V>) {
-    set(event.target.value as V);
-  }
 
   return (
-    <Select
-      {...props}
-      onChange={onOptionChange}
-      multiple={multiple}
-      value={(value ? value : multiple ? [] : "") as V}
-      children={children}
+    <FilterFieldController
+      store={store}
+      name={name}
+      defaultValue={defaultValue}
+      humanize={humanize}
+      serialize={serialize as (value: V) => InferSerializeReturn<V>}
+      unserialize={unserialize as (value: InferSerializeReturn<V>) => V}
+      submittable={submittable}
+      control={({ value, onChange }) => (
+        <Select {...props} multiple={multiple} value={(value ? value : multiple ? [] : "") as V} onChange={onChange} />
+      )}
     />
   );
 }
