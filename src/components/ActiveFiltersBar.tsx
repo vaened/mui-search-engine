@@ -74,15 +74,17 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
           </Box>
         )}
 
-        <Box>
-          <Tooltip title={clearAllButtonTooltip} placement="left" arrow>
-            <span>
-              <IconButton onClick={clearAll} aria-label="delete" disabled={!hasActives}>
-                {icon("activeFiltersClearAllIcon")}
-              </IconButton>
-            </span>
-          </Tooltip>
-        </Box>
+        {!readonly && (
+          <Box>
+            <Tooltip title={clearAllButtonTooltip} placement="left" arrow>
+              <span>
+                <IconButton onClick={clearAll} aria-label="delete" disabled={!hasActives}>
+                  {icon("activeFiltersClearAllIcon")}
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Box>
+        )}
       </Grid>
     </Grid>
   );
