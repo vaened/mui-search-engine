@@ -45,6 +45,7 @@ export function useActiveFilters() {
 
   function clearAll() {
     store.reset();
+    syncFromStore();
   }
 
   return { actives, hasActives, syncFromStore, clearAll };
