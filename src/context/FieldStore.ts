@@ -3,9 +3,9 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { Events, RegisteredField, RegisteredFieldDictionary } from "@/context";
+import type { RegisteredField, RegisteredFieldDictionary } from "@/context";
 import { FieldsCollection } from "@/context/FieldsCollection";
-import { createEventEmitter, type EventEmitter, type Unsubscribe } from "@/context/event-emitter";
+import { type EventEmitter, type Unsubscribe } from "@/context/event-emitter";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
 
@@ -19,17 +19,17 @@ export type FieldStoreState = Readonly<{
 
 export class FieldStore {
   readonly #persistence: PersistenceAdapter;
-  readonly #emitter: EventEmitter<Events>;
+  readonly #emitter: EventEmitter;
 
   #initial: PrimitiveFilterDictionary;
   #listeners: Set<() => void> = new Set();
   #fields: RegisteredFieldDictionary;
   #state: FieldStoreState = { collection: FieldsCollection.empty(), touched: [], operation: null };
 
-  constructor(persistence: PersistenceAdapter, emitter: EventEmitter<Events> | null = null) {
+  constructor(persistence: PersistenceAdapter, emitter: EventEmitter) {
     this.#fields = new Map();
     this.#persistence = persistence;
-    this.#emitter = emitter ?? createEventEmitter<Events>();
+    this.#emitter = emitter;
     this.#initial = persistence.read() ?? {};
   }
 
