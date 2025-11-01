@@ -38,7 +38,7 @@ export function SearchBuilder({
 }: SearchEngineContextProviderProps) {
   const autostarted = useRef(false);
 
-  const isAutostartable = !autostarted.current && !manualStart;
+  const checkAutostartable = useCallback(() => !autostarted.current && !manualStart, [manualStart]);
 
   useEffect(() => {
     const unsubscribe = store.onFieldChange(({ collection: fields, operation: lastOperation, touched: touchedFieldNames }) => {
@@ -46,7 +46,7 @@ export function SearchBuilder({
 
       const isSubmittableOperation = ["sync", "reset", "set"].includes(lastOperation ?? "");
       const isSubmittableTouched = touchedFieldNames.some((name) => fields.get(name)?.submittable);
-      const isAutoSubmitEnable = !isAutostartable && (submitOnChange || isSubmittableTouched);
+      const isAutoSubmitEnable = !checkAutostartable() && (submitOnChange || isSubmittableTouched);
       const canBeSubmitted = isSubmittableOperation && isAutoSubmitEnable;
 
       if (!canBeSubmitted) {
@@ -57,10 +57,10 @@ export function SearchBuilder({
     });
 
     return () => unsubscribe();
-  }, [submitOnChange, isAutostartable]);
+  }, [submitOnChange, checkAutostartable]);
 
   useEffect(() => {
-    if (!isAutostartable) {
+    if (!checkAutostartable()) {
       return;
     }
 
@@ -69,7 +69,10 @@ export function SearchBuilder({
       autostarted.current = true;
     }, autoStartDelay);
 
-    return () => clearTimeout(timmer);
+    return () => {
+      clearTimeout(timmer);
+      autostarted.current = false;
+    };
   }, [store.collection(), autoStartDelay]);
 
   useEffect(() => {
