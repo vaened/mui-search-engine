@@ -1,8 +1,32 @@
+import ActiveFiltersBar from "@/components/ActiveFiltersBar";
+import FilterFieldController from "@/components/FilterFieldController";
 import OptionSelect from "@/components/OptionSelect";
 import SearchBar, { type FlagsKeysOf } from "@/components/SearchBar";
 import SearchBuilder from "@/components/SearchBuilder";
+import type { FieldsCollection } from "@/context/FieldsCollection";
+import { FieldStore } from "@/context/FieldStore";
+import { UrlPersistenceAdapter } from "@/persistence/UrlPersistenceAdapter";
 import type { SearchParams } from "@/types";
-import { Container, CssBaseline, FormControl, Grid, InputLabel, MenuItem, ThemeProvider, createTheme } from "@mui/material";
+import {
+  Container,
+  CssBaseline,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  ThemeProvider,
+  createTheme,
+} from "@mui/material";
+import type { SelectChangeEvent } from "node_modules/@mui/material";
+import { useRef } from "react";
 
 const theme = createTheme();
 
@@ -10,11 +34,9 @@ const additives = {
   onlyActives: "Solo activos",
   inDebt: {
     label: "Con deuda",
-    description: "Usuarios que tienen un deuda pendiente de pago.",
   },
   withoutEmail: {
     label: "Sin email",
-    description: "Filtrar a todos los usuarios sin email.",
   },
 };
 
@@ -80,13 +102,25 @@ interface Params extends SearchParams {
   flags?: FlagsKeysOf<typeof flags>[];
 }
 
-export default function App() {
-  function search(params: Params) {
-    console.log({ submit: { ...params } });
+function useSingleton<T>(state: () => T): T {
+  const instance = useRef<T | null>();
+
+  if (!instance.current) {
+    instance.current = state();
   }
 
-  function onChange(params: Params) {
-    console.log({ changed: { ...params } });
+  return instance.current;
+}
+
+export default function App() {
+  const store = useSingleton(() => new FieldStore(new UrlPersistenceAdapter()));
+
+  function search(collection: FieldsCollection) {
+    console.log({ submit: [...collection.toArray()] });
+  }
+
+  function onChange(collection: FieldsCollection) {
+    console.log({ changed: { ...collection.toValues() } });
   }
 
   return (
@@ -97,57 +131,104 @@ export default function App() {
 
         <Grid container gap={2} flexDirection="column">
           <Grid>
-            <SearchBuilder onSearch={search} onChange={onChange} loading={false} persistence="url">
+            <SearchBuilder store={store} onSearch={search} onChange={onChange} loading={false}>
               <Grid size={12}>
                 <FormControl fullWidth>
-                  <InputLabel id="country">Sedes</InputLabel>
-                  <OptionSelect
+                  <InputLabel id="country">Pais</InputLabel>
+                  <OptionSelect<typeof countries, string[]>
                     name="country"
                     labelId="country"
-                    defaultValue={countries[0]}
-                    label="Sedes"
-                    unserialize={(a) => countries.find((c) => c.value === a) ?? null}
-                    serialize={(a) => a?.value as string}>
+                    defaultValue={[]}
+                    serialize={(a) => a.map((a) => a?.value as string)}
+                    unserialize={(a) => a.map((a) => countries.find((c) => c.value === a) as (typeof countries)[number])}
+                    humanize={(centers) => centers.map((center) => ({ value: center, label: center.label }))}
+                    label="Pais"
+                    submittable
+                    multiple>
                     <MenuItem value="" disabled>
                       Todos
                     </MenuItem>
-                    {countries.map((country) => (
-                      <MenuItem value={country as any}>{country.label}</MenuItem>
+                    {countries.map((country, index) => (
+                      <MenuItem key={`country-${index}`} value={country as any}>
+                        {country.label}
+                      </MenuItem>
                     ))}
                   </OptionSelect>
                 </FormControl>
               </Grid>
               <Grid size={6}>
                 <FormControl fullWidth>
-                  <InputLabel id="centers">Sedes</InputLabel>
-                  <OptionSelect name="centers" labelId="centers" defaultValue={[]} label="Sedes" multiple>
+                  <InputLabel id="centers" shrink>
+                    Sedes
+                  </InputLabel>
+                  <OptionSelect name="centers" labelId="centers" defaultValue="" label="Sedes" humanize={(values) => values} displayEmpty>
                     <MenuItem value="" disabled>
                       Todos
                     </MenuItem>
-                    <MenuItem value="person">San Juan de Lurigancho</MenuItem>
-                    <MenuItem value="account">Independencia</MenuItem>
+                    <MenuItem value="San Juan de Lurigancho">San Juan de Lurigancho</MenuItem>
+                    <MenuItem value="Independencia">Independencia</MenuItem>
                   </OptionSelect>
                 </FormControl>
               </Grid>
               <Grid size={6}>
-                <FormControl fullWidth>
-                  <InputLabel id="classroom">Salones</InputLabel>
-                  <OptionSelect name="classroom" labelId="classroom" defaultValue="sjl2" label="Salones">
-                    <MenuItem value="sjl1">SJL-1</MenuItem>
-                    <MenuItem value="sjl2">JSL-2</MenuItem>
-                  </OptionSelect>
-                </FormControl>
-              </Grid>
-              <Grid size={12}>
-                <SearchBar
-                  label="Buscar coincidencias por"
-                  name={{ query: "q" }}
-                  indexes={indexes}
-                  flags={flags}
-                  defaultIndex={"account"}
+                <FilterFieldController
+                  store={store}
+                  name="classroom"
+                  submittable
+                  humanize={(value) => value as string}
+                  control={({ value, set }) => (
+                    <FormControl fullWidth>
+                      <InputLabel id="centers" shrink>
+                        Sedes
+                      </InputLabel>
+                      <Select
+                        name="classroom"
+                        labelId="classroom"
+                        value={value ?? ""}
+                        onChange={(event: SelectChangeEvent<unknown>, child: React.ReactNode) => {
+                          set(event.target.value as "");
+                        }}
+                        label="Salones"
+                        displayEmpty>
+                        <MenuItem value="" disabled>
+                          Todos
+                        </MenuItem>
+                        <MenuItem value="sjl1">SJL-1</MenuItem>
+                        <MenuItem value="sjl2">JSL-2</MenuItem>
+                      </Select>
+                    </FormControl>
+                  )}
                 />
               </Grid>
+              <Grid size={12}>
+                <SearchBar name={{ query: "q" }} size="medium" indexes={indexes} flags={flags} defaultIndex={"account"} />
+              </Grid>
+              <Grid size={12}>
+                <ActiveFiltersBar />
+              </Grid>
             </SearchBuilder>
+          </Grid>
+          <Grid size={12}>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Label</TableCell>
+                    <TableCell>Description</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Object.entries(indexes).map(([key, value]) => (
+                    <TableRow key={key}>
+                      <TableCell>{key}</TableCell>
+                      <TableCell>{value.label}</TableCell>
+                      <TableCell>{value.description}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
         </Grid>
       </Container>
