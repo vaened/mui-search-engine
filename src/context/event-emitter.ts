@@ -3,7 +3,13 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { Events } from "@/context";
+import type { FieldsCollection } from "@/context/FieldsCollection";
+import type { FieldStoreState } from "@/context/FieldStore";
+
+export type Events = {
+  submit: FieldsCollection;
+  change: FieldStoreState;
+};
 
 export type Unsubscribe = () => void;
 

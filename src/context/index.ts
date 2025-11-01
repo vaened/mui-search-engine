@@ -1,17 +1,6 @@
-/**
- * @author enea dhack <contact@vaened.dev>
- * @link https://vaened.dev DevFolio
- */
-
-import type { FieldsCollection } from "@/context/FieldsCollection";
 import type { FieldStore, FieldStoreState } from "@/context/FieldStore";
 import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
 import { createContext, useContext } from "react";
-
-export type Events = {
-  submit: FieldsCollection;
-  change: FieldStoreState;
-};
 
 export type RegisteredField<V extends FilterValue = FilterValue, P extends PrimitiveValue = PrimitiveValue> = Readonly<Field<V, P>> &
   Readonly<{
