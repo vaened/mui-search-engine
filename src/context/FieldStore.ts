@@ -5,7 +5,8 @@
 
 import type { RegisteredField, RegisteredFieldDictionary } from "@/context";
 import { FieldsCollection } from "@/context/FieldsCollection";
-import { type EventEmitter, type Unsubscribe } from "@/context/event-emitter";
+import { createEventEmitter, type EventEmitter, type Unsubscribe } from "@/context/event-emitter";
+import { url } from "@/persistence";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import type { Field, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
 
@@ -207,4 +208,13 @@ export class FieldStore {
   #override = (field: Omit<RegisteredField<FilterValue, PrimitiveValue>, "updatedAt" | "value">, newValue: FilterValue) => {
     this.#fields.set(field.name, { ...field, updatedAt: Date.now(), value: newValue });
   };
+}
+
+export type FieldStoreOptions = {
+  persistence?: PersistenceAdapter;
+  emitter?: EventEmitter;
+};
+
+export function createFieldStore({ persistence, emitter }: FieldStoreOptions = {}) {
+  return new FieldStore(persistence ?? url(), emitter ?? createEventEmitter());
 }
