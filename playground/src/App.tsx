@@ -179,7 +179,7 @@ export default function App() {
                   control={({ value, set }) => (
                     <FormControl fullWidth>
                       <InputLabel id="centers" shrink>
-                        Sedes
+                        Salones
                       </InputLabel>
                       <Select
                         name="classroom"
