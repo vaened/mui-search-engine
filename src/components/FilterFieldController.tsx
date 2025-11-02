@@ -8,7 +8,7 @@ import { useFilterField } from "@/hooks/useFilterField";
 import type { Field, FilterValue, InferHumanizeReturn, InferSerializeReturn } from "@/types";
 import { type ReactElement } from "react";
 
-type Event = { target: any };
+type Event = { target: any } | any;
 
 type Control<V extends FilterValue> = ({ value, onChange }: { value: V | null; onChange: (event: Event) => void }) => ReactElement;
 
