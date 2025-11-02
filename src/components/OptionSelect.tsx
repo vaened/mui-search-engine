@@ -19,17 +19,17 @@ type NormalizedOptionItem<V extends OptionValue, I extends UnpackedValue<V>> = {
   label: ReactElement | string;
 };
 
-export type ArrayOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>, O> = Omit<SelectProps<V>, "value" | "name"> & {
+export type ArrayOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>, O> = {
   items: O[];
   getValue: (item: O) => I;
   getLabel: (item: O) => ReactElement | string;
 };
 
-export type ObjectOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>> = Omit<SelectProps<V>, "value" | "name"> & {
+export type ObjectOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>> = {
   items?: Record<I, ReactElement | string>;
 };
 
-export type OptionSelectProps<V extends OptionValue, I extends UnpackedValue<V>, O> = {
+export type OptionSelectProps<V extends OptionValue, I extends UnpackedValue<V>, O> = Omit<SelectProps<V>, "value" | "name"> & {
   name: FilterName;
   submittable: boolean;
   untrackable?: boolean;
@@ -69,15 +69,13 @@ export function OptionSelect<V extends OptionValue, I extends UnpackedValue<V>, 
       control={({ value, onChange }) => {
         return (
           <Select {...restOfProps} multiple={multiple} value={value as V} onChange={onChange}>
-            {!children &&
-              items &&
-              items.map(({ value, label }, index) => (
-                <MenuItem key={String(value)} value={value}>
-                  {label}
-                </MenuItem>
-              ))}
-
-            {children}
+            {children
+              ? children
+              : items?.map(({ value, label }, index) => (
+                  <MenuItem key={String(value)} value={value}>
+                    {label}
+                  </MenuItem>
+                ))}
           </Select>
         );
       }}
