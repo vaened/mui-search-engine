@@ -37,10 +37,6 @@ export type OptionSelectProps<V extends OptionValue, I extends UnpackedValue<V>,
   toHumanLabel?: (value: I) => string;
 } & (ArrayOptionItemProps<V, I, O> | ObjectOptionItemProps<V, I>);
 
-function isSingularValue(value: OptionValue): value is SingularValue {
-  return !Array.isArray(value);
-}
-
 export function OptionSelect<V extends OptionValue, I extends UnpackedValue<V>, O>(props: OptionSelectProps<V, I, O>) {
   const { store } = useSearchBuilder();
   const { name, defaultValue, multiple, submittable, untrackable, children, toHumanLabel, ...restOfProps } = props;
@@ -88,6 +84,10 @@ export function OptionSelect<V extends OptionValue, I extends UnpackedValue<V>, 
       }}
     />
   );
+}
+
+function isSingularValue(value: OptionValue): value is SingularValue {
+  return !Array.isArray(value);
 }
 
 function isArrayOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>, O>(
