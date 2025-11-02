@@ -5,6 +5,8 @@
 
 type IsRecord<T> = T extends object ? (T extends readonly any[] ? false : T extends Function ? false : true) : false;
 
+export type UnpackedValue<T> = T extends (infer U)[] ? U : T;
+
 export type Paths<T> = IsRecord<T> extends true
   ? {
       [K in keyof T & string]: IsRecord<T[K]> extends true ? `${K}.${Paths<T[K]>}` : `${K}`;

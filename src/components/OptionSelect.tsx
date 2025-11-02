@@ -5,38 +5,65 @@
 
 import FilterFieldController from "@/components/FilterFieldController";
 import { useSearchBuilder } from "@/context";
-import type { Field, FilterValue, InferSerializeReturn, PrimitiveValue } from "@/types";
+import type { UnpackedValue } from "@/internal";
+import type { FilterName, InferHumanizeReturn, InferSerializeReturn } from "@/types";
 import { Select, type SelectProps } from "@mui/material";
+import { useCallback } from "react";
 
-export type OptionSelectProps<V extends FilterValue, P extends PrimitiveValue> = Omit<SelectProps<V>, "value" | "name"> &
-  Omit<Field<V, P>, "value"> & {
-    defaultValue: V;
-  };
+type SingularValue = string | number | boolean;
 
-export function OptionSelect<V extends FilterValue, P extends PrimitiveValue>({
+type OptionValue = SingularValue | SingularValue[];
+
+export type OptionSelectProps<V extends OptionValue, H extends UnpackedValue<V>> = Omit<SelectProps<V>, "value" | "name"> & {
+  name: FilterName;
+  submittable: boolean;
+  untrackable?: boolean;
+  defaultValue?: V;
+  toHumanLabel?: (value: H) => string;
+};
+
+function isSingularValue(value: OptionValue): value is SingularValue {
+  return !Array.isArray(value);
+}
+export function OptionSelect<V extends OptionValue, H extends UnpackedValue<V>>({
   name,
   defaultValue,
   multiple,
   submittable,
-  humanize,
-  serialize,
-  unserialize,
-  ...props
-}: OptionSelectProps<V, P>) {
+  untrackable,
+  toHumanLabel,
+  ...restOfProps
+}: OptionSelectProps<V, H>) {
   const { store } = useSearchBuilder();
+
+  const serialize = useCallback((value: V) => value as InferSerializeReturn<V>, []);
+
+  const unserialize = useCallback((value: InferSerializeReturn<V>) => value as V, []);
+
+  function humanize(value: V): InferHumanizeReturn<V> {
+    if (isSingularValue(value)) {
+      return (toHumanLabel?.(value as H) ?? String(value)) as InferHumanizeReturn<V>;
+    }
+
+    return value.map((singular) => ({
+      label: toHumanLabel?.(singular as H) ?? String(singular),
+      value: singular,
+    })) as InferHumanizeReturn<V>;
+  }
 
   return (
     <FilterFieldController
+      {...restOfProps}
       store={store}
       name={name}
-      defaultValue={defaultValue}
-      humanize={humanize}
-      serialize={serialize as (value: V) => InferSerializeReturn<V>}
-      unserialize={unserialize as (value: InferSerializeReturn<V>) => V}
+      defaultValue={(defaultValue ? defaultValue : multiple ? [] : "") as V}
+      humanize={untrackable ? undefined : humanize}
+      serialize={serialize}
+      unserialize={unserialize}
       submittable={submittable}
-      control={({ value, onChange }) => (
-        <Select {...props} multiple={multiple} value={(value ? value : multiple ? [] : "") as V} onChange={onChange} />
-      )}
+      control={({ value, onChange }) => {
+        return <Select {...restOfProps} multiple={multiple} value={value as V} onChange={onChange} />;
+      }}
     />
   );
 }
