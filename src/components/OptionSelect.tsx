@@ -14,18 +14,18 @@ type SingularValue = string | number | boolean;
 
 type OptionValue = SingularValue | SingularValue[];
 
-export type OptionSelectProps<V extends OptionValue, H extends UnpackedValue<V>> = Omit<SelectProps<V>, "value" | "name"> & {
+export type OptionSelectProps<V extends OptionValue, I extends UnpackedValue<V>> = Omit<SelectProps<V>, "value" | "name"> & {
   name: FilterName;
   submittable: boolean;
   untrackable?: boolean;
   defaultValue?: V;
-  toHumanLabel?: (value: H) => string;
+  toHumanLabel?: (value: I) => string;
 };
 
 function isSingularValue(value: OptionValue): value is SingularValue {
   return !Array.isArray(value);
 }
-export function OptionSelect<V extends OptionValue, H extends UnpackedValue<V>>({
+export function OptionSelect<V extends OptionValue, I extends UnpackedValue<V>>({
   name,
   defaultValue,
   multiple,
@@ -33,7 +33,7 @@ export function OptionSelect<V extends OptionValue, H extends UnpackedValue<V>>(
   untrackable,
   toHumanLabel,
   ...restOfProps
-}: OptionSelectProps<V, H>) {
+}: OptionSelectProps<V, I>) {
   const { store } = useSearchBuilder();
 
   const serialize = useCallback((value: V) => value as InferSerializeReturn<V>, []);
@@ -42,11 +42,11 @@ export function OptionSelect<V extends OptionValue, H extends UnpackedValue<V>>(
 
   function humanize(value: V): InferHumanizeReturn<V> {
     if (isSingularValue(value)) {
-      return (toHumanLabel?.(value as H) ?? String(value)) as InferHumanizeReturn<V>;
+      return (toHumanLabel?.(value as I) ?? String(value)) as InferHumanizeReturn<V>;
     }
 
     return value.map((singular) => ({
-      label: toHumanLabel?.(singular as H) ?? String(singular),
+      label: toHumanLabel?.(singular as I) ?? String(singular),
       value: singular,
     })) as InferHumanizeReturn<V>;
   }
