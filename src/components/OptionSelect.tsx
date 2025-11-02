@@ -49,12 +49,16 @@ export function OptionSelect<V extends OptionValue, I extends UnpackedValue<V>, 
   const unserialize = useCallback((value: InferSerializeReturn<V>) => value as V, []);
 
   function humanize(value: V): InferHumanizeReturn<V> {
+    if (toHumanLabel === undefined) {
+      return undefined;
+    }
+
     if (isSingularValue(value)) {
-      return (toHumanLabel?.(value as I) ?? String(value)) as InferHumanizeReturn<V>;
+      return (toHumanLabel(value as I) ?? String(value)) as InferHumanizeReturn<V>;
     }
 
     return value.map((singular) => ({
-      label: toHumanLabel?.(singular as I) ?? String(singular),
+      label: toHumanLabel(singular as I) ?? String(singular),
       value: singular,
     })) as InferHumanizeReturn<V>;
   }
