@@ -25,13 +25,14 @@ export class FieldStore {
   #initial: PrimitiveFilterDictionary;
   #listeners: Set<() => void> = new Set();
   #fields: RegisteredFieldDictionary;
-  #state: FieldStoreState = { collection: FieldsCollection.empty(), touched: [], operation: null };
+  #state: FieldStoreState;
 
   constructor(persistence: PersistenceAdapter, emitter: EventEmitter) {
     this.#fields = new Map();
     this.#persistence = persistence;
     this.#emitter = emitter;
     this.#initial = persistence.read() ?? {};
+    this.#state = this.#initialState();
   }
 
   state = () => this.#state;
@@ -170,6 +171,10 @@ export class FieldStore {
     this.#commit({ operation: "reset", collection, touched });
   };
 
+  clean = () => {
+    this.#commit(this.#initialState());
+  };
+
   onPersistenceChange = (listener: (fields: FieldsCollection | undefined) => void): Unsubscribe => {
     return this.#persistence.subscribe(() => listener(this.sync()));
   };
@@ -225,6 +230,12 @@ export class FieldStore {
   #override = (field: Omit<RegisteredField<FilterValue, PrimitiveValue>, "updatedAt" | "value">, newValue: FilterValue) => {
     this.#fields.set(field.name, { ...field, updatedAt: Date.now(), value: newValue });
   };
+
+  #initialState = (): FieldStoreState => ({
+    collection: FieldsCollection.empty(),
+    touched: [],
+    operation: null,
+  });
 }
 
 export type FieldStoreOptions = {
