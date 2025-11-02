@@ -7,34 +7,44 @@ import FilterFieldController from "@/components/FilterFieldController";
 import { useSearchBuilder } from "@/context";
 import type { UnpackedValue } from "@/internal";
 import type { FilterName, InferHumanizeReturn, InferSerializeReturn } from "@/types";
-import { Select, type SelectProps } from "@mui/material";
-import { useCallback } from "react";
+import { MenuItem, Select, type SelectProps } from "@mui/material";
+import { useCallback, useMemo, type ReactElement } from "react";
 
-type SingularValue = string | number | boolean;
+type SingularValue = string | number;
 
 type OptionValue = SingularValue | SingularValue[];
 
-export type OptionSelectProps<V extends OptionValue, I extends UnpackedValue<V>> = Omit<SelectProps<V>, "value" | "name"> & {
+type NormalizedOptionItem<V extends OptionValue, I extends UnpackedValue<V>> = {
+  value: I;
+  label: ReactElement | string;
+};
+
+export type ArrayOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>, O> = Omit<SelectProps<V>, "value" | "name"> & {
+  items: O[];
+  getValue: (item: O) => I;
+  getLabel: (item: O) => ReactElement | string;
+};
+
+export type ObjectOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>> = Omit<SelectProps<V>, "value" | "name"> & {
+  items?: Record<I, ReactElement | string>;
+};
+
+export type OptionSelectProps<V extends OptionValue, I extends UnpackedValue<V>, O> = {
   name: FilterName;
   submittable: boolean;
   untrackable?: boolean;
   defaultValue?: V;
   toHumanLabel?: (value: I) => string;
-};
+} & (ArrayOptionItemProps<V, I, O> | ObjectOptionItemProps<V, I>);
 
 function isSingularValue(value: OptionValue): value is SingularValue {
   return !Array.isArray(value);
 }
-export function OptionSelect<V extends OptionValue, I extends UnpackedValue<V>>({
-  name,
-  defaultValue,
-  multiple,
-  submittable,
-  untrackable,
-  toHumanLabel,
-  ...restOfProps
-}: OptionSelectProps<V, I>) {
+
+export function OptionSelect<V extends OptionValue, I extends UnpackedValue<V>, O>(props: OptionSelectProps<V, I, O>) {
   const { store } = useSearchBuilder();
+  const { name, defaultValue, multiple, submittable, untrackable, children, toHumanLabel, ...restOfProps } = props;
+  const items = useMemo(() => normalize(props), [props.items]);
 
   const serialize = useCallback((value: V) => value as InferSerializeReturn<V>, []);
 
@@ -62,10 +72,50 @@ export function OptionSelect<V extends OptionValue, I extends UnpackedValue<V>>(
       unserialize={unserialize}
       submittable={submittable}
       control={({ value, onChange }) => {
-        return <Select {...restOfProps} multiple={multiple} value={value as V} onChange={onChange} />;
+        return (
+          <Select {...restOfProps} multiple={multiple} value={value as V} onChange={onChange}>
+            {!children &&
+              items &&
+              items.map(({ value, label }, index) => (
+                <MenuItem key={String(value)} value={value}>
+                  {label}
+                </MenuItem>
+              ))}
+
+            {children}
+          </Select>
+        );
       }}
     />
   );
+}
+
+function isArrayOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>, O>(
+  x: OptionSelectProps<V, I, O>
+): x is OptionSelectProps<V, I, O> & ArrayOptionItemProps<V, I, O> {
+  return "items" in x && Array.isArray(x.items);
+}
+function isObjectOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>, O>(
+  x: OptionSelectProps<V, I, O>
+): x is OptionSelectProps<V, I, O> & ObjectOptionItemProps<V, I> {
+  return "items" in x && x.items !== null && typeof x.items === "object";
+}
+
+function normalize<V extends OptionValue, I extends UnpackedValue<V>, O>(
+  props: OptionSelectProps<V, I, O>
+): NormalizedOptionItem<V, I>[] | null {
+  if (isArrayOptionItemProps(props)) {
+    return props.items.map((item) => ({
+      value: props.getValue(item) as I,
+      label: props.getLabel(item),
+    }));
+  }
+
+  if (isObjectOptionItemProps(props)) {
+    return Object.entries<ReactElement | string>(props.items || {}).map(([value, label]) => ({ value: value as I, label }));
+  }
+
+  return null;
 }
 
 export default OptionSelect;
