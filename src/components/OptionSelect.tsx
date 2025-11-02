@@ -59,7 +59,6 @@ export function OptionSelect<V extends OptionValue, I extends UnpackedValue<V>, 
 
   return (
     <FilterFieldController
-      {...restOfProps}
       store={store}
       name={name}
       defaultValue={(defaultValue ? defaultValue : multiple ? [] : "") as V}
