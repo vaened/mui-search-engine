@@ -8,7 +8,7 @@ import type { FieldsCollection } from "@/context/FieldsCollection";
 import type { Paths } from "@/internal";
 
 export type FilterName = string;
-type InputValue = null | string | FilterName | boolean | Date | Record<FilterName, unknown>;
+type InputValue = null | string | boolean | Date | Record<FilterName, unknown>;
 export type InputSize = "small" | "medium";
 export type FilterLabel = string;
 export type FilterValue = null | InputValue | InputValue[];
