@@ -8,7 +8,7 @@ import { useSearchBuilder } from "@/context";
 import type { UnpackedValue } from "@/internal";
 import type { FilterName, InferHumanizeReturn, InferSerializeReturn } from "@/types";
 import { MenuItem, Select, type SelectProps } from "@mui/material";
-import { useCallback, useMemo, type ReactElement } from "react";
+import { useCallback, useMemo, type ReactElement, type ReactNode } from "react";
 
 type SingularValue = string | number;
 
@@ -35,9 +35,11 @@ export type OptionSelectProps<V extends OptionValue, I extends UnpackedValue<V>,
   untrackable?: boolean;
   defaultValue?: V;
   toHumanLabel?: (value: I) => string;
-} & (ArrayOptionItemProps<V, I, O> | ObjectOptionItemProps<V, I>);
+} & (ArrayOptionItemProps<V, I, O> | ObjectOptionItemProps<V, I> | { items: never; children: ReactNode });
 
 export function OptionSelect<V extends OptionValue, I extends UnpackedValue<V>, O>(props: OptionSelectProps<V, I, O>) {
+  validateOptionSelectProps(props);
+
   const { store } = useSearchBuilder();
   const { name, defaultValue, multiple, submittable, untrackable, children, toHumanLabel, ...restOfProps } = props;
   const items = useMemo(() => normalize(props), [props.items]);
@@ -113,6 +115,28 @@ function normalize<V extends OptionValue, I extends UnpackedValue<V>, O>(
   }
 
   return null;
+}
+
+function validateOptionSelectProps<V extends OptionValue, I extends UnpackedValue<V>, O>(props: OptionSelectProps<V, I, O>): void {
+  if ("items" in props && props.items && "children" in props && props.children) {
+    throw new Error(`
+      [OptionSelect] Cannot use both "items" and "children" props simultaneously.
+      
+      Use ONLY ONE of these options:
+      
+      ✅ With items (auto-generation):
+      <OptionSelect
+        items={[...]}
+        getValue={...}
+        getLabel={...}
+      />
+      
+      ✅ With children (custom):
+      <OptionSelect>
+        <MenuItem>...</MenuItem>
+      </OptionSelect>
+    `);
+  }
 }
 
 export default OptionSelect;
