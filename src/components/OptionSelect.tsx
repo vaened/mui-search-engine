@@ -29,24 +29,46 @@ export type ObjectOptionItemProps<V extends OptionValue, I extends UnpackedValue
   items?: Record<I, ReactElement | string>;
 };
 
-export type OptionSelectProps<V extends OptionValue, I extends UnpackedValue<V>, O> = Omit<SelectProps<V>, "value" | "name"> & {
+export type OptionSelectProps<V extends OptionValue, I extends UnpackedValue<V>, O, P extends InferSerializeReturn<V>> = Omit<
+  SelectProps<V>,
+  "value" | "name"
+> & {
   name: FilterName;
   submittable: boolean;
   untrackable?: boolean;
   defaultValue?: V;
+  unserialize?: (value: P) => V;
+  serialize?: (value: V) => P;
   toHumanLabel?: (value: I) => string;
 } & (ArrayOptionItemProps<V, I, O> | ObjectOptionItemProps<V, I> | { items: never; children: ReactNode });
 
-export function OptionSelect<V extends OptionValue, I extends UnpackedValue<V>, O>(props: OptionSelectProps<V, I, O>) {
+export function OptionSelect<V extends OptionValue, I extends UnpackedValue<V>, O, P extends InferSerializeReturn<V>>(
+  props: OptionSelectProps<V, I, O, P>
+) {
   validateOptionSelectProps(props);
 
   const { store } = useSearchBuilder();
-  const { name, defaultValue, multiple, submittable, untrackable, children, toHumanLabel, ...restOfProps } = props;
+  const {
+    name,
+    defaultValue,
+    multiple,
+    submittable,
+    untrackable,
+    children,
+    toHumanLabel,
+    serialize: serializer,
+    unserialize: unserializer,
+    ...restOfProps
+  } = props;
   const items = useMemo(() => normalize(props), [props.items]);
 
-  const serialize = useCallback((value: V) => value as InferSerializeReturn<V>, []);
+  const serialize = useCallback((value: V) => {
+    return serializer?.(value) ?? (value as InferSerializeReturn<V>);
+  }, []);
 
-  const unserialize = useCallback((value: InferSerializeReturn<V>) => value as V, []);
+  const unserialize = useCallback((value: InferSerializeReturn<V>) => {
+    return unserializer?.(value as P) ?? (value as V);
+  }, []);
 
   function humanize(value: V): InferHumanizeReturn<V> {
     if (toHumanLabel === undefined) {
@@ -93,19 +115,19 @@ function isSingularValue(value: OptionValue): value is SingularValue {
   return !Array.isArray(value);
 }
 
-function isArrayOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>, O>(
-  x: OptionSelectProps<V, I, O>
-): x is OptionSelectProps<V, I, O> & ArrayOptionItemProps<V, I, O> {
+function isArrayOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>, O, P extends InferSerializeReturn<V>>(
+  x: OptionSelectProps<V, I, O, P>
+): x is OptionSelectProps<V, I, O, P> & ArrayOptionItemProps<V, I, O> {
   return "items" in x && Array.isArray(x.items);
 }
-function isObjectOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>, O>(
-  x: OptionSelectProps<V, I, O>
-): x is OptionSelectProps<V, I, O> & ObjectOptionItemProps<V, I> {
+function isObjectOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>, O, P extends InferSerializeReturn<V>>(
+  x: OptionSelectProps<V, I, O, P>
+): x is OptionSelectProps<V, I, O, P> & ObjectOptionItemProps<V, I> {
   return "items" in x && x.items !== null && typeof x.items === "object";
 }
 
-function normalize<V extends OptionValue, I extends UnpackedValue<V>, O>(
-  props: OptionSelectProps<V, I, O>
+function normalize<V extends OptionValue, I extends UnpackedValue<V>, O, P extends InferSerializeReturn<V>>(
+  props: OptionSelectProps<V, I, O, P>
 ): NormalizedOptionItem<V, I>[] | null {
   if (isArrayOptionItemProps(props)) {
     return props.items.map((item) => ({
@@ -121,7 +143,9 @@ function normalize<V extends OptionValue, I extends UnpackedValue<V>, O>(
   return null;
 }
 
-function validateOptionSelectProps<V extends OptionValue, I extends UnpackedValue<V>, O>(props: OptionSelectProps<V, I, O>): void {
+function validateOptionSelectProps<V extends OptionValue, I extends UnpackedValue<V>, O, P extends InferSerializeReturn<V>>(
+  props: OptionSelectProps<V, I, O, P>
+): void {
   if ("items" in props && props.items && "children" in props && props.children) {
     throw new Error(`
       [OptionSelect] Cannot use both "items" and "children" props simultaneously.
