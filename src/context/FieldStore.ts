@@ -8,7 +8,15 @@ import { FieldsCollection } from "@/context/FieldsCollection";
 import { createEventEmitter, type EventEmitter, type Unsubscribe } from "@/context/event-emitter";
 import { url } from "@/persistence";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
-import type { Field, FieldOptions, FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue } from "@/types";
+import type {
+  Field,
+  FieldOptions,
+  FilterName,
+  FilterValue,
+  InferSerializeReturn,
+  PrimitiveFilterDictionary,
+  PrimitiveValue,
+} from "@/types";
 
 export type FieldOperation = "set" | "update" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
 
@@ -46,7 +54,7 @@ export class FieldStore {
     return () => this.#listeners.delete(listener);
   };
 
-  listen = <V extends FilterValue, P extends PrimitiveValue>(name: FilterName): (() => Field<V, P> | undefined) => {
+  listen = <V extends FilterValue, P extends InferSerializeReturn<V>>(name: FilterName): (() => Field<V, P> | undefined) => {
     return () => this.#state.collection.get<V, P>(name);
   };
 
@@ -85,7 +93,7 @@ export class FieldStore {
     return collection;
   };
 
-  register = <V extends FilterValue, P extends PrimitiveValue>(field: Field<V, P>) => {
+  register = <V extends FilterValue, P extends InferSerializeReturn<V>>(field: Field<V, P>) => {
     if (this.exists(field.name)) {
       throw new Error(`Field "${field.name}" is already registered`);
     }

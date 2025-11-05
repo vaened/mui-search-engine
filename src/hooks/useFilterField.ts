@@ -1,15 +1,15 @@
 import type { FieldStore } from "@/context/FieldStore";
-import type { Field, FieldOptions, FilterValue, InferHumanizeReturn, PrimitiveValue } from "@/types";
+import type { Field, FieldOptions, FilterValue, InferHumanizeReturn, InferSerializeReturn } from "@/types";
 import { useEffect, useSyncExternalStore } from "react";
 
-export type UseSearchFieldProps<V extends FilterValue, P extends PrimitiveValue, H extends InferHumanizeReturn<V>> = Omit<
+export type UseSearchFieldProps<V extends FilterValue, P extends InferSerializeReturn<V>, H extends InferHumanizeReturn<V>> = Omit<
   Field<V, P, H>,
   "value"
 > & {
   defaultValue?: V;
 };
 
-export function useFilterField<V extends FilterValue, P extends PrimitiveValue, H extends InferHumanizeReturn<V>>(
+export function useFilterField<V extends FilterValue, P extends InferSerializeReturn<V>, H extends InferHumanizeReturn<V>>(
   store: FieldStore,
   { name, defaultValue, submittable, ...restOfProps }: UseSearchFieldProps<V, P, H>
 ) {
