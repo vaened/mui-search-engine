@@ -32,7 +32,7 @@ export interface IndexedFilterChip<V extends InputValue[] = InputValue[]> extend
 export type InferHumanizeReturn<V extends FilterValue> =
   | (V extends (infer T extends InputValue)[] ? IndexedFilterChip<T[]>[] : FilterLabel)
   | undefined;
-export type InferSerializeReturn<V extends FilterValue> = (V extends InputValue[] ? string[] : string) | null;
+export type InferSerializeReturn<V extends FilterValue> = (V extends unknown[] ? string[] : string) | null;
 
 export interface FieldOptions {
   submittable?: boolean;
