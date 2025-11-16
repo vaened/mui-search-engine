@@ -41,6 +41,7 @@ export type UiVariantProps<TValue, TItem, TItemsObj> =
   | UiChildrenProps;
 
 type OmittedSelectProps = "value" | "name" | "defaultValue" | "multiple" | "type" | "multiple" | "onChange" | "items" | "children";
+type OmittedConfigProps = "humanize" | "serializer";
 
 export interface OptionSelectProps extends Omit<SelectProps, OmittedSelectProps> {}
 
@@ -55,8 +56,6 @@ type OptionSelectConfig<
     defaultValue?: TValue;
     toHumanLabel?: (value: TValue | TOption) => FilterLabel;
   } & UiVariantProps<TOption, TItem, TItemsObj>;
-
-type OmittedConfigProps = "humanize" | "serializer";
 
 export type ScalarOptionSelectConfig<
   TKey extends OptionSelectScalarTypeKey,
