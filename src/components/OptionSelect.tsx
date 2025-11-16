@@ -80,6 +80,16 @@ export type ArrayOptionSelectConfig<
     toHumanLabel?: (value: TItemValue) => FilterLabel;
   } & UiVariantProps<TItemValue, TItem, TItemsObj>;
 
+export type ArrayOptionSelectWithChildrenConfig<
+  TKey extends OptionSelectArrayTypeKey,
+  TValue extends FilterTypeMap[TKey]
+> = OptionSelectProps &
+  Omit<ArrayFilterFieldConfig<TKey, TValue>, OmittedConfigProps | "defaultValue"> &
+  UiChildrenProps & {
+    defaultValue?: TValue;
+    toHumanLabel?: (value: ArrayItemType<TValue>) => FilterLabel;
+  };
+
 export type EmptyArrayOptionSelectConfig<
   TKey extends OptionSelectArrayTypeKey,
   TItem = unknown,
@@ -87,8 +97,16 @@ export type EmptyArrayOptionSelectConfig<
   TItemsObj = unknown
 > = OptionSelectProps &
   Omit<EmptyArrayFilterFieldConfig<TKey>, OmittedConfigProps> & {
-    toHumanLabel?: (value: TItemValue) => FilterLabel;
+    toHumanLabel?: (value: NoInfer<TItemValue>) => FilterLabel;
   } & UiVariantProps<TItemValue, TItem, TItemsObj>;
+
+export type EmptyArrayOptionSelectWithChildrenConfig<TKey extends OptionSelectArrayTypeKey> = OptionSelectProps &
+  Omit<EmptyArrayFilterFieldConfig<TKey>, OmittedConfigProps> &
+  UiChildrenProps & {
+    toHumanLabel?: (value: ArrayItemType<FilterTypeMap[TKey]>) => FilterLabel;
+  };
+
+export function OptionSelect<TKey extends OptionSelectArrayTypeKey>(props: EmptyArrayOptionSelectWithChildrenConfig<TKey>): ReactElement;
 
 export function OptionSelect<TKey extends OptionSelectScalarTypeKey, TValue extends FilterTypeMap[TKey], TItem, TItemsObj>(
   props: ScalarOptionSelectConfig<TKey, TValue, TItem, TItemsObj>
@@ -96,6 +114,10 @@ export function OptionSelect<TKey extends OptionSelectScalarTypeKey, TValue exte
 
 export function OptionSelect<TKey extends OptionSelectArrayTypeKey, TItem, TItemsObj>(
   props: EmptyArrayOptionSelectConfig<TKey, TItem, TItemsObj>
+): ReactElement;
+
+export function OptionSelect<TKey extends OptionSelectArrayTypeKey, TValue extends FilterTypeMap[TKey]>(
+  props: ArrayOptionSelectWithChildrenConfig<TKey, TValue>
 ): ReactElement;
 
 export function OptionSelect<TKey extends OptionSelectArrayTypeKey, TValue extends FilterTypeMap[TKey], TItem, TItemsObj>(
