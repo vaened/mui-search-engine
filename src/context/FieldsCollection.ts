@@ -2,6 +2,8 @@ import type { GenericRegisteredField, RegisteredFieldDictionary } from "@/contex
 import type { FilterName, PrimitiveFilterDictionary, Serializer, ValueFilterDictionary } from "@/field";
 import type { NonUndefined } from "@/internal";
 
+export const EMPTY_VALUE = "";
+
 export class FieldsCollection implements Iterable<GenericRegisteredField> {
   #values: RegisteredFieldDictionary;
 
@@ -78,7 +80,7 @@ export class FieldsCollection implements Iterable<GenericRegisteredField> {
   };
 
   public static isValidValue = (value: unknown): value is NonNullable<unknown> => {
-    return value !== undefined && value !== null;
+    return value !== undefined && value !== null && value !== EMPTY_VALUE;
   };
 
   public [Symbol.iterator]() {

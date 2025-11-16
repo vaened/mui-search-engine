@@ -1,5 +1,6 @@
 import FilterFieldController, { type FieldController } from "@/components/FilterFieldController";
 import { useSearchBuilder } from "@/context";
+import { EMPTY_VALUE } from "@/context/FieldsCollection";
 import type { ArrayItemType, FieldConfig, FilterLabel, FilterTypeKey, FilterTypeMap } from "@/field";
 import { type ArrayFilterFieldConfig, type EmptyArrayFilterFieldConfig, type ScalarFilterFieldConfig } from "@/hooks/useFilterField";
 import { MenuItem, Select, type SelectProps } from "@mui/material";
@@ -123,7 +124,6 @@ export function OptionSelect<TKey extends OptionSelectArrayTypeKey, TValue exten
 export function OptionSelect<TKey extends OptionSelectArrayTypeKey, TValue extends FilterTypeMap[TKey], TItem, TItemsObj>(
   props: ArrayOptionSelectConfig<TKey, TValue, TItem, TItemsObj>
 ): ReactElement;
-
 export function OptionSelect<
   Tkey extends OptionSelectTypeKey,
   TValue extends FilterTypeMap[Tkey],
@@ -139,7 +139,7 @@ export function OptionSelect<
     props as OptionSelectConfig<Tkey, TValue, TItem, TIOption, TitemsObj>;
 
   const multiple = type.endsWith("[]");
-  const emptyValue = multiple ? [] : "";
+  const emptyValue = multiple ? [] : EMPTY_VALUE;
 
   const humanize = useMemo(() => {
     if (!toHumanLabel) {
