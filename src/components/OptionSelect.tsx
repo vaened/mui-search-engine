@@ -109,15 +109,15 @@ export function OptionSelect<
   Tkey extends OptionSelectTypeKey,
   TValue extends FilterTypeMap[Tkey],
   TItem,
-  TItemValue extends string | number,
-  TitemsObj extends Record<Extract<TItemValue, string | number>, ReactNode | string>
+  TIOption extends string | number,
+  TitemsObj extends Record<Extract<TIOption, string | number>, ReactNode | string>
 >(props: any) {
   validateOptionSelectProps(props);
 
   const { store } = useSearchBuilder();
 
   const { name, type, defaultValue, submittable, items, children, toHumanLabel, getValue, getLabel, ...restOfProps } =
-    props as OptionSelectConfig<Tkey, TValue, TItem, TItemValue, TitemsObj>;
+    props as OptionSelectConfig<Tkey, TValue, TItem, TIOption, TitemsObj>;
 
   const multiple = type.endsWith("[]");
   const emptyValue = multiple ? [] : "";
@@ -131,7 +131,7 @@ export function OptionSelect<
       return (value: string[] | string[]) =>
         value.map((v) => ({
           value: v,
-          label: toHumanLabel(v as TValue | TItemValue) ?? String(v),
+          label: toHumanLabel(v as TValue | TIOption) ?? String(v),
         }));
     }
     return toHumanLabel;
