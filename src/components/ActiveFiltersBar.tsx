@@ -17,6 +17,7 @@ export type ActiveFiltersBarProps = {
   readonly?: boolean;
   untitled?: boolean;
   unstyled?: boolean;
+  limit?: number;
   sx?: SxProps<Theme>;
   labels?: {
     headerTitle?: string;
@@ -30,6 +31,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   readonly,
   untitled,
   unstyled,
+  limit,
   sx,
   chipProps: { onRemove, ...restOfProps } = {},
 }) => {
@@ -66,7 +68,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
 
         {isReady && hasActives && (
           <Box display="flex" flexWrap="wrap" gap={1}>
-            {actives.map((field) => (
+            {actives.slice(0, limit ?? actives.length).map((field) => (
               <FilterChip
                 key={`filter-chip-group-${field.name}`}
                 field={field}
