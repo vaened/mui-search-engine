@@ -1,15 +1,15 @@
 import type { RegisteredField } from "@/context";
 import { FieldStore } from "@/context/FieldStore";
-import {
-  type ArrayFieldConfig,
-  type ArrayTypeKey,
-  type FieldConfig,
-  type FieldOptions,
-  type FilterTypeKey,
-  type FilterTypeMap,
-  type GenericField,
-  type ScalarFieldConfig,
-  type ScalarTypeKey,
+import type {
+  ArrayFieldConfig,
+  ArrayTypeKey,
+  FieldConfig,
+  FieldOptions,
+  FilterTypeKey,
+  FilterTypeMap,
+  GenericField,
+  ScalarFieldConfig,
+  ScalarTypeKey,
 } from "@/field";
 import resolve from "@/serializers/resolve";
 import { useEffect, useMemo, useSyncExternalStore } from "react";
