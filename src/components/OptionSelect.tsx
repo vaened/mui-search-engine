@@ -93,75 +93,6 @@ export type EmptyArrayOptionSelectConfig<
     toHumanLabel?: (value: TItemValue) => FilterLabel;
   } & UiVariantProps<TItemValue, TItem, TItemsObj>;
 
-function isArrayBranch<TValue extends string | number, TItem, TItemsObj extends Record<TValue, ReactNode | string>>(
-  props: UiVariantProps<TValue, TItem, TItemsObj>
-): props is UiArrayProps<TValue, TItem> {
-  return "items" in props && Array.isArray(props.items) && "getValue" in props;
-}
-
-function isObjectBranch<TValue extends string | number, TItem, TItemsObj extends Record<TValue, ReactNode | string>>(
-  props: UiVariantProps<TValue, TItem, TItemsObj>
-): props is UiObjectProps<TValue, TItemsObj> {
-  return "items" in props && !!props.items && !Array.isArray(props.items) && typeof props.items === "object" && !("getValue" in props);
-}
-
-function normalize<TValue extends string | number, TItem, TItemsObj extends Record<TValue, ReactNode | string>>(
-  props: UiVariantProps<TValue, TItem, TItemsObj>
-): NormalizedOptionItem<TValue>[] | null {
-  if (isArrayBranch(props)) {
-    return props.items.map((item) => ({
-      value: props.getValue(item),
-      label: props.getLabel(item) as ReactElement | string,
-    }));
-  }
-
-  if (isObjectBranch(props)) {
-    return Object.entries(props.items).map(([value, label]) => ({
-      value: value as TValue,
-      label: label as ReactElement | string,
-    }));
-  }
-
-  return null;
-}
-
-function validateOptionSelectProps<TValue extends string | number, TItem, TItemsObj extends Record<TValue, ReactNode | string>>(
-  props: UiVariantProps<TValue, TItem, TItemsObj>
-): void {
-  if ("items" in props && props.items && "children" in props && props.children) {
-    throw new Error(`
-      [OptionSelect] Props conflict detected: Cannot use both "items" and "children" props simultaneously.
-
-      ❌ PROBLEM: You've provided both "items" and "children" to OptionSelect, but these are mutually exclusive ways to define options.
-
-      ✅ SOLUTION: Choose ONLY ONE of these three supported patterns:
-
-      PATTERN 1: Array of objects with accessors
-        <OptionSelect
-          items={users}
-          getValue={(user) => user.id}
-          getLabel={(user) => user.name}
-        />
-
-      PATTERN 2: Simple key-value object
-        <OptionSelect
-          items={{
-            "active": "Active",
-            "inactive": "Inactive"
-          }}
-        />
-
-      PATTERN 3: Direct MenuItem children
-        <OptionSelect>
-          <MenuItem value="active">Active</MenuItem>
-          <MenuItem value="inactive">Inactive</MenuItem>
-        </OptionSelect>
-
-      Remove either the "items" prop or the "children" to resolve this error.
-    `);
-  }
-}
-
 export function OptionSelect<TKey extends OptionSelectScalarTypeKey, TValue extends FilterTypeMap[TKey], TItem, TItemsObj>(
   props: ScalarOptionSelectConfig<TKey, TValue, TItem, TItemsObj>
 ): ReactElement;
@@ -234,6 +165,75 @@ export function OptionSelect<
       }}
     />
   );
+}
+
+function isArrayBranch<TValue extends string | number, TItem, TItemsObj extends Record<TValue, ReactNode | string>>(
+  props: UiVariantProps<TValue, TItem, TItemsObj>
+): props is UiArrayProps<TValue, TItem> {
+  return "items" in props && Array.isArray(props.items) && "getValue" in props;
+}
+
+function isObjectBranch<TValue extends string | number, TItem, TItemsObj extends Record<TValue, ReactNode | string>>(
+  props: UiVariantProps<TValue, TItem, TItemsObj>
+): props is UiObjectProps<TValue, TItemsObj> {
+  return "items" in props && !!props.items && !Array.isArray(props.items) && typeof props.items === "object" && !("getValue" in props);
+}
+
+function normalize<TValue extends string | number, TItem, TItemsObj extends Record<TValue, ReactNode | string>>(
+  props: UiVariantProps<TValue, TItem, TItemsObj>
+): NormalizedOptionItem<TValue>[] | null {
+  if (isArrayBranch(props)) {
+    return props.items.map((item) => ({
+      value: props.getValue(item),
+      label: props.getLabel(item) as ReactElement | string,
+    }));
+  }
+
+  if (isObjectBranch(props)) {
+    return Object.entries(props.items).map(([value, label]) => ({
+      value: value as TValue,
+      label: label as ReactElement | string,
+    }));
+  }
+
+  return null;
+}
+
+function validateOptionSelectProps<TValue extends string | number, TItem, TItemsObj extends Record<TValue, ReactNode | string>>(
+  props: UiVariantProps<TValue, TItem, TItemsObj>
+): void {
+  if ("items" in props && props.items && "children" in props && props.children) {
+    throw new Error(`
+      [OptionSelect] Props conflict detected: Cannot use both "items" and "children" props simultaneously.
+
+      ❌ PROBLEM: You've provided both "items" and "children" to OptionSelect, but these are mutually exclusive ways to define options.
+
+      ✅ SOLUTION: Choose ONLY ONE of these three supported patterns:
+
+      PATTERN 1: Array of objects with accessors
+        <OptionSelect
+          items={users}
+          getValue={(user) => user.id}
+          getLabel={(user) => user.name}
+        />
+
+      PATTERN 2: Simple key-value object
+        <OptionSelect
+          items={{
+            "active": "Active",
+            "inactive": "Inactive"
+          }}
+        />
+
+      PATTERN 3: Direct MenuItem children
+        <OptionSelect>
+          <MenuItem value="active">Active</MenuItem>
+          <MenuItem value="inactive">Inactive</MenuItem>
+        </OptionSelect>
+
+      Remove either the "items" prop or the "children" to resolve this error.
+    `);
+  }
 }
 
 export default OptionSelect;
