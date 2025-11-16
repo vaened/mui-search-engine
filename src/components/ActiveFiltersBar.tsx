@@ -7,8 +7,9 @@ import FilterChip, { type FilterChipProps } from "@/components/FilterChip";
 import { useSearchEngineConfig, type Translator } from "@/config";
 import type { GenericRegisteredField } from "@/context";
 import { useActiveFilters } from "@/hooks/useActiveFilters";
+import { useSearchEngineIsReady } from "@/hooks/useSearchEngineIsReady";
 import type { Theme } from "@emotion/react";
-import { Box, Grid, IconButton, Tooltip, Typography, type SxProps } from "@mui/material";
+import { Box, Grid, IconButton, Skeleton, Tooltip, Typography, type SxProps } from "@mui/material";
 import React, { useMemo } from "react";
 
 export type ActiveFiltersBarProps = {
@@ -35,6 +36,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   const { translate, icon } = useSearchEngineConfig();
   const { actives, hasActives, syncFromStore, clearAll } = useActiveFilters();
   const { headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);
+  const isReady = useSearchEngineIsReady();
 
   function onFilterChipRemove(field: GenericRegisteredField) {
     syncFromStore();
@@ -58,9 +60,11 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
       )}
 
       <Grid display="grid" gridTemplateColumns="1fr auto" width="100%" alignItems="center" container>
-        {!hasActives && <Typography>{emptyStateMessage}</Typography>}
+        {!isReady && <Skeleton variant="text" sx={{ fontSize: "19.5px" }} />}
 
-        {hasActives && (
+        {isReady && !hasActives && <Typography>{emptyStateMessage}</Typography>}
+
+        {isReady && hasActives && (
           <Box display="flex" flexWrap="wrap" gap={1}>
             {actives.map((field) => (
               <FilterChip
