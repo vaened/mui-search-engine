@@ -1,11 +1,9 @@
 import FilterFieldController, { type FieldController } from "@/components/FilterFieldController";
-import { MenuItem, Select, type SelectProps } from "@mui/material";
-import { type ReactElement, type ReactNode, useMemo } from "react";
-
-import { type ArrayFilterFieldConfig, type EmptyArrayFilterFieldConfig, type ScalarFilterFieldConfig } from "@/hooks/useFilterField";
-
 import { useSearchBuilder } from "@/context";
 import type { ArrayItemType, FieldConfig, FilterLabel, FilterTypeKey, FilterTypeMap } from "@/field";
+import { type ArrayFilterFieldConfig, type EmptyArrayFilterFieldConfig, type ScalarFilterFieldConfig } from "@/hooks/useFilterField";
+import { MenuItem, Select, type SelectProps } from "@mui/material";
+import { type ReactElement, type ReactNode, useMemo } from "react";
 
 type NormalizedOptionItem<I extends string | number> = {
   value: I;
