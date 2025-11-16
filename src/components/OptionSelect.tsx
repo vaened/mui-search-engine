@@ -201,34 +201,34 @@ function validateOptionSelectProps<TValue extends string | number, TItem, TItems
 ): void {
   if ("items" in props && props.items && "children" in props && props.children) {
     throw new Error(`
-      [OptionSelect] Props conflict detected: Cannot use both "items" and "children" props simultaneously.
+[OptionSelect] Props conflict detected: Cannot use both "items" and "children" props simultaneously.
 
-      ❌ PROBLEM: You've provided both "items" and "children" to OptionSelect, but these are mutually exclusive ways to define options.
+❌ PROBLEM: You've provided both "items" and "children" to OptionSelect, but these are mutually exclusive ways to define options.
 
-      ✅ SOLUTION: Choose ONLY ONE of these three supported patterns:
+✅ SOLUTION: Choose ONLY ONE of these three supported patterns:
 
-      PATTERN 1: Array of objects with accessors
-        <OptionSelect
-          items={users}
-          getValue={(user) => user.id}
-          getLabel={(user) => user.name}
-        />
+PATTERN 1: Array of objects with accessors
+  <OptionSelect
+    items={users}
+    getValue={(user) => user.id}
+    getLabel={(user) => user.name}
+  />
 
-      PATTERN 2: Simple key-value object
-        <OptionSelect
-          items={{
-            "active": "Active",
-            "inactive": "Inactive"
-          }}
-        />
+PATTERN 2: Simple key-value object
+  <OptionSelect
+    items={{
+      "active": "Active",
+      "inactive": "Inactive"
+    }}
+  />
 
-      PATTERN 3: Direct MenuItem children
-        <OptionSelect>
-          <MenuItem value="active">Active</MenuItem>
-          <MenuItem value="inactive">Inactive</MenuItem>
-        </OptionSelect>
+PATTERN 3: Direct MenuItem children
+  <OptionSelect>
+    <MenuItem value="active">Active</MenuItem>
+    <MenuItem value="inactive">Inactive</MenuItem>
+  </OptionSelect>
 
-      Remove either the "items" prop or the "children" to resolve this error.
+Remove either the "items" prop or the "children" to resolve this error.
     `);
   }
 }
