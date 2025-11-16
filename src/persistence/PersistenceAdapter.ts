@@ -6,7 +6,7 @@
 import type { PrimitiveFilterDictionary } from "@/field";
 
 export interface PersistenceAdapter {
-  read(): PrimitiveFilterDictionary;
-  write(values: PrimitiveFilterDictionary): void;
+  read(whitelist?: string[]): PrimitiveFilterDictionary;
+  write(values: PrimitiveFilterDictionary, whitelist?: string[]): void;
   subscribe(callback: () => void): () => void;
 }

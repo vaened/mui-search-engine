@@ -7,11 +7,11 @@ import type { PrimitiveFilterDictionary } from "@/field";
 import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 
 export class EmptyPersistenceAdapter implements PersistenceAdapter {
-  read(): PrimitiveFilterDictionary {
+  read(whitelist?: string[]): PrimitiveFilterDictionary {
     return {};
   }
 
-  write(values: PrimitiveFilterDictionary): void {}
+  write(values: PrimitiveFilterDictionary, whitelist?: string[]): void {}
 
   subscribe(callback: () => void): () => void {
     return () => {};

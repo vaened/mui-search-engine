@@ -13,16 +13,17 @@ export class UrlPersistenceAdapter implements PersistenceAdapter {
     }
   }
 
-  read = (): PrimitiveFilterDictionary => {
+  read = (whitelist?: string[]): PrimitiveFilterDictionary => {
     const params = new URLSearchParams(window.location.search);
     const keys = new Set(params.keys());
     const values: PrimitiveFilterDictionary = {};
 
-    keys.forEach((key) => {
-      if (key.endsWith("[]")) {
-        const realKey = key.slice(0, -2);
+    const keysToProcess = whitelist ? Array.from(keys).filter((key) => whitelist.includes(this.#normalize(key))) : keys;
 
-        values[realKey] = params.getAll(key);
+    keysToProcess.forEach((key) => {
+      if (this.#isArray(key)) {
+        const parameter = this.#convertToScalar(key);
+        values[parameter] = params.getAll(key);
       } else {
         values[key] = params.get(key) as string;
       }
@@ -31,8 +32,17 @@ export class UrlPersistenceAdapter implements PersistenceAdapter {
     return values;
   };
 
-  write = (values: PrimitiveFilterDictionary) => {
-    const params = new URLSearchParams();
+  write = (values: PrimitiveFilterDictionary, whitelist?: string[]) => {
+    const currentParams = new URLSearchParams(window.location.search);
+    const newParams = new URLSearchParams();
+
+    if (whitelist) {
+      currentParams.forEach((value, key) => {
+        if (!whitelist.includes(this.#normalize(key))) {
+          newParams.append(key, value);
+        }
+      });
+    }
 
     Object.entries(values).forEach(([key, value]) => {
       if (Array.isArray(value)) {
@@ -43,19 +53,19 @@ export class UrlPersistenceAdapter implements PersistenceAdapter {
             return;
           }
 
-          params.append(`${key}[]`, String(v));
+          newParams.append(this.#convertToArray(key), String(v));
         });
 
         return;
       }
 
       if (this.#isValid(value)) {
-        params.append(key, String(value));
+        newParams.append(key, String(value));
       }
     });
 
-    const newSearch = params.toString();
-    const oldSearch = new URLSearchParams(window.location.search).toString();
+    const newSearch = newParams.toString();
+    const oldSearch = currentParams.toString();
 
     if (newSearch === oldSearch) {
       return;
@@ -71,6 +81,22 @@ export class UrlPersistenceAdapter implements PersistenceAdapter {
     return () => {
       window.removeEventListener("popstate", callback);
     };
+  };
+
+  #convertToScalar = (parameter: string): string => {
+    return parameter.slice(0, -2);
+  };
+
+  #convertToArray = (parameter: string): string => {
+    return `${parameter}[]`;
+  };
+
+  #normalize = (parameter: string): string => {
+    return this.#isArray(parameter) ? this.#convertToScalar(parameter) : parameter;
+  };
+
+  #isArray = (parameter: string): boolean => {
+    return parameter.endsWith("[]");
   };
 
   #isValid = (value: unknown) => {
