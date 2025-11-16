@@ -52,7 +52,7 @@ type OptionSelectConfig<
   TItem,
   TOption extends string | number,
   TItemsObj
-> = Omit<SelectProps, OmittedSelectProps> &
+> = BaseOptionSelectProps &
   Omit<FieldConfig<TKey, TValue>, OmittedConfigProps> & {
     defaultValue?: TValue;
     toHumanLabel?: (value: TValue | TOption) => FilterLabel;
