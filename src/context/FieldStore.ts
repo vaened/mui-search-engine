@@ -36,6 +36,7 @@ export class FieldStore {
   readonly #persistence: PersistenceAdapter;
   readonly #emitter: EventEmitter;
 
+  #whitelist: FilterName[];
   #initial: PrimitiveFilterDictionary;
   #listeners: Set<() => void> = new Set();
   #fields: RegisteredFieldDictionary;
@@ -47,6 +48,7 @@ export class FieldStore {
     this.#emitter = emitter;
     this.#initial = persistence.read() ?? {};
     this.#state = this.#initialState();
+    this.#whitelist = [];
   }
 
   state = () => this.#state;
@@ -83,7 +85,7 @@ export class FieldStore {
 
   persist = () => {
     const collection = this.#state.collection;
-    this.#persistence.write(collection.toPrimitives());
+    this.#persistence.write(collection.toPrimitives(), this.#whitelist);
     this.#emitter.emit("submit", collection);
   };
 
@@ -112,6 +114,7 @@ export class FieldStore {
       updatedAt: Date.now(),
     } as unknown as GenericRegisteredField;
 
+    this.#whitelist.push(field.name);
     this.#override(registered, this.#parse(this.#initial[field.name], registered));
     this.#commit({ operation: "register", collection: new FieldsCollection(this.#fields) });
   }
@@ -122,6 +125,7 @@ export class FieldStore {
     }
 
     this.#fields.delete(name);
+    this.#whitelist = this.#whitelist.filter((field) => field !== name);
 
     this.#commit({
       operation: "unregister",
