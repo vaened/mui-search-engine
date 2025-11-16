@@ -98,7 +98,7 @@ export class FieldStore {
 
   register<F extends GenericField>(field: F): void {
     if (this.exists(field.name)) {
-      throw new Error(`Field "${field.name}" is already registered`);
+      throwAlreadyRegisteredErrorFor(field, this.#fields);
     }
 
     const registered = {
@@ -239,6 +239,27 @@ export class FieldStore {
     touched: [],
     operation: null,
   });
+}
+
+function throwAlreadyRegisteredErrorFor(field: GenericField, fields: Map<string, GenericRegisteredField>) {
+  throw new Error(`
+DUPLICATE FIELD REGISTRATION
+=================================
+
+Field "${field.name}" is already registered and cannot be registered again.
+
+QUICK FIX:
+Check for multiple components using the same field name "${field.name}" in your application.
+
+TECHNICAL CONTEXT:
+Field names must be unique across your entire application. Each field name can only be registered once.
+
+CURRENT FIELD REGISTRY:
+• Total registered fields: ${fields.size}
+• All field names: [${Array.from(fields.keys()).join(", ")}]
+
+=================================
+  `);
 }
 
 export type FieldStoreOptions = {
