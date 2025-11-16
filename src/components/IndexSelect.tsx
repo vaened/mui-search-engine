@@ -6,8 +6,9 @@
 import DropdownMenu from "@/components/DropdownMenu";
 import { useSearchEngineConfig, type Translator } from "@/config";
 import { useSearchBuilder } from "@/context";
+import type { FilterBag, FilterName } from "@/field";
 import { useFilterField } from "@/hooks/useFilterField";
-import type { FilterBag, FilterName, InputSize } from "@/types";
+import type { InputSize } from "@/types";
 import { createFilterDictionaryFrom, dictionaryToFilterElements } from "@/utils";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -54,11 +55,10 @@ export function IndexSelect<N extends FilterName>({
 
   const [open, setMenuOpenStatus] = useState(false);
   const { value, set } = useFilterField(store, {
+    type: "string",
     name,
     defaultValue,
     submittable,
-    serialize: (index) => index,
-    unserialize: (index) => index,
   });
 
   const current = useMemo(() => (value ? dictionary[value] : null), [value]);

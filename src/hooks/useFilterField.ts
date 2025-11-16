@@ -1,48 +1,110 @@
-import type { FieldStore } from "@/context/FieldStore";
-import type { Field, FieldOptions, FilterValue, InferHumanizeReturn, InferSerializeReturn } from "@/types";
-import { useEffect, useSyncExternalStore } from "react";
+import type { RegisteredField } from "@/context";
+import { FieldStore } from "@/context/FieldStore";
+import {
+  type ArrayFieldConfig,
+  type ArrayTypeKey,
+  type FieldConfig,
+  type FieldOptions,
+  type FilterTypeKey,
+  type FilterTypeMap,
+  type GenericField,
+  type ScalarFieldConfig,
+  type ScalarTypeKey,
+} from "@/field";
+import resolve from "@/serializers/resolve";
+import { useEffect, useMemo, useSyncExternalStore } from "react";
 
-export type UseSearchFieldProps<V extends FilterValue, P extends InferSerializeReturn<V>, H extends InferHumanizeReturn<V>> = Omit<
-  Field<V, P, H>,
-  "value"
-> & {
-  defaultValue?: V;
+export type FilterFieldReturn<TResolved, TRegistered> = {
+  field: TRegistered | undefined;
+  value: TResolved;
+  set: (value: TResolved) => void;
 };
 
-export function useFilterField<V extends FilterValue, P extends InferSerializeReturn<V>, H extends InferHumanizeReturn<V>>(
+export interface UseFilterFieldProps<TValue> {
+  defaultValue: TValue;
+}
+
+export interface FilterFieldConfig<TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]>
+  extends FieldConfig<TKey, TValue>,
+    UseFilterFieldProps<TValue> {}
+
+export interface ScalarFilterFieldConfig<TKey extends ScalarTypeKey, TValue extends FilterTypeMap[TKey]>
+  extends ScalarFieldConfig<TKey, TValue>,
+    UseFilterFieldProps<TValue> {}
+
+export interface EmptyArrayFilterFieldConfig<TKey extends ArrayTypeKey>
+  extends ArrayFieldConfig<TKey, FilterTypeMap[TKey]>,
+    UseFilterFieldProps<[]> {}
+
+export interface ArrayFilterFieldConfig<TKey extends ArrayTypeKey, TValue extends FilterTypeMap[TKey]>
+  extends ArrayFieldConfig<TKey, TValue>,
+    UseFilterFieldProps<TValue> {}
+
+export type GenericFilterFieldConfig = {
+  [K in FilterTypeKey]: FilterFieldConfig<K, FilterTypeMap[K]>;
+}[FilterTypeKey];
+
+export function useFilterField<TKey extends ScalarTypeKey, TValue extends FilterTypeMap[TKey]>(
   store: FieldStore,
-  { name, defaultValue, submittable, ...restOfProps }: UseSearchFieldProps<V, P, H>
-) {
-  const field = useSyncExternalStore(store.subscribe, store.listen<V, P>(name), store.listen<V, P>(name));
+  config: ScalarFilterFieldConfig<TKey, TValue>
+): FilterFieldReturn<TValue, TKey>;
+
+export function useFilterField<TKey extends ArrayTypeKey>(
+  store: FieldStore,
+  config: EmptyArrayFilterFieldConfig<TKey>
+): FilterFieldReturn<FilterTypeMap[TKey], TKey>;
+
+export function useFilterField<TKey extends ArrayTypeKey, TValue extends FilterTypeMap[TKey]>(
+  store: FieldStore,
+  config: ArrayFilterFieldConfig<TKey, TValue>
+): FilterFieldReturn<TValue, TKey>;
+
+export function useFilterField<TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]>(
+  store: FieldStore,
+  config: any
+): FilterFieldReturn<TValue, RegisteredField<TKey, TValue>> {
+  const { name, type, defaultValue, submittable, serializer, ...restOfProps } = config as GenericFilterFieldConfig;
+
+  const selector = useMemo(() => store.listen<TKey, TValue>(name), [store, name]);
+
+  const field = useSyncExternalStore(store.subscribe, selector, selector);
 
   useEffect(() => {
     store.register({
+      type,
       name,
-      value: (defaultValue ?? null) as V,
       submittable,
+      value: defaultValue,
+      serializer: serializer || resolve(type),
       ...restOfProps,
-    });
+    } as GenericField);
 
     return () => store.unregister(name);
-  }, []);
+  }, [store, name, type]);
 
   useEffect(() => {
+    if (!field) {
+      return;
+    }
+
     const touched: Partial<FieldOptions> = {};
 
-    if (submittable !== field?.submittable) {
+    if (submittable !== field.submittable) {
       touched.submittable = submittable;
     }
 
-    store.update(name, touched);
-  }, [submittable]);
+    if (Object.keys(touched).length > 0) {
+      store.update(name, touched);
+    }
+  }, [submittable, field]);
 
-  function set(value: V) {
+  const set = (value: TValue) => {
     store.set(name, value);
-  }
+  };
 
   return {
-    set,
     field,
-    value: field?.value ?? defaultValue ?? null,
+    value: (field?.value ?? defaultValue) as TValue,
+    set,
   };
 }

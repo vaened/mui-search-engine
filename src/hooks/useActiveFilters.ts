@@ -3,13 +3,13 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { useSearchBuilder, type RegisteredField } from "@/context";
+import { useSearchBuilder, type GenericRegisteredField } from "@/context";
 import type { FieldsCollection } from "@/context/FieldsCollection";
 import { useEffect, useState } from "react";
 
 export function useActiveFilters() {
   const { store } = useSearchBuilder();
-  const [actives, setActives] = useState<RegisteredField[]>([]);
+  const [actives, setActives] = useState<GenericRegisteredField[]>([]);
   const hasActives = actives.length > 0;
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export function useActiveFilters() {
   return { actives, hasActives, syncFromStore, clearAll };
 }
 
-function onlyHumanizables(field: RegisteredField): boolean {
+function onlyHumanizables(field: GenericRegisteredField): boolean {
   const value = field.value;
 
   if (field.humanize === undefined || value === null || value === undefined) {

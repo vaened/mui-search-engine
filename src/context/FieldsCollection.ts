@@ -1,7 +1,8 @@
-import type { RegisteredField, RegisteredFieldDictionary } from "@/context";
-import type { FilterName, FilterValue, PrimitiveFilterDictionary, PrimitiveValue, ValueFilterDictionary } from "@/types";
+import type { GenericRegisteredField, RegisteredFieldDictionary } from "@/context";
+import type { FilterName, PrimitiveFilterDictionary, Serializer, ValueFilterDictionary } from "@/field";
+import type { NonUndefined } from "@/internal";
 
-export class FieldsCollection implements Iterable<RegisteredField> {
+export class FieldsCollection implements Iterable<GenericRegisteredField> {
   #values: RegisteredFieldDictionary;
 
   constructor(values: RegisteredFieldDictionary) {
@@ -14,21 +15,31 @@ export class FieldsCollection implements Iterable<RegisteredField> {
 
   public size = () => this.#values.size;
 
-  public toArray = (): Array<RegisteredField> => Array.from(this);
+  public toArray = (): Array<GenericRegisteredField> => Array.from(this);
 
   public toMap = (): RegisteredFieldDictionary => new Map(this.#values);
 
-  public toRecord = (): Record<FilterName, RegisteredField> => Object.fromEntries(this.#values);
+  public toRecord = (): Record<FilterName, GenericRegisteredField> => Object.fromEntries(this.#values);
 
   public toValues = (): ValueFilterDictionary => {
     return this.#collect((field) => field.value);
   };
 
-  public toPrimitives = (): PrimitiveFilterDictionary => {
-    return this.#collect((field) => (field.serialize ? field.serialize(field.value) : (field.value as PrimitiveValue)));
+  toPrimitives = (): PrimitiveFilterDictionary => {
+    return this.#collect((field) => {
+      if (!FieldsCollection.isValidValue(field.value)) {
+        return undefined;
+      }
+
+      if (field.serializer) {
+        return (field.serializer as Serializer<typeof field.value>).serialize(field.value);
+      }
+
+      return Array.isArray(field.value) ? field.value.map(String) : String(field.value);
+    });
   };
 
-  public onlyActives = (): RegisteredField[] => {
+  public onlyActives = (): GenericRegisteredField[] => {
     return this.filter((field) => FieldsCollection.isValidValue(field.value));
   };
 
@@ -36,11 +47,11 @@ export class FieldsCollection implements Iterable<RegisteredField> {
     return this.#values.has(name);
   };
 
-  public get = <V extends FilterValue, P extends PrimitiveValue>(name: FilterName): RegisteredField<V, P> | undefined => {
-    return this.#values.get(name) as unknown as RegisteredField<V, P> | undefined;
+  get = (name: FilterName): GenericRegisteredField | undefined => {
+    return this.#values.get(name);
   };
 
-  public map = <V extends unknown>(mapper: (field: RegisteredField) => V): V[] => {
+  public map = <V extends unknown>(mapper: (field: GenericRegisteredField) => V): V[] => {
     const values: V[] = [];
 
     for (const field of this) {
@@ -50,8 +61,8 @@ export class FieldsCollection implements Iterable<RegisteredField> {
     return values;
   };
 
-  public filter = (predicate: (field: RegisteredField) => boolean): RegisteredField[] => {
-    const values: RegisteredField[] = [];
+  public filter = (predicate: (field: GenericRegisteredField) => boolean): GenericRegisteredField[] => {
+    const values: GenericRegisteredField[] = [];
 
     for (const field of this) {
       if (predicate(field)) {
@@ -62,11 +73,11 @@ export class FieldsCollection implements Iterable<RegisteredField> {
     return values;
   };
 
-  public forEach = (callback: (field: RegisteredField) => void) => {
+  public forEach = (callback: (field: GenericRegisteredField) => void) => {
     this.#values.forEach(callback);
   };
 
-  public static isValidValue = (value: unknown) => {
+  public static isValidValue = (value: unknown): value is NonNullable<unknown> => {
     return value !== undefined && value !== null;
   };
 
@@ -74,19 +85,21 @@ export class FieldsCollection implements Iterable<RegisteredField> {
     return this.#values.values();
   }
 
-  #collect = <T>(collector: (field: RegisteredField) => T): Record<FilterName, T> => {
-    const result = {} as Record<FilterName, T>;
+  #collect = <T>(collector: (field: GenericRegisteredField) => T): Record<FilterName, NonUndefined<T>> => {
+    const result = {} as Record<FilterName, NonUndefined<T>>;
 
     this.forEach((field) => {
       const value = collector(field);
 
-      if (!FieldsCollection.isValidValue(value)) {
-        return;
+      if (this.#isDefined(value)) {
+        result[field.name] = value;
       }
-
-      result[field.name] = value;
     });
 
     return result;
+  };
+
+  #isDefined = <T>(value: T): value is NonUndefined<T> => {
+    return value !== undefined;
   };
 }

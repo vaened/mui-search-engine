@@ -5,7 +5,7 @@
 
 import FilterChip, { type FilterChipProps } from "@/components/FilterChip";
 import { useSearchEngineConfig, type Translator } from "@/config";
-import type { RegisteredField } from "@/context";
+import type { GenericRegisteredField } from "@/context";
 import { useActiveFilters } from "@/hooks/useActiveFilters";
 import type { Theme } from "@emotion/react";
 import { Box, Grid, IconButton, Tooltip, Typography, type SxProps } from "@mui/material";
@@ -36,7 +36,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   const { actives, hasActives, syncFromStore, clearAll } = useActiveFilters();
   const { headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);
 
-  function onFilterChipRemove(field: RegisteredField) {
+  function onFilterChipRemove(field: GenericRegisteredField) {
     syncFromStore();
     onRemove?.(field);
   }

@@ -8,8 +8,9 @@ import FlagsSelect, { type FlagsBag } from "@/components/FlagsSelect";
 import IndexSelect from "@/components/IndexSelect";
 import { useSearchEngineConfig, type Translator } from "@/config";
 import { useSearchBuilder } from "@/context";
+import type { FilterBag, FilterName } from "@/field";
 import { useFilterField } from "@/hooks/useFilterField";
-import type { FilterBag, FilterName, InputSize } from "@/types";
+import type { InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
 import { Button } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -47,7 +48,7 @@ interface SearchBarProps<IB extends FilterBag<FilterName>, FB extends FlagsBag<F
   debounceDelay?: number;
   defaultIndex?: KeysOf<IB>;
   defaultFlags?: FlagsKeysOf<FB>[];
-  defaultValue?: string;
+  defaultValue?: string | null;
   onChange?: (params: string) => void;
 }
 
@@ -170,7 +171,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   labels,
   defaultIndex,
   defaultFlags,
-  defaultValue,
+  defaultValue = null,
   onChange,
 }: SearchBarProps<IB, FB>) {
   const inputId = id || useId();
@@ -179,19 +180,22 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
   const inputSearch = useRef<HTMLInputElement>(undefined);
   const dictionary = useMemo(() => createFilterDictionaryFrom<KeysOf<IB>>(indexes), [indexes]);
   const [index, setIndex] = useState<KeysOf<IB> | undefined>(() => {
-    return dictionary && !defaultIndex ? (Object.keys(dictionary)[0] as KeysOf<IB>) : defaultIndex;
+    return dictionary && !defaultIndex ? (Object.keys(dictionary)[0] as KeysOf<IB> | undefined) : defaultIndex;
   });
-
+  const indexName = name?.index ?? "index";
   const { value, set } = useFilterField(store, {
+    type: "string",
     name: name?.query || "q",
-    defaultValue: defaultValue || null,
+    defaultValue: defaultValue ?? "",
     submittable: submittable?.query,
-    humanize: (v, fields) => {
-      const value = fields.get<KeysOf<IB>, string>(name?.index ?? "index")?.value;
-      return [dictionary && value ? dictionary[value].label : null, v].filter((v) => v).join(": ");
+    humanize: (currentValue, fields) => {
+      const currentIndex = fields.get(indexName)?.value as KeysOf<IB> | undefined;
+      return [dictionary && currentIndex ? dictionary[currentIndex].label : null, currentValue].filter((label) => label).join(": ");
     },
-    serialize: (v) => v,
-    unserialize: (v) => v,
+    serializer: {
+      serialize: (v) => v,
+      unserialize: (v) => v,
+    },
   });
 
   const { defaultIndexLabel, searchAriaLabel } = useSearchBarTranslations(translate, labels);
@@ -226,7 +230,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
           <Box className="content">
             {dictionary && index && (
               <IndexSelect
-                name={name?.index}
+                name={indexName}
                 size={size}
                 submittable={submittable?.index === undefined ? false : submittable?.index}
                 options={dictionary}

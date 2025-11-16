@@ -6,7 +6,7 @@
 import { SearchBuilderContext, SearchFieldsStoreContext } from "@/context";
 import type { FieldsCollection } from "@/context/FieldsCollection";
 import { FieldStore } from "@/context/FieldStore";
-import type { PrimitiveFilterDictionary } from "@/types";
+import type { PrimitiveFilterDictionary } from "@/field";
 import Grid from "@mui/material/Grid";
 import React, { useCallback, useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 

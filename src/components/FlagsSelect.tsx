@@ -6,8 +6,9 @@
 import DropdownMenu from "@/components/DropdownMenu";
 import { useSearchEngineConfig, type Translator } from "@/config";
 import { useSearchBuilder } from "@/context";
+import type { FilterBag, FilterDictionary, FilterElement, FilterName } from "@/field";
 import { useFilterField } from "@/hooks/useFilterField";
-import type { FilterBag, FilterDictionary, FilterElement, FilterName, InputSize } from "@/types";
+import type { InputSize } from "@/types";
 import { createFilterDictionaryFrom } from "@/utils";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -74,12 +75,11 @@ export function FlagsSelect<N extends FilterName>({
 
   const [open, setMenuOpenStatus] = useState(false);
   const { value, set } = useFilterField(store, {
+    type: "string[]",
     name,
     defaultValue,
     submittable,
     humanize: (flags) => flags.map((flag) => ({ value: flag, label: labeled(dictionary, flag) ?? flag })),
-    serialize: (flags) => flags,
-    unserialize: (flags) => flags,
   });
 
   const { dropdownHeaderTitle, triggerTooltipMessage, clearSelectionButtonTooltip } = useFlagsSelectTranslations(translate, labels);

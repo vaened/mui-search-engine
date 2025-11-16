@@ -1,39 +1,76 @@
-/**
- * @author enea dhack <contact@vaened.dev>
- * @link https://vaened.dev DevFolio
- */
-
 import type { FieldStore } from "@/context/FieldStore";
-import { useFilterField } from "@/hooks/useFilterField";
-import type { Field, FilterValue, InferHumanizeReturn, InferSerializeReturn } from "@/types";
+import {
+  useFilterField,
+  type ArrayFilterFieldConfig,
+  type EmptyArrayFilterFieldConfig,
+  type FilterFieldConfig,
+  type ScalarFilterFieldConfig,
+} from "@/hooks/useFilterField";
 import { type ReactElement } from "react";
+
+import type { ArrayTypeKey, FilterTypeKey, FilterTypeMap, ScalarTypeKey } from "@/field"; // O donde estén tus tipos
 
 type Event = { target: any } | any;
 
-type Control<V extends FilterValue> = ({ value, onChange }: { value: V | null; onChange: (event: Event) => void }) => ReactElement;
+export type Control<V> = ({ value, onChange }: { value: V | null; onChange: (event: Event) => void }) => ReactElement;
 
-export type FilterFieldControllerProps<V extends FilterValue, P extends InferSerializeReturn<V>, H extends InferHumanizeReturn<V>> = Omit<
-  Field<V, P, H>,
-  "value"
-> & {
+export type ControllerProps<V> = {
   store: FieldStore;
-  defaultValue?: V;
   control: Control<V>;
 };
 
-export function FilterFieldController<
-  V extends FilterValue,
-  P extends InferSerializeReturn<V>,
-  H extends InferHumanizeReturn<V> = InferHumanizeReturn<V>
->({ store, control, ...restOfProps }: FilterFieldControllerProps<V, P, H>) {
-  const { value, set } = useFilterField(store, restOfProps);
+export interface FieldControllerProps<TValue> {
+  store: FieldStore;
+  control: Control<TValue>;
+}
+
+export interface FieldController<TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]>
+  extends FilterFieldConfig<TKey, TValue>,
+    ControllerProps<TValue> {}
+
+export interface ScalarFieldControllerProps<TKey extends ScalarTypeKey, TValue extends FilterTypeMap[TKey]>
+  extends ScalarFilterFieldConfig<TKey, TValue>,
+    ControllerProps<TValue> {}
+
+export interface EmptyArrayFieldControllerProps<TKey extends ArrayTypeKey>
+  extends EmptyArrayFilterFieldConfig<TKey>,
+    FieldControllerProps<FilterTypeMap[TKey]> {}
+
+export interface ArrayFieldControllerProps<TKey extends ArrayTypeKey, TValue extends FilterTypeMap[TKey]>
+  extends ArrayFilterFieldConfig<TKey, TValue>,
+    FieldControllerProps<TValue> {}
+
+type GenericFieldControllerProps = {
+  [K in FilterTypeKey]: FieldController<K, FilterTypeMap[K]>;
+}[FilterTypeKey];
+
+export function FilterFieldController<TKey extends ScalarTypeKey, TValue extends FilterTypeMap[TKey]>(
+  props: ScalarFieldControllerProps<TKey, TValue>
+): ReactElement;
+
+export function FilterFieldController<TKey extends ArrayTypeKey>(props: EmptyArrayFieldControllerProps<TKey>): ReactElement;
+
+export function FilterFieldController<TKey extends ArrayTypeKey, TValue extends FilterTypeMap[TKey]>(
+  props: ArrayFieldControllerProps<TKey, TValue>
+): ReactElement;
+
+export function FilterFieldController<TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]>(props: any) {
+  const { store, control, ...restOfProps } = props as FieldController<TKey, TValue>;
+
+  
+  const { value, set } = useFilterField(
+    store,
+    restOfProps as any
+  );
 
   function onChange(event: Event) {
-    const value = getEventValue(event);
-    set(value);
+    set(getEventValue(event) as TValue);
   }
 
-  return control({ value, onChange });
+  return control({
+    value: value as TValue,
+    onChange,
+  });
 }
 
 function isObject<T extends object>(value: unknown): value is T {
@@ -41,16 +78,14 @@ function isObject<T extends object>(value: unknown): value is T {
 }
 
 function isCheckbox(element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | { type?: string }): element is HTMLInputElement {
-  return element.type === "checkbox";
+  return (element as any).type === "checkbox";
 }
 
 function getEventValue(event: Event) {
   const target = event.target;
-
   if (isObject(target) && target) {
     return isCheckbox(target) ? target.checked : (target as any).value;
   }
-
   return event;
 }
 

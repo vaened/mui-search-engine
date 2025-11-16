@@ -3,25 +3,31 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { useSearchBuilder, type RegisteredField } from "@/context";
-import type { FilterValue, IndexedFilterChip, InputValue } from "@/types";
+import { useSearchBuilder, type GenericRegisteredField } from "@/context";
+import type { FieldsCollection } from "@/context/FieldsCollection";
+import type { FilterValue, HumanizedValue, ValueOf } from "@/field";
 import { Chip, type ChipProps } from "@mui/material";
 import React from "react";
 
 export type FilterChipProps = Omit<ChipProps, "label" | "onDelete" | "size"> & {
-  field: RegisteredField;
+  field: GenericRegisteredField;
   readonly?: boolean;
-  onRemove?: (field: RegisteredField) => void;
+  onRemove?: (field: GenericRegisteredField) => void;
 };
 
-function isIndexedChipArray(value: unknown): value is IndexedFilterChip<InputValue[]>[] {
-  return Array.isArray(value) && value.length > 0 && typeof value[0] === "object" && "value" in value[0];
+type AnyHumanizedValue = HumanizedValue<any>;
+
+function createLabelFor(field: GenericRegisteredField, fields: FieldsCollection): AnyHumanizedValue | undefined {
+  const humanize = field.humanize as unknown as
+    | ((value: ValueOf<GenericRegisteredField>, fields: FieldsCollection) => AnyHumanizedValue)
+    | undefined;
+  return humanize ? humanize(field.value, fields) : undefined;
 }
 
 export const FilterChip: React.FC<FilterChipProps> = ({ field, readonly, onRemove, ...restOfProps }) => {
   const { store } = useSearchBuilder();
 
-  const humanized = field.humanize?.(field.value, store.collection());
+  const humanized = createLabelFor(field, store.collection());
 
   if (humanized === undefined || humanized === null || humanized.length === 0) {
     return null;
@@ -38,7 +44,7 @@ export const FilterChip: React.FC<FilterChipProps> = ({ field, readonly, onRemov
     onRemove?.(field);
   }
 
-  if (!isIndexedChipArray(humanized)) {
+  if (typeof humanized === "string") {
     return <Chip {...restOfProps} label={humanized} size="small" onDelete={readonly ? undefined : () => remove()} />;
   }
 
@@ -50,7 +56,7 @@ export const FilterChip: React.FC<FilterChipProps> = ({ field, readonly, onRemov
           key={`filter-chip-${field.name}-${chip.label}`}
           label={chip.label}
           size="small"
-          onDelete={readonly ? undefined : () => remove(chip.value)}
+          onDelete={readonly ? undefined : () => remove(chip.value as FilterValue)}
         />
       ))}
     </>

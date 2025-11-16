@@ -3,20 +3,21 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { RegisteredField, RegisteredFieldDictionary } from "@/context";
+import type { GenericRegisteredField, RegisteredField, RegisteredFieldDictionary } from "@/context";
 import { FieldsCollection } from "@/context/FieldsCollection";
 import { createEventEmitter, type EventEmitter, type Unsubscribe } from "@/context/event-emitter";
-import { url } from "@/persistence";
-import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import type {
-  Field,
   FieldOptions,
   FilterName,
-  FilterValue,
-  InferSerializeReturn,
+  FilterTypeKey,
+  FilterTypeMap,
+  GenericField,
   PrimitiveFilterDictionary,
   PrimitiveValue,
-} from "@/types";
+  ValueOf,
+} from "@/field";
+import { url } from "@/persistence";
+import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 
 export type FieldOperation = "set" | "update" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
 
@@ -54,8 +55,10 @@ export class FieldStore {
     return () => this.#listeners.delete(listener);
   };
 
-  listen = <V extends FilterValue, P extends InferSerializeReturn<V>>(name: FilterName): (() => Field<V, P> | undefined) => {
-    return () => this.#state.collection.get<V, P>(name);
+  listen = <TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]>(
+    name: FilterName
+  ): (() => RegisteredField<TKey, TValue> | undefined) => {
+    return () => this.#state.collection.get(name) as RegisteredField<TKey, TValue> | undefined;
   };
 
   sync = (): FieldsCollection | undefined => {
@@ -93,23 +96,20 @@ export class FieldStore {
     return collection;
   };
 
-  register = <V extends FilterValue, P extends InferSerializeReturn<V>>(field: Field<V, P>) => {
+  register<F extends GenericField>(field: F): void {
     if (this.exists(field.name)) {
       throw new Error(`Field "${field.name}" is already registered`);
     }
 
     const registered = {
-      ...(field as unknown as Field<FilterValue, PrimitiveValue>),
+      ...field,
       defaultValue: field.value,
-    };
+      updatedAt: Date.now(),
+    } as unknown as GenericRegisteredField;
 
     this.#override(registered, this.#parse(this.#initial[field.name], registered));
-
-    this.#commit({
-      operation: "register",
-      collection: new FieldsCollection(this.#fields),
-    });
-  };
+    this.#commit({ operation: "register", collection: new FieldsCollection(this.#fields) });
+  }
 
   unregister = (name: FilterName) => {
     if (!this.exists(name)) {
@@ -144,28 +144,28 @@ export class FieldStore {
     });
   };
 
-  set = <V extends FilterValue>(name: FilterName, value: V) => {
+  set = (name: FilterName, value: GenericRegisteredField["value"] | null) => {
     const field = this.#fields.get(name);
 
     if (!field || Object.is(field.value, value)) {
       return;
     }
 
-    this.#override(field, value);
+    this.#override(field, value as ValueOf<typeof field>);
 
-    this.#commit({
-      operation: "set",
-      touched: [name],
-      collection: new FieldsCollection(this.#fields),
-    });
+    this.#commit({ operation: "set", touched: [name], collection: new FieldsCollection(this.#fields) });
   };
 
   reset = () => {
     const touched: FilterName[] = [];
 
     this.#fields.forEach((field) => {
+      if (Object.is(field.value, field.defaultValue)) {
+        console.log({ name: field.name, value: field.value, defaultValue: field.defaultValue });
+      }
+
       if (!Object.is(field.value, field.defaultValue)) {
-        this.#override(field, field.defaultValue);
+        this.#override(field, field.defaultValue as ValueOf<typeof field>);
         touched.push(field.name);
       }
     });
@@ -174,9 +174,7 @@ export class FieldStore {
       return;
     }
 
-    const collection = new FieldsCollection(this.#fields);
-
-    this.#commit({ operation: "reset", collection, touched });
+    this.#commit({ operation: "reset", collection: new FieldsCollection(this.#fields), touched });
   };
 
   clean = () => {
@@ -207,11 +205,7 @@ export class FieldStore {
       }
     });
 
-    if (touched.length === 0) {
-      return;
-    }
-
-    return touched;
+    return touched.length ? touched : undefined;
   };
 
   #commit = (state: Partial<FieldStoreState>) => {
@@ -224,20 +218,21 @@ export class FieldStore {
     this.#emitter.emit("change", this.#state);
   };
 
-  #parse = (
-    newValue: PrimitiveValue | undefined,
-    field: Pick<RegisteredField<FilterValue, PrimitiveValue>, "unserialize" | "defaultValue">
-  ): FilterValue => {
-    if (!FieldsCollection.isValidValue(newValue)) {
-      return field.defaultValue;
+  #parse = <T extends GenericRegisteredField>(newValue: PrimitiveValue, field: Pick<T, "defaultValue" | "serializer">): ValueOf<T> => {
+    if (newValue === undefined || newValue === null) {
+      return field.defaultValue as ValueOf<T>;
     }
 
-    return field.unserialize ? field.unserialize(newValue) : newValue;
+    return field.serializer.unserialize(newValue as any) as ValueOf<T>;
   };
 
-  #override = (field: Omit<RegisteredField<FilterValue, PrimitiveValue>, "updatedAt" | "value">, newValue: FilterValue) => {
-    this.#fields.set(field.name, { ...field, updatedAt: Date.now(), value: newValue });
-  };
+  #override<F extends GenericRegisteredField>(field: F, newValue: ValueOf<F>): void {
+    this.#fields.set(field.name, {
+      ...(field as F),
+      updatedAt: Date.now(),
+      value: newValue,
+    });
+  }
 
   #initialState = (): FieldStoreState => ({
     collection: FieldsCollection.empty(),

@@ -1,170 +1,211 @@
-/**
- * @author enea dhack <contact@vaened.dev>
- * @link https://vaened.dev DevFolio
- */
-
-import FilterFieldController from "@/components/FilterFieldController";
-import { useSearchBuilder } from "@/context";
-import type { UnpackedValue } from "@/internal";
-import type { FilterName, InferHumanizeReturn, InferSerializeReturn } from "@/types";
+import FilterFieldController, { type FieldController } from "@/components/FilterFieldController";
 import { MenuItem, Select, type SelectProps } from "@mui/material";
-import { useCallback, useMemo, type ReactElement, type ReactNode } from "react";
+import { type ReactElement, type ReactNode, useMemo } from "react";
 
-type SingularValue = string | number;
+import { type ArrayFilterFieldConfig, type EmptyArrayFilterFieldConfig, type ScalarFilterFieldConfig } from "@/hooks/useFilterField";
 
-type OptionValue = SingularValue | SingularValue[];
+import { useSearchBuilder } from "@/context";
+import type { ArrayItemType, FieldConfig, FilterLabel, FilterTypeKey, FilterTypeMap } from "@/field";
 
-type NormalizedOptionItem<V extends OptionValue, I extends UnpackedValue<V>> = {
+type NormalizedOptionItem<I extends string | number> = {
   value: I;
   label: ReactElement | string;
 };
 
-export type ArrayOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>, O> = {
-  items: O[];
-  getValue: (item: O) => I;
-  getLabel: (item: O) => ReactElement | string;
+export type OptionSelectTypeKey = Extract<FilterTypeKey, "string" | "number" | "string[]" | "number[]">;
+export type OptionSelectScalarTypeKey = Exclude<OptionSelectTypeKey, `${string}[]`>;
+export type OptionSelectArrayTypeKey = Extract<OptionSelectTypeKey, `${string}[]`>;
+
+export type UiArrayProps<TValue, TItem> = {
+  items: TItem[];
+  getValue: (item: TItem) => TValue;
+  getLabel: (item: TItem) => ReactNode;
+  children?: never;
 };
 
-export type ObjectOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>> = {
-  items?: Record<I, ReactElement | string>;
+export type UiObjectProps<TValue extends string | number, TItemsObj extends Record<TValue, ReactNode | string>> = {
+  items: TItemsObj;
+  getValue?: never;
+  getLabel?: never;
+  children?: never;
 };
 
-export type OptionSelectProps<V extends OptionValue, I extends UnpackedValue<V>, O, P extends InferSerializeReturn<V>> = Omit<
-  SelectProps<V>,
-  "value" | "name"
-> & {
-  name: FilterName;
-  submittable: boolean;
-  untrackable?: boolean;
-  defaultValue?: V;
-  unserialize?: (value: P) => V;
-  serialize?: (value: V) => P;
-  toHumanLabel?: (value: I) => string;
-} & (ArrayOptionItemProps<V, I, O> | ObjectOptionItemProps<V, I> | { items: never; children: ReactNode });
+export type UiChildrenProps = {
+  items?: never;
+  getValue?: never;
+  getLabel?: never;
+  children: ReactNode;
+};
 
-export function OptionSelect<V extends OptionValue, I extends UnpackedValue<V>, O, P extends InferSerializeReturn<V>>(
-  props: OptionSelectProps<V, I, O, P>
-) {
-  validateOptionSelectProps(props);
+export type UiVariantProps<TValue, TItem, TItemsObj> =
+  | UiArrayProps<TValue, TItem>
+  | UiObjectProps<TValue & (string | number), TItemsObj & Record<TValue & (string | number), ReactNode | string>>
+  | UiChildrenProps;
 
-  const { store } = useSearchBuilder();
-  const {
-    name,
-    defaultValue,
-    multiple,
-    submittable,
-    untrackable,
-    children,
-    toHumanLabel,
-    serialize: serializer,
-    unserialize: unserializer,
-    ...restOfProps
-  } = props;
-  const items = useMemo(() => normalize(props), [props.items]);
+type OmittedSelectProps = "value" | "name" | "defaultValue" | "multiple" | "type" | "multiple" | "onChange" | "items" | "children";
 
-  const serialize = useCallback((value: V) => {
-    return serializer?.(value) ?? (value as InferSerializeReturn<V>);
-  }, []);
+export type BaseOptionSelectProps = Omit<SelectProps, OmittedSelectProps>;
 
-  const unserialize = useCallback((value: InferSerializeReturn<V>) => {
-    return unserializer?.(value as P) ?? (value as V);
-  }, []);
+type OptionSelectConfig<
+  TKey extends OptionSelectTypeKey,
+  TValue extends FilterTypeMap[TKey],
+  TItem,
+  TOption extends string | number,
+  TItemsObj
+> = Omit<SelectProps, OmittedSelectProps> &
+  Omit<FieldConfig<TKey, TValue>, OmittedConfigProps> & {
+    defaultValue?: TValue;
+    toHumanLabel?: (value: TValue | TOption) => FilterLabel;
+  } & UiVariantProps<TOption, TItem, TItemsObj>;
 
-  function humanize(value: V): InferHumanizeReturn<V> {
-    if (toHumanLabel === undefined) {
-      return undefined;
-    }
+type OmittedConfigProps = "humanize" | "serializer";
 
-    if (isSingularValue(value)) {
-      return (toHumanLabel(value as I) ?? String(value)) as InferHumanizeReturn<V>;
-    }
+export type ScalarOptionSelectConfig<
+  TKey extends OptionSelectScalarTypeKey,
+  TValue extends FilterTypeMap[TKey],
+  TItem = unknown,
+  TItemsObj = unknown
+> = BaseOptionSelectProps &
+  Omit<ScalarFilterFieldConfig<TKey, TValue>, OmittedConfigProps | "defaultValue"> & {
+    defaultValue?: TValue;
+    toHumanLabel?: (value: TValue) => FilterLabel;
+  } & UiVariantProps<TValue, TItem, TItemsObj>;
 
-    return value.map((singular) => ({
-      label: toHumanLabel(singular as I) ?? String(singular),
-      value: singular,
-    })) as InferHumanizeReturn<V>;
-  }
+export type ArrayOptionSelectConfig<
+  TKey extends OptionSelectArrayTypeKey,
+  TValue extends FilterTypeMap[TKey],
+  TItem = unknown,
+  TItemValue = ArrayItemType<TValue>,
+  TItemsObj = unknown
+> = BaseOptionSelectProps &
+  Omit<ArrayFilterFieldConfig<TKey, TValue>, OmittedConfigProps | "defaultValue"> & {
+    defaultValue?: TValue;
+    toHumanLabel?: (value: TItemValue) => FilterLabel;
+  } & UiVariantProps<TItemValue, TItem, TItemsObj>;
 
-  return (
-    <FilterFieldController
-      store={store}
-      name={name}
-      defaultValue={(defaultValue ? defaultValue : multiple ? [] : "") as V}
-      humanize={untrackable ? undefined : humanize}
-      serialize={serialize}
-      unserialize={unserialize}
-      submittable={submittable}
-      control={({ value, onChange }) => {
-        return (
-          <Select {...restOfProps} multiple={multiple} value={value as V} onChange={onChange}>
-            {children
-              ? children
-              : items?.map(({ value, label }, index) => (
-                  <MenuItem key={String(value)} value={value}>
-                    {label}
-                  </MenuItem>
-                ))}
-          </Select>
-        );
-      }}
-    />
-  );
+export type EmptyArrayOptionSelectConfig<
+  TKey extends OptionSelectArrayTypeKey,
+  TItem = unknown,
+  TItemValue = ArrayItemType<FilterTypeMap[TKey]>,
+  TItemsObj = unknown
+> = BaseOptionSelectProps &
+  Omit<EmptyArrayFilterFieldConfig<TKey>, OmittedConfigProps> & {
+    toHumanLabel?: (value: TItemValue) => FilterLabel;
+  } & UiVariantProps<TItemValue, TItem, TItemsObj>;
+
+function isArrayBranch<TValue extends string | number, TItem, TItemsObj extends Record<TValue, ReactNode | string>>(
+  props: UiVariantProps<TValue, TItem, TItemsObj>
+): props is UiArrayProps<TValue, TItem> {
+  return "items" in props && Array.isArray(props.items) && "getValue" in props;
 }
 
-function isSingularValue(value: OptionValue): value is SingularValue {
-  return !Array.isArray(value);
+function isObjectBranch<TValue extends string | number, TItem, TItemsObj extends Record<TValue, ReactNode | string>>(
+  props: UiVariantProps<TValue, TItem, TItemsObj>
+): props is UiObjectProps<TValue, TItemsObj> {
+  return "items" in props && !!props.items && !Array.isArray(props.items) && typeof props.items === "object" && !("getValue" in props);
 }
 
-function isArrayOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>, O, P extends InferSerializeReturn<V>>(
-  x: OptionSelectProps<V, I, O, P>
-): x is OptionSelectProps<V, I, O, P> & ArrayOptionItemProps<V, I, O> {
-  return "items" in x && Array.isArray(x.items);
-}
-function isObjectOptionItemProps<V extends OptionValue, I extends UnpackedValue<V>, O, P extends InferSerializeReturn<V>>(
-  x: OptionSelectProps<V, I, O, P>
-): x is OptionSelectProps<V, I, O, P> & ObjectOptionItemProps<V, I> {
-  return "items" in x && x.items !== null && typeof x.items === "object";
-}
-
-function normalize<V extends OptionValue, I extends UnpackedValue<V>, O, P extends InferSerializeReturn<V>>(
-  props: OptionSelectProps<V, I, O, P>
-): NormalizedOptionItem<V, I>[] | null {
-  if (isArrayOptionItemProps(props)) {
+function normalize<TValue extends string | number, TItem, TItemsObj extends Record<TValue, ReactNode | string>>(
+  props: UiVariantProps<TValue, TItem, TItemsObj>
+): NormalizedOptionItem<TValue>[] | null {
+  if (isArrayBranch(props)) {
     return props.items.map((item) => ({
-      value: props.getValue(item) as I,
-      label: props.getLabel(item),
+      value: props.getValue(item),
+      label: props.getLabel(item) as ReactElement | string,
     }));
   }
 
-  if (isObjectOptionItemProps(props)) {
-    return Object.entries<ReactElement | string>(props.items || {}).map(([value, label]) => ({ value: value as I, label }));
+  if (isObjectBranch(props)) {
+    return Object.entries(props.items).map(([value, label]) => ({
+      value: value as TValue,
+      label: label as ReactElement | string,
+    }));
   }
 
   return null;
 }
 
-function validateOptionSelectProps<V extends OptionValue, I extends UnpackedValue<V>, O, P extends InferSerializeReturn<V>>(
-  props: OptionSelectProps<V, I, O, P>
+function validateOptionSelectProps<TValue extends string | number, TItem, TItemsObj extends Record<TValue, ReactNode | string>>(
+  props: UiVariantProps<TValue, TItem, TItemsObj>
 ): void {
   if ("items" in props && props.items && "children" in props && props.children) {
-    throw new Error(`
-      [OptionSelect] Cannot use both "items" and "children" props simultaneously.
-      
-      Use ONLY ONE of these options:
-      
-      ✅ With items (auto-generation):
-      <OptionSelect
-        items={[...]}
-        getValue={...}
-        getLabel={...}
-      />
-      
-      ✅ With children (custom):
-      <OptionSelect>
-        <MenuItem>...</MenuItem>
-      </OptionSelect>
-    `);
+    throw new Error(`[OptionSelect] Cannot use both "items" and "children"...`);
   }
+}
+
+export function OptionSelect<TKey extends OptionSelectScalarTypeKey, TValue extends FilterTypeMap[TKey], TItem, TItemsObj>(
+  props: ScalarOptionSelectConfig<TKey, TValue, TItem, TItemsObj>
+): ReactElement;
+
+export function OptionSelect<TKey extends OptionSelectArrayTypeKey, TItem, TItemsObj>(
+  props: EmptyArrayOptionSelectConfig<TKey, TItem, TItemsObj>
+): ReactElement;
+
+export function OptionSelect<TKey extends OptionSelectArrayTypeKey, TValue extends FilterTypeMap[TKey], TItem, TItemsObj>(
+  props: ArrayOptionSelectConfig<TKey, TValue, TItem, TItemsObj>
+): ReactElement;
+
+export function OptionSelect<
+  Tkey extends OptionSelectTypeKey,
+  TValue extends FilterTypeMap[Tkey],
+  TItem,
+  TItemValue extends string | number,
+  TitemsObj extends Record<Extract<TItemValue, string | number>, ReactNode | string>
+>(props: any) {
+  validateOptionSelectProps(props);
+
+  const { store } = useSearchBuilder();
+
+  const { name, type, defaultValue, submittable, items, children, toHumanLabel, getValue, getLabel, ...restOfProps } =
+    props as OptionSelectConfig<Tkey, TValue, TItem, TItemValue, TitemsObj>;
+
+  const multiple = type.endsWith("[]");
+  const emptyValue = multiple ? [] : "";
+
+  const humanize = useMemo(() => {
+    if (!toHumanLabel) {
+      return undefined;
+    }
+
+    if (multiple) {
+      return (value: string[] | string[]) =>
+        value.map((v) => ({
+          value: v,
+          label: toHumanLabel(v as TValue | TItemValue) ?? String(v),
+        }));
+    }
+    return toHumanLabel;
+  }, [toHumanLabel, multiple]);
+
+  const normalizedItems = useMemo(() => normalize(props), [items, getValue, getLabel, children]);
+
+  const config = {
+    type,
+    name,
+    defaultValue: defaultValue ?? emptyValue,
+    submittable,
+    humanize,
+  } as Partial<FieldController<Tkey, TValue>>;
+
+  return (
+    <FilterFieldController
+      store={store}
+      {...(config as any)}
+      control={({ value, onChange }) => {
+        console.log({ value, emptyValue, multiple });
+        return (
+          <Select {...restOfProps} multiple={multiple} value={value ?? emptyValue} onChange={onChange}>
+            {children ??
+              normalizedItems?.map(({ value, label }) => (
+                <MenuItem key={String(value)} value={value}>
+                  {label}
+                </MenuItem>
+              ))}
+          </Select>
+        );
+      }}
+    />
+  );
 }
 
 export default OptionSelect;
