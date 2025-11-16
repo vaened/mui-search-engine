@@ -13,14 +13,12 @@ export class UrlPersistenceAdapter implements PersistenceAdapter {
     }
   }
 
-  read = (whitelist?: string[]): PrimitiveFilterDictionary => {
+  read = (): PrimitiveFilterDictionary => {
     const params = new URLSearchParams(window.location.search);
     const keys = new Set(params.keys());
     const values: PrimitiveFilterDictionary = {};
 
-    const keysToProcess = whitelist ? Array.from(keys).filter((key) => whitelist.includes(this.#normalize(key))) : keys;
-
-    keysToProcess.forEach((key) => {
+    keys.forEach((key) => {
       if (this.#isArray(key)) {
         const parameter = this.#convertToScalar(key);
         values[parameter] = params.getAll(key);
