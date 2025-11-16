@@ -221,7 +221,6 @@ export function OptionSelect<
       store={store}
       {...(config as any)}
       control={({ value, onChange }) => {
-        console.log({ value, emptyValue, multiple });
         return (
           <Select {...restOfProps} multiple={multiple} value={value ?? emptyValue} onChange={onChange}>
             {children ??
