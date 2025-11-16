@@ -21,6 +21,11 @@ import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 
 export type FieldOperation = "set" | "update" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
 
+export type FieldStoreOptions = {
+  persistence?: PersistenceAdapter;
+  emitter?: EventEmitter;
+};
+
 export type FieldStoreState = Readonly<{
   collection: FieldsCollection;
   operation: FieldOperation;
@@ -261,11 +266,6 @@ CURRENT FIELD REGISTRY:
 =================================
   `);
 }
-
-export type FieldStoreOptions = {
-  persistence?: PersistenceAdapter;
-  emitter?: EventEmitter;
-};
 
 export function createFieldStore({ persistence, emitter }: FieldStoreOptions = {}) {
   return new FieldStore(persistence ?? url(), emitter ?? createEventEmitter());
