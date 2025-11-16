@@ -5,7 +5,7 @@
 
 import { useSearchBuilder, type GenericRegisteredField } from "@/context";
 import type { FieldsCollection } from "@/context/FieldsCollection";
-import type { FilterValue, HumanizedValue, ValueOf } from "@/field";
+import type { FilterValue, HumanizedValue, Humanizer, ValueOf } from "@/field";
 import { Chip, type ChipProps } from "@mui/material";
 import React from "react";
 
@@ -18,9 +18,7 @@ export type FilterChipProps = Omit<ChipProps, "label" | "onDelete" | "size"> & {
 type AnyHumanizedValue = HumanizedValue<any>;
 
 function createLabelFor(field: GenericRegisteredField, fields: FieldsCollection): AnyHumanizedValue | undefined {
-  const humanize = field.humanize as unknown as
-    | ((value: ValueOf<GenericRegisteredField>, fields: FieldsCollection) => AnyHumanizedValue)
-    | undefined;
+  const humanize = field.humanize as Humanizer<ValueOf<GenericRegisteredField>, AnyHumanizedValue> | undefined;
   return humanize ? humanize(field.value, fields) : undefined;
 }
 

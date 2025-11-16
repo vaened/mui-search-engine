@@ -59,6 +59,7 @@ export type HumanizedValue<V extends ArrayFilterValue> = string | ReadonlyArray<
 export type PrimitiveFilterDictionary = Record<FilterName, PrimitiveValue>;
 export type ValueFilterDictionary = Record<FilterName, FilterValue>;
 
+export type Humanizer<TValue, TResponse = HumanizeReturnType<TValue>> = (value: TValue, fields: FieldsCollection) => TResponse;
 export type Serializer<TValue> = {
   serialize(value: TValue): SerializeReturnType<TValue>;
   unserialize(value: SerializeReturnType<TValue>): NoInfer<TValue>;
@@ -71,21 +72,21 @@ export interface FieldOptions {
 export interface FieldConfig<TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]> extends FieldOptions {
   type: TKey;
   name: FilterName;
-  humanize: (value: TValue, fields: FieldsCollection) => HumanizeReturnType<TValue>;
+  humanize: Humanizer<TValue>;
   serializer: Serializer<TValue>;
 }
 
 export type ScalarFieldConfig<TKey extends ScalarTypeKey, TValue extends FilterTypeMap[TKey]> = FieldOptions & {
   name: FilterName;
   type: TKey;
-  humanize?: (value: TValue, fields: FieldsCollection) => string;
+  humanize?: Humanizer<TValue, string>;
   serializer?: Serializer<TValue>;
 };
 
 export type ArrayFieldConfig<TKey extends ArrayTypeKey, TValue extends FilterTypeMap[TKey]> = FieldOptions & {
   name: FilterName;
   type: TKey;
-  humanize?: (value: TValue, fields: FieldsCollection) => FilterMultiLabel<TValue>;
+  humanize?: Humanizer<TValue, FilterMultiLabel<TValue>>;
   serializer?: Serializer<TValue>;
 };
 
