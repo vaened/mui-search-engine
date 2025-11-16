@@ -63,6 +63,7 @@ export type Serializer<TValue> = {
   serialize(value: TValue): SerializeReturnType<TValue>;
   unserialize(value: SerializeReturnType<TValue>): NoInfer<TValue>;
 };
+
 export interface FieldOptions {
   submittable?: boolean;
 }
