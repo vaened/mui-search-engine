@@ -37,8 +37,9 @@ export function SearchBuilder({
   onChange,
 }: SearchEngineContextProviderProps) {
   const autostarted = useRef(false);
+  const isReady = useRef(manualStart === true);
 
-  const checkIsReady = useCallback(() => autostarted.current === true || manualStart === true, [manualStart]);
+  const checkIsReady = useCallback(() => isReady.current, []);
   const checkAutostartable = useCallback(() => !autostarted.current && !manualStart, [manualStart]);
 
   useEffect(() => {
@@ -62,19 +63,21 @@ export function SearchBuilder({
 
   useEffect(() => {
     if (!checkAutostartable()) {
+      isReady.current = true;
       return;
     }
 
     const timmer = setTimeout(() => {
       dispatch(store.collection());
       autostarted.current = true;
+      isReady.current = true;
     }, autoStartDelay);
 
     return () => {
       clearTimeout(timmer);
       autostarted.current = false;
     };
-  }, [store.collection(), autoStartDelay]);
+  }, [store, autoStartDelay]);
 
   useEffect(() => {
     const handleExternalUpdate = (newFields: FieldsCollection | undefined) => {
