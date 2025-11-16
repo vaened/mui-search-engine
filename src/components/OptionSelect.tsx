@@ -223,11 +223,12 @@ function validateOptionSelectProps<TValue extends string | number, TItem, TItems
 ): void {
   if ("items" in props && props.items && "children" in props && props.children) {
     throw new Error(`
-[OptionSelect] Props conflict detected: Cannot use both "items" and "children" props simultaneously.
+OPTION SELECT PROPS CONFLICT
+================================================================
 
-❌ PROBLEM: You've provided both "items" and "children" to OptionSelect, but these are mutually exclusive ways to define options.
+PROBLEM: You've provided both "items" and "children" to OptionSelect, but these are mutually exclusive ways to define options.
 
-✅ SOLUTION: Choose ONLY ONE of these three supported patterns:
+SOLUTION: Choose ONLY ONE of these three supported patterns:
 
 PATTERN 1: Array of objects with accessors
   <OptionSelect
@@ -251,6 +252,7 @@ PATTERN 3: Direct MenuItem children
   </OptionSelect>
 
 Remove either the "items" prop or the "children" to resolve this error.
+================================================================
     `);
   }
 }
