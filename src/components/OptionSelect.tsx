@@ -44,7 +44,7 @@ export type UiVariantProps<TValue, TItem, TItemsObj> =
 
 type OmittedSelectProps = "value" | "name" | "defaultValue" | "multiple" | "type" | "multiple" | "onChange" | "items" | "children";
 
-export type BaseOptionSelectProps = Omit<SelectProps, OmittedSelectProps>;
+export interface OptionSelectProps extends Omit<SelectProps, OmittedSelectProps> {}
 
 type OptionSelectConfig<
   TKey extends OptionSelectTypeKey,
@@ -52,7 +52,7 @@ type OptionSelectConfig<
   TItem,
   TOption extends string | number,
   TItemsObj
-> = BaseOptionSelectProps &
+> = OptionSelectProps &
   Omit<FieldConfig<TKey, TValue>, OmittedConfigProps> & {
     defaultValue?: TValue;
     toHumanLabel?: (value: TValue | TOption) => FilterLabel;
@@ -65,7 +65,7 @@ export type ScalarOptionSelectConfig<
   TValue extends FilterTypeMap[TKey],
   TItem = unknown,
   TItemsObj = unknown
-> = BaseOptionSelectProps &
+> = OptionSelectProps &
   Omit<ScalarFilterFieldConfig<TKey, TValue>, OmittedConfigProps | "defaultValue"> & {
     defaultValue?: TValue;
     toHumanLabel?: (value: TValue) => FilterLabel;
@@ -77,7 +77,7 @@ export type ArrayOptionSelectConfig<
   TItem = unknown,
   TItemValue = ArrayItemType<TValue>,
   TItemsObj = unknown
-> = BaseOptionSelectProps &
+> = OptionSelectProps &
   Omit<ArrayFilterFieldConfig<TKey, TValue>, OmittedConfigProps | "defaultValue"> & {
     defaultValue?: TValue;
     toHumanLabel?: (value: TItemValue) => FilterLabel;
@@ -88,7 +88,7 @@ export type EmptyArrayOptionSelectConfig<
   TItem = unknown,
   TItemValue = ArrayItemType<FilterTypeMap[TKey]>,
   TItemsObj = unknown
-> = BaseOptionSelectProps &
+> = OptionSelectProps &
   Omit<EmptyArrayFilterFieldConfig<TKey>, OmittedConfigProps> & {
     toHumanLabel?: (value: TItemValue) => FilterLabel;
   } & UiVariantProps<TItemValue, TItem, TItemsObj>;
