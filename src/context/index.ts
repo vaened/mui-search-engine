@@ -17,6 +17,7 @@ export interface SearchBuilderContextState {
   store: FieldStore;
   submitOnChange: boolean;
   isLoading: boolean;
+  checkIsReady: () => boolean;
   refresh: (params: PrimitiveFilterDictionary) => void;
 }
 

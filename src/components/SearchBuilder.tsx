@@ -38,6 +38,7 @@ export function SearchBuilder({
 }: SearchEngineContextProviderProps) {
   const autostarted = useRef(false);
 
+  const checkIsReady = useCallback(() => autostarted.current === true || manualStart === true, [manualStart]);
   const checkAutostartable = useCallback(() => !autostarted.current && !manualStart, [manualStart]);
 
   useEffect(() => {
@@ -120,9 +121,10 @@ export function SearchBuilder({
       store,
       isLoading: loading,
       submitOnChange,
+      checkIsReady,
       refresh,
     }),
-    [store, loading, submitOnChange, refresh]
+    [store, loading, submitOnChange, checkIsReady, refresh]
   );
 
   return (
