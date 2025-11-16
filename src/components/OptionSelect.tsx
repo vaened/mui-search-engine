@@ -129,7 +129,36 @@ function validateOptionSelectProps<TValue extends string | number, TItem, TItems
   props: UiVariantProps<TValue, TItem, TItemsObj>
 ): void {
   if ("items" in props && props.items && "children" in props && props.children) {
-    throw new Error(`[OptionSelect] Cannot use both "items" and "children"...`);
+    throw new Error(`
+      [OptionSelect] Props conflict detected: Cannot use both "items" and "children" props simultaneously.
+
+      ❌ PROBLEM: You've provided both "items" and "children" to OptionSelect, but these are mutually exclusive ways to define options.
+
+      ✅ SOLUTION: Choose ONLY ONE of these three supported patterns:
+
+      PATTERN 1: Array of objects with accessors
+        <OptionSelect
+          items={users}
+          getValue={(user) => user.id}
+          getLabel={(user) => user.name}
+        />
+
+      PATTERN 2: Simple key-value object
+        <OptionSelect
+          items={{
+            "active": "Active",
+            "inactive": "Inactive"
+          }}
+        />
+
+      PATTERN 3: Direct MenuItem children
+        <OptionSelect>
+          <MenuItem value="active">Active</MenuItem>
+          <MenuItem value="inactive">Inactive</MenuItem>
+        </OptionSelect>
+
+      Remove either the "items" prop or the "children" to resolve this error.
+    `);
   }
 }
 
@@ -197,7 +226,7 @@ export function OptionSelect<
           <Select {...restOfProps} multiple={multiple} value={value ?? emptyValue} onChange={onChange}>
             {children ??
               normalizedItems?.map(({ value, label }) => (
-                <MenuItem key={String(value)} value={value}>
+                <MenuItem key={`option-select-item-${value}`} value={value}>
                   {label}
                 </MenuItem>
               ))}
