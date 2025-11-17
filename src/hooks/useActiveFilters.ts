@@ -6,7 +6,7 @@
 import { useSearchBuilder, type GenericRegisteredField } from "@/context";
 import type { FieldsCollection } from "@/context/FieldsCollection";
 import type { HumanizedValue, Humanizer, ScalarFilterValue, ValueOf } from "@/field";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type AnyHumanizedValue = HumanizedValue<any>;
 
@@ -16,24 +16,39 @@ export interface ActiveFilterTag {
   field: GenericRegisteredField;
 }
 
-export function useActiveFilters() {
+export interface ActiveFiltersBarProps {
+  preserveFieldsOrder?: boolean;
+}
+
+export function useActiveFilters({ preserveFieldsOrder }: ActiveFiltersBarProps = {}) {
   const { store } = useSearchBuilder();
   const [actives, setActives] = useState<ActiveFilterTag[]>([]);
   const hasActives = actives.length > 0;
 
+  const setActivesFrom = useCallback(
+    (fields: FieldsCollection) => {
+      const humanizables = fields.filter(onlyHumanizables);
+
+      if (!preserveFieldsOrder) {
+        humanizables.sort((a, b) => b.updatedAt - a.updatedAt);
+      }
+
+      console.log({ preserveFieldsOrder });
+
+      setActives(
+        humanizables.flatMap((field): ActiveFilterTag[] => {
+          const humanized = createLabelFor(field, store.collection());
+          return createTagsFrom(humanized, field);
+        })
+      );
+    },
+    [preserveFieldsOrder]
+  );
+
   useEffect(() => {
     const unsubscribe = store.onFieldSubmit(setActivesFrom);
     return () => unsubscribe();
-  }, [store]);
-
-  function setActivesFrom(fields: FieldsCollection) {
-    setActives(
-      fields.filter(onlyHumanizables).flatMap((field): ActiveFilterTag[] => {
-        const humanized = createLabelFor(field, store.collection());
-        return createTagsFrom(humanized, field);
-      })
-    );
-  }
+  }, [store, setActivesFrom]);
 
   function syncFromStore() {
     setActivesFrom(store.collection());

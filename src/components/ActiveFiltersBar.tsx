@@ -18,6 +18,7 @@ export type ActiveFiltersBarProps = {
   untitled?: boolean;
   unstyled?: boolean;
   limitTags?: number;
+  preserveFieldsOrder?: boolean;
   sx?: SxProps<Theme>;
   labels?: {
     filtersLabel?: string;
@@ -33,14 +34,16 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   untitled,
   unstyled,
   limitTags = 10,
+  preserveFieldsOrder,
   sx,
   chipProps: { onRemove, ...restOfProps } = {},
 }) => {
   const isReady = useSearchEngineIsReady();
   const { translate, icon } = useSearchEngineConfig();
-  const { hasActives, actives, syncFromStore, clearAll } = useActiveFilters();
+  const { hasActives, actives, syncFromStore, clearAll } = useActiveFilters({ preserveFieldsOrder });
   const { filtersLabel, headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);
 
+  console.log({ ActiveFiltersBar: preserveFieldsOrder });
   const tags = useMemo(() => actives.slice(0, limitTags ?? actives.length), [actives, limitTags]);
   const restOfTagNumber = actives.length - tags.length;
 
