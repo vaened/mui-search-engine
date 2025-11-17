@@ -7,6 +7,9 @@ import type { TranslationDictionary } from "@/types";
 
 export default {
   en: {
+    global: {
+      filtersLabel: "Filters",
+    },
     searchBar: {
       defaultLabel: "Search for matches by",
       searchAriaLabel: "search",
@@ -29,6 +32,9 @@ export default {
     },
   },
   es: {
+    global: {
+      filtersLabel: "Filtros",
+    },
     searchBar: {
       defaultLabel: "Buscar coincidencias por",
       searchAriaLabel: "buscar",

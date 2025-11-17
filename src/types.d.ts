@@ -11,6 +11,9 @@ export type InputSize = "small" | "medium";
 export type Locale = keyof typeof translations;
 
 export type TranslationStrings = {
+  global: {
+    filtersLabel: string;
+  };
   searchBar: {
     defaultLabel: string;
     searchAriaLabel: string;

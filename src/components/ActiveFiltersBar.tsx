@@ -20,6 +20,7 @@ export type ActiveFiltersBarProps = {
   limit?: number;
   sx?: SxProps<Theme>;
   labels?: {
+    filtersLabel?: string;
     headerTitle?: string;
     emptyStateMessage?: string;
     clearAllButtonTooltip?: string;
@@ -37,7 +38,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
 }) => {
   const { translate, icon } = useSearchEngineConfig();
   const { hasActives, actives, syncFromStore, clearAll } = useActiveFilters();
-  const { headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);
+  const { filtersLabel, headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);
   const isReady = useSearchEngineIsReady();
 
   const tags = useMemo(() => actives.slice(0, limit ?? actives.length), [actives, limit]);
@@ -84,7 +85,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
             {restOfTagNumber > 0 && (
               <Box display="flex" alignItems="center" gap={0.5} sx={{ userSelect: "none" }}>
                 <Typography fontWeight="600">+{restOfTagNumber}</Typography>
-                <Typography color="text.secondary">Filters</Typography>
+                <Typography color="text.secondary">{filtersLabel}</Typography>
               </Box>
             )}
           </Box>
@@ -109,6 +110,10 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
 function useFilterBarTranslations(translate: Translator, labels: ActiveFiltersBarProps["labels"]) {
   return useMemo(
     () => ({
+      filtersLabel: translate("global.filtersLabel", {
+        text: labels?.filtersLabel,
+        fallback: "Filters",
+      }),
       headerTitle: translate("activeFiltersBar.title", {
         text: labels?.headerTitle,
         fallback: "Active Filters",
