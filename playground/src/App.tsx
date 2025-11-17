@@ -4,9 +4,7 @@ import OptionSelect from "@/components/OptionSelect";
 import SearchBar, { type FlagsKeysOf } from "@/components/SearchBar";
 import SearchBuilder from "@/components/SearchBuilder";
 import type { FieldsCollection } from "@/context/FieldsCollection";
-import { FieldStore } from "@/context/FieldStore";
-import { UrlPersistenceAdapter } from "@/persistence/UrlPersistenceAdapter";
-import type { SearchParams } from "@/types";
+import { useSearchEngine } from "@/hooks/useSearchEngine";
 import {
   Container,
   CssBaseline,
@@ -23,22 +21,27 @@ import {
   TableHead,
   TableRow,
   ThemeProvider,
+  Typography,
   createTheme,
 } from "@mui/material";
-import type { SelectChangeEvent } from "node_modules/@mui/material";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 const theme = createTheme();
 
+type NumberValue = 1 | 2 | 3;
+
 const additives = {
-  onlyActives: "Solo activos",
-  inDebt: {
-    label: "Con deuda",
-  },
-  withoutEmail: {
-    label: "Sin email",
-  },
+  onlyActives: (
+    <>
+      oli <b>ga</b>
+    </>
+  ),
+  inDebt: "Con deuda",
+  withoutEmail: "Sin email",
 };
+
+const additive: keyof typeof additives = "onlyActives";
+const numberValue: NumberValue = 1;
 
 const exclusives = {
   exclusives: {
@@ -90,13 +93,14 @@ const flags = {
   },
 };
 
-const countries = [
-  { value: "PER", label: "Peru" },
-  { value: "COL", label: "Colombia" },
-  { value: "BRA", label: "Brasil" },
+type CountryId = 1 | 2 | 3;
+const countries: { value: CountryId; label: string }[] = [
+  { value: 1, label: "Peru" },
+  { value: 2, label: "Colombia" },
+  { value: 3, label: "Brasil" },
 ];
 
-interface Params extends SearchParams {
+interface Params {
   q?: string;
   index?: keyof typeof indexes;
   flags?: FlagsKeysOf<typeof flags>[];
@@ -113,7 +117,9 @@ function useSingleton<T>(state: () => T): T {
 }
 
 export default function App() {
-  const store = useSingleton(() => new FieldStore(new UrlPersistenceAdapter()));
+  const store = useSearchEngine({ persistInUrl: true });
+
+  const data: number[] = [];
 
   function search(collection: FieldsCollection) {
     console.log({ submit: [...collection.toArray()] });
@@ -122,46 +128,68 @@ export default function App() {
   function onChange(collection: FieldsCollection) {
     console.log({ changed: { ...collection.toValues() } });
   }
+  const [personName, setPersonName] = useState<string[]>([]);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container sx={{ py: 4 }}>
-        <h1>Playground — mui-search-engine</h1>
-
+        <Typography variant="h4">Playground — mui-search-engine</Typography>
         <Grid container gap={2} flexDirection="column">
           <Grid>
-            <SearchBuilder store={store} onSearch={search} onChange={onChange} loading={false}>
-              <Grid size={12}>
+            <SearchBuilder store={store} onSearch={search} onChange={onChange} loading={false} submitOnChange>
+              <Grid size={6}>
                 <FormControl fullWidth>
-                  <InputLabel id="country">Pais</InputLabel>
-                  <OptionSelect<typeof countries, string[]>
-                    name="country"
-                    labelId="country"
-                    defaultValue={[]}
-                    serialize={(a) => a.map((a) => a?.value as string)}
-                    unserialize={(a) => a.map((a) => countries.find((c) => c.value === a) as (typeof countries)[number])}
-                    humanize={(centers) => centers.map((center) => ({ value: center, label: center.label }))}
-                    label="Pais"
+                  <InputLabel id="countries" shrink>
+                    Paises
+                  </InputLabel>
+                  <OptionSelect
+                    type="number"
+                    name="countries"
+                    labelId="countries"
+                    label="Paises"
+                    items={countries}
+                    getValue={(country) => country.value}
+                    getLabel={(country) => country.label}
+                    toHumanLabel={(v) => countries.find((country) => country.value === v)?.label ?? v.toString()}
                     submittable
-                    multiple>
+                    displayEmpty
+                  />
+                </FormControl>
+              </Grid>
+              <Grid size={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="additives" shrink>
+                    Aditivos
+                  </InputLabel>
+                  <OptionSelect
+                    type="string[]"
+                    name="additives"
+                    labelId="additives"
+                    defaultValue={[]}
+                    label="Aditivos"
+                    toHumanLabel={(value) => additives[value as keyof typeof additives] as string}
+                    submittable
+                    displayEmpty>
                     <MenuItem value="" disabled>
                       Todos
                     </MenuItem>
-                    {countries.map((country, index) => (
-                      <MenuItem key={`country-${index}`} value={country as any}>
-                        {country.label}
-                      </MenuItem>
-                    ))}
                   </OptionSelect>
                 </FormControl>
               </Grid>
               <Grid size={6}>
                 <FormControl fullWidth>
                   <InputLabel id="centers" shrink>
-                    Sedes
+                    Sedesf
                   </InputLabel>
-                  <OptionSelect name="centers" labelId="centers" defaultValue="" label="Sedes" humanize={(values) => values} displayEmpty>
+                  <OptionSelect
+                    type="string"
+                    name="centers"
+                    labelId="centers"
+                    label="Sedesd"
+                    defaultValue={""}
+                    toHumanLabel={(v) => v}
+                    displayEmpty>
                     <MenuItem value="" disabled>
                       Todos
                     </MenuItem>
@@ -173,23 +201,21 @@ export default function App() {
               <Grid size={6}>
                 <FilterFieldController
                   store={store}
+                  type="string[]"
                   name="classroom"
                   submittable
-                  humanize={(value) => value as string}
-                  control={({ value, set }) => (
+                  defaultValue={[]}
+                  serializer={{
+                    serialize: (c) => c,
+                    unserialize: (c) => c,
+                  }}
+                  humanize={(value) => value.map((value) => ({ value: value, label: value.toString() }))}
+                  control={(props) => (
                     <FormControl fullWidth>
-                      <InputLabel id="centers" shrink>
-                        Salones
+                      <InputLabel id="centersd" shrink>
+                        Salonesd
                       </InputLabel>
-                      <Select
-                        name="classroom"
-                        labelId="classroom"
-                        value={value ?? ""}
-                        onChange={(event: SelectChangeEvent<unknown>, child: React.ReactNode) => {
-                          set(event.target.value as "");
-                        }}
-                        label="Salones"
-                        displayEmpty>
+                      <Select name="classroom" labelId="classroom" label="Salones" {...props} multiple displayEmpty>
                         <MenuItem value="" disabled>
                           Todos
                         </MenuItem>
@@ -200,11 +226,12 @@ export default function App() {
                   )}
                 />
               </Grid>
+
               <Grid size={12}>
                 <SearchBar name={{ query: "q" }} size="medium" indexes={indexes} flags={flags} defaultIndex={"account"} />
               </Grid>
               <Grid size={12}>
-                <ActiveFiltersBar />
+                <ActiveFiltersBar limitTags={4}  />
               </Grid>
             </SearchBuilder>
           </Grid>
@@ -213,7 +240,7 @@ export default function App() {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Name</TableCell>
+                    <TableCell>Namde</TableCell>
                     <TableCell>Label</TableCell>
                     <TableCell>Description</TableCell>
                   </TableRow>
@@ -234,4 +261,8 @@ export default function App() {
       </Container>
     </ThemeProvider>
   );
+}
+
+function MultipleSelectCheckmarks() {
+  return <div></div>;
 }
