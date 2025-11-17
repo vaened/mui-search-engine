@@ -36,10 +36,10 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   sx,
   chipProps: { onRemove, ...restOfProps } = {},
 }) => {
+  const isReady = useSearchEngineIsReady();
   const { translate, icon } = useSearchEngineConfig();
   const { hasActives, actives, syncFromStore, clearAll } = useActiveFilters();
   const { filtersLabel, headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);
-  const isReady = useSearchEngineIsReady();
 
   const tags = useMemo(() => actives.slice(0, limitTags ?? actives.length), [actives, limitTags]);
   const restOfTagNumber = actives.length - tags.length;
