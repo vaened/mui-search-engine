@@ -36,9 +36,12 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   chipProps: { onRemove, ...restOfProps } = {},
 }) => {
   const { translate, icon } = useSearchEngineConfig();
-  const { actives, hasActives, syncFromStore, clearAll } = useActiveFilters();
+  const { hasActives, actives, syncFromStore, clearAll } = useActiveFilters();
   const { headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);
   const isReady = useSearchEngineIsReady();
+
+  const tags = useMemo(() => actives.slice(0, limit ?? actives.length), [actives, limit]);
+  const restOfTagNumber = actives.length - tags.length;
 
   function onFilterChipRemove(field: GenericRegisteredField) {
     syncFromStore();
@@ -68,15 +71,22 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
 
         {isReady && hasActives && (
           <Box display="flex" flexWrap="wrap" gap={1}>
-            {actives.slice(0, limit ?? actives.length).map((field) => (
+            {tags.map((tag, index) => (
               <FilterChip
-                key={`filter-chip-group-${field.name}`}
-                field={field}
+                key={`filter-chip-group-${tag.field.name}-${index}`}
+                tag={tag}
                 readonly={readonly}
                 onRemove={onFilterChipRemove}
                 {...restOfProps}
               />
             ))}
+
+            {restOfTagNumber > 0 && (
+              <Box display="flex" alignItems="center" gap={0.5} sx={{ userSelect: "none" }}>
+                <Typography fontWeight="600">+{restOfTagNumber}</Typography>
+                <Typography color="text.secondary">Filters</Typography>
+              </Box>
+            )}
           </Box>
         )}
 
