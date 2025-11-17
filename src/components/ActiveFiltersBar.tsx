@@ -17,7 +17,7 @@ export type ActiveFiltersBarProps = {
   readonly?: boolean;
   untitled?: boolean;
   unstyled?: boolean;
-  limit?: number;
+  limitTags?: number;
   sx?: SxProps<Theme>;
   labels?: {
     filtersLabel?: string;
@@ -32,7 +32,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   readonly,
   untitled,
   unstyled,
-  limit,
+  limitTags = 10,
   sx,
   chipProps: { onRemove, ...restOfProps } = {},
 }) => {
@@ -41,7 +41,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   const { filtersLabel, headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);
   const isReady = useSearchEngineIsReady();
 
-  const tags = useMemo(() => actives.slice(0, limit ?? actives.length), [actives, limit]);
+  const tags = useMemo(() => actives.slice(0, limitTags ?? actives.length), [actives, limitTags]);
   const restOfTagNumber = actives.length - tags.length;
 
   function onFilterChipRemove(field: GenericRegisteredField) {
