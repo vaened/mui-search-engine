@@ -6,7 +6,8 @@ export function createArraySerializer<V extends FilterValue>(serializer: Seriali
       return value.map((v) => serializer.serialize(v) as string);
     },
     unserialize(value: string[]): V[] {
-      return value.map((v) => serializer.unserialize(v as SerializeReturnType<V>));
+      const values = value.map((v) => serializer.unserialize(v as SerializeReturnType<V>));
+      return values.filter((v) => v !== undefined);
     },
-  } as Serializer<string[]>;
+  } as Serializer<V[]>;
 }
