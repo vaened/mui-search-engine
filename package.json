@@ -34,7 +34,9 @@
     "dev": "tsup --watch --dts",
     "play": "vite --config vite.config.ts",
     "clean": "rimraf dist",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:ui": "vitest --ui"
   },
   "peerDependencies": {
     "@mui/material": "^7.3",
@@ -45,14 +47,19 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@tabler/icons-react": "^3.35.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@vitejs/plugin-react": "^5.0.4",
+    "happy-dom": "^20.0.10",
     "rimraf": "^5",
     "tsconfig-paths": "^4.2.0",
     "tsup": "^8.5",
     "typescript": "^5.9",
-    "vite": "^7.1.9"
+    "vite": "^7.1.9",
+    "vitest": "^4.0.13"
   },
   "authors": [
     {
