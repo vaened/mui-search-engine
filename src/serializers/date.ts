@@ -7,7 +7,9 @@ export const dateSerializer: Serializer<Date> = {
   },
 
   unserialize(value: string) {
-    const date = new Date(value);
+    const asNumber = Number(value);
+    const date = !isNaN(asNumber) && value.trim() !== "" ? new Date(asNumber) : new Date(value);
+
     return isNaN(date.getTime()) ? undefined : date;
   },
 };
