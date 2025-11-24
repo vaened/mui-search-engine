@@ -43,7 +43,6 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   const { hasActives, actives, syncFromStore, clearAll } = useActiveFilters({ preserveFieldsOrder });
   const { filtersLabel, headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);
 
-  console.log({ ActiveFiltersBar: preserveFieldsOrder });
   const tags = useMemo(() => actives.slice(0, limitTags ?? actives.length), [actives, limitTags]);
   const restOfTagNumber = actives.length - tags.length;
 

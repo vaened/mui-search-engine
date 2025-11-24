@@ -173,12 +173,7 @@ export class FieldStore {
     const touched: FilterName[] = [];
 
     this.#fields.forEach((field) => {
-      if (Object.is(field.value, field.defaultValue)) {
-        console.log({ name: field.name, value: field.value, defaultValue: field.defaultValue });
-      }
-
       if (!Object.is(field.value, field.defaultValue)) {
-        this.#override(field, field.defaultValue as ValueOf<typeof field>);
         touched.push(field.name);
       }
     });

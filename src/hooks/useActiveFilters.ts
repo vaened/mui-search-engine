@@ -33,8 +33,6 @@ export function useActiveFilters({ preserveFieldsOrder }: ActiveFiltersBarProps 
         humanizables.sort((a, b) => b.updatedAt - a.updatedAt);
       }
 
-      console.log({ preserveFieldsOrder });
-
       setActives(
         humanizables.flatMap((field): ActiveFilterTag[] => {
           const humanized = createLabelFor(field, store.collection());
