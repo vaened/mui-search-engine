@@ -153,6 +153,10 @@ export class FieldStore {
     });
   };
 
+  get = <TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]>(name: FilterName): RegisteredField<TKey, TValue> | undefined => {
+    return this.#state.collection.get(name) as RegisteredField<TKey, TValue> | undefined;
+  };
+
   set = (name: FilterName, value: GenericRegisteredField["value"] | null) => {
     const field = this.#fields.get(name);
 
