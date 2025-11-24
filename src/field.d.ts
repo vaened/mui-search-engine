@@ -62,7 +62,7 @@ export type ValueFilterDictionary = Record<FilterName, FilterValue>;
 export type Humanizer<TValue, TResponse = HumanizeReturnType<TValue>> = (value: TValue, fields: FieldsCollection) => TResponse;
 export type Serializer<TValue> = {
   serialize(value: TValue): SerializeReturnType<TValue>;
-  unserialize(value: SerializeReturnType<TValue>): NoInfer<TValue>;
+  unserialize(value: SerializeReturnType<TValue>): NoInfer<TValue> | undefined;
 };
 
 export interface FieldOptions {
