@@ -3,7 +3,7 @@ import type { Field, FilterName, FilterTypeKey, FilterTypeMap, PrimitiveFilterDi
 import { createContext, useContext } from "react";
 
 export interface RegisteredField<TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]> extends Field<TKey, TValue> {
-  defaultValue: TValue;
+  defaultValue: TValue | null;
   updatedAt: number;
 }
 
