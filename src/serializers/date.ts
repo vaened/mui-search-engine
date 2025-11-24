@@ -1,5 +1,5 @@
-import { createSerializer } from "@/serializers/resolve";
 import type { Serializer } from "@/field";
+import { createSerializer } from "@/serializers/resolve";
 
 export const dateSerializer: Serializer<Date> = {
   serialize(value: Date) {
@@ -7,7 +7,8 @@ export const dateSerializer: Serializer<Date> = {
   },
 
   unserialize(value: string) {
-    return new Date(value);
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? undefined : date;
   },
 };
 

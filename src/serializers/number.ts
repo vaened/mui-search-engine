@@ -7,7 +7,8 @@ export const numberSerializer: Serializer<number> = {
   },
 
   unserialize(value: string) {
-    return Number(value);
+    const parsed = Number(value);
+    return Number.isNaN(parsed) ? undefined : parsed;
   },
 };
 
