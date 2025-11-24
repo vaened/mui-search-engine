@@ -174,6 +174,7 @@ export class FieldStore {
 
     this.#fields.forEach((field) => {
       if (!Object.is(field.value, field.defaultValue)) {
+        this.#override(field, field.defaultValue as ValueOf<typeof field>);
         touched.push(field.name);
       }
     });
