@@ -36,6 +36,7 @@
     "clean": "rimraf dist",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
+    "test:run": "vitest run",
     "test:ui": "vitest --ui"
   },
   "peerDependencies": {

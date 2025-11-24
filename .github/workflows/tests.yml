@@ -38,4 +38,4 @@ jobs:
         run: pnpm typecheck
 
       - name: Run Tests
-        run: pnpm test --run
+        run: pnpm test:run
