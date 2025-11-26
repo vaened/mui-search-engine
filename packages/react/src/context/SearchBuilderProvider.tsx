@@ -3,37 +3,59 @@
  * @link https://vaened.dev DevFolio
  */
 
-import Grid from "@mui/material/Grid";
-import type { FieldsCollection, PrimitiveFilterDictionary } from "@vaened/react-search-builder";
-import { FieldStore, SearchBuilderContext, SearchFieldsStoreContext } from "@vaened/react-search-builder";
-import React, { useCallback, useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
+import React, {
+  cloneElement,
+  ComponentProps,
+  FormEventHandler,
+  isValidElement,
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
+import { SearchBuilderContext, SearchFieldsStoreContext } from ".";
+import type { PrimitiveFilterDictionary } from "../field";
+import { FieldsCollection } from "./FieldsCollection";
+import { FieldStore } from "./FieldStore";
 
-export type SearchEngineContextProviderProps = {
+type FormProps = {
+  onSubmit?: FormEventHandler;
+  children?: ReactNode;
+  [key: string]: unknown;
+};
+
+export type SearchBuilderProviderProps = {
   children: ReactNode;
   store: FieldStore;
   loading: boolean;
   manualStart?: boolean;
   autoStartDelay?: number;
   submitOnChange?: boolean;
+  Container?: ReactElement<FormProps>;
   onSearch?: (params: FieldsCollection) => void;
   onChange?: (params: FieldsCollection) => void;
-};
+} & Omit<ComponentProps<"form">, "onSubmit" | "onChange">;
 
 function SearchStoreContextProvider({ store, children }: { store: FieldStore; children: ReactNode }) {
   const state = useSyncExternalStore(store.subscribe, store.state, store.state);
   return <SearchFieldsStoreContext.Provider value={{ state }}>{children}</SearchFieldsStoreContext.Provider>;
 }
 
-export function SearchBuilder({
+export function SearchBuilderProvider({
   children,
   store,
   loading,
   manualStart,
   autoStartDelay = 200,
   submitOnChange = false,
+  Container,
   onSearch,
   onChange,
-}: SearchEngineContextProviderProps) {
+  ...restOfProps
+}: SearchBuilderProviderProps) {
   const autostarted = useRef(false);
   const isReady = useRef(manualStart === true);
 
@@ -131,12 +153,16 @@ export function SearchBuilder({
   return (
     <SearchBuilderContext.Provider value={value}>
       <SearchStoreContextProvider store={store}>
-        <Grid component="form" onSubmit={onSubmit} spacing={2} container>
-          {children}
-        </Grid>
+        {isValidElement(Container) ? (
+          cloneElement(Container, { onSubmit }, children)
+        ) : (
+          <form onSubmit={onSubmit} {...restOfProps}>
+            {children}
+          </form>
+        )}
       </SearchStoreContextProvider>
     </SearchBuilderContext.Provider>
   );
 }
 
-export default SearchBuilder;
+export default SearchBuilderProvider;

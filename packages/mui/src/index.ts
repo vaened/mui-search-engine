@@ -6,4 +6,4 @@ export * from "./components/FlagsSelect";
 export * from "./components/IndexSelect";
 export * from "./components/OptionSelect";
 export * from "./components/SearchBar";
-export * from "./components/SearchBuilder";
+export * from "./components/SearchForm";

@@ -17,14 +17,7 @@ import {
   Typography,
   createTheme,
 } from "@mui/material";
-import {
-  ActiveFiltersBar,
-  FilterFieldController,
-  OptionSelect,
-  SearchBar,
-  SearchBuilder,
-  type FlagsKeysOf,
-} from "@vaened/mui-search-builder";
+import { ActiveFiltersBar, FilterFieldController, OptionSelect, SearchBar, SearchForm, type FlagsKeysOf } from "@vaened/mui-search-builder";
 import type { FieldsCollection } from "@vaened/react-search-builder";
 import { useSearchEngine } from "@vaened/react-search-builder";
 import { useState } from "react";
@@ -130,7 +123,7 @@ export default function App() {
         <Typography variant="h4">Playground — mui-search-engine</Typography>
         <Grid container gap={2} flexDirection="column">
           <Grid>
-            <SearchBuilder store={store} onSearch={search} onChange={onChange} loading={false} submitOnChange>
+            <SearchForm store={store} onSearch={search} onChange={onChange} loading={false}>
               <Grid size={6}>
                 <FormControl fullWidth>
                   <InputLabel id="countries" shrink>
@@ -226,7 +219,7 @@ export default function App() {
               <Grid size={12}>
                 <ActiveFiltersBar limitTags={4} />
               </Grid>
-            </SearchBuilder>
+            </SearchForm>
           </Grid>
           <Grid size={12}>
             <TableContainer component={Paper}>

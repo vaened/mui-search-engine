@@ -8,6 +8,7 @@ export * from "./context";
 export * from "./context/event-emitter";
 export * from "./context/FieldsCollection";
 export * from "./context/FieldStore";
+export * from "./context/SearchBuilderProvider";
 
 export * from "./persistence";
 
