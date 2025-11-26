@@ -11,7 +11,10 @@
     "test:ci": "pnpm -r test:ci",
     "typecheck": "pnpm -r typecheck",
     "clean": "rimraf packages/**/dist node_modules",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "play": "pnpm --filter @vaened/search-builder-playground dev",
+    "react:build": "pnpm --filter @vaened/react-search-builder build",
+    "mui:build": "pnpm --filter @vaened/mui-search-builder build"
   },
   "devDependencies": {
     "@types/react": "^19.2",
