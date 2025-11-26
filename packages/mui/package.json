@@ -23,8 +23,7 @@
     "react-dom": ">=19.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.0.0",
-    "@mui/material": "^7.3.5",
-    "@tabler/icons-react": "^3.35.0"
+    "@mui/material": "^7.3.5"
   },
   "devDependencies": {
     "tsup": "^8.5",
