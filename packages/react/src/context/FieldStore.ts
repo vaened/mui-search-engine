@@ -16,14 +16,14 @@ import type { GenericRegisteredField, RegisteredField, RegisteredFieldDictionary
 
 export type FieldOperation = "set" | "update" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
 
-export type FieldStoreOptions = {
+export type FieldStoreConfig = {
   persistence?: PersistenceAdapter;
   emitter?: EventEmitter;
 };
 
-type CreateStoreResolverOptions = () => FieldStoreOptions;
+type CreateStoreResolverOptions = () => FieldStoreConfig;
 type CreateStoreQuickOptions = { persistInUrl: boolean };
-export type CreateStoreOptions = FieldStoreOptions | CreateStoreQuickOptions | CreateStoreResolverOptions;
+export type CreateStoreOptions = FieldStoreConfig | CreateStoreQuickOptions | CreateStoreResolverOptions;
 
 export type FieldStoreState = Readonly<{
   collection: FieldsCollection;
@@ -271,7 +271,7 @@ CURRENT FIELD REGISTRY:
 }
 
 export function createFieldStore(options: CreateStoreQuickOptions): FieldStore;
-export function createFieldStore(options: FieldStoreOptions): FieldStore;
+export function createFieldStore(options: FieldStoreConfig): FieldStore;
 export function createFieldStore(resolver: CreateStoreResolverOptions): FieldStore;
 export function createFieldStore(arg: CreateStoreOptions | undefined): FieldStore;
 export function createFieldStore(): FieldStore;
@@ -292,7 +292,7 @@ export function createFieldStore(args: CreateStoreOptions | undefined = undefine
   return create(args);
 }
 
-function create({ persistence = undefined, emitter = undefined }: FieldStoreOptions = {}): FieldStore {
+function create({ persistence = undefined, emitter = undefined }: FieldStoreConfig = {}): FieldStore {
   return new FieldStore(persistence ?? empty(), emitter ?? createEventEmitter());
 }
 
