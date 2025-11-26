@@ -1,13 +1,16 @@
-import FilterFieldController, { type FieldController } from "@/components/FilterFieldController";
+import FilterFieldController, { type FieldController } from "./FilterFieldController";
 import { MenuItem, Select, type SelectProps } from "@mui/material";
-import type { ArrayItemType, FieldConfig, FilterLabel, FilterTypeKey, FilterTypeMap } from "@vaened/react-search-builder";
-import {
-  type ArrayFilterFieldConfig,
-  EMPTY_VALUE,
-  type EmptyArrayFilterFieldConfig,
-  type ScalarFilterFieldConfig,
-  useSearchBuilder,
+import type {
+  ArrayFilterFieldConfig,
+  ArrayItemType,
+  EmptyArrayFilterFieldConfig,
+  FieldConfig,
+  FilterLabel,
+  FilterTypeKey,
+  FilterTypeMap,
+  ScalarFilterFieldConfig,
 } from "@vaened/react-search-builder";
+import { EMPTY_VALUE, useSearchBuilder } from "@vaened/react-search-builder";
 import { type ReactElement, type ReactNode, useMemo } from "react";
 
 type NormalizedOptionItem<I extends string | number> = {

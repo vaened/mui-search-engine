@@ -1,14 +1,16 @@
-import type { FieldStore } from "@vaened/react-search-builder";
-import {
-  useFilterField,
-  type ArrayFilterFieldConfig,
-  type EmptyArrayFilterFieldConfig,
-  type FilterFieldConfig,
-  type ScalarFilterFieldConfig,
+import type {
+  ArrayFilterFieldConfig,
+  ArrayTypeKey,
+  EmptyArrayFilterFieldConfig,
+  FieldStore,
+  FilterFieldConfig,
+  FilterTypeKey,
+  FilterTypeMap,
+  ScalarFilterFieldConfig,
+  ScalarTypeKey,
 } from "@vaened/react-search-builder";
+import { useFilterField } from "@vaened/react-search-builder";
 import { type ReactElement } from "react";
-
-import type { ArrayTypeKey, FilterTypeKey, FilterTypeMap, ScalarTypeKey } from "@vaened/react-search-builder"; // O donde estén tus tipos
 
 type Event = { target: any } | any;
 

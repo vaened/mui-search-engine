@@ -3,12 +3,11 @@
  * @link https://vaened.dev DevFolio
  */
 
-import FilterChip, { type FilterChipProps } from "@/components/FilterChip";
-import { useSearchEngineConfig, type Translator } from "@/config";
+import FilterChip, { type FilterChipProps } from "./FilterChip";
 import type { Theme } from "@emotion/react";
 import { Box, Grid, IconButton, Skeleton, Tooltip, Typography, type SxProps } from "@mui/material";
-import type { GenericRegisteredField } from "@vaened/react-search-builder";
-import { useActiveFilters, useSearchEngineIsReady } from "@vaened/react-search-builder";
+import type { GenericRegisteredField, Translator } from "@vaened/react-search-builder";
+import { useActiveFilters, useSearchEngineConfig, useSearchEngineIsReady } from "@vaened/react-search-builder";
 import React, { useMemo } from "react";
 
 export type ActiveFiltersBarProps = {

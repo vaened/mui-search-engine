@@ -3,16 +3,21 @@
  * @link https://vaened.dev DevFolio
  */
 
-import DropdownMenu from "@/components/DropdownMenu";
-import { useSearchEngineConfig, type Translator } from "@/config";
+import DropdownMenu from "./DropdownMenu";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import { IconChevronDown } from "@tabler/icons-react";
-import type { FilterBag, FilterName, InputSize } from "@vaened/react-search-builder";
-import { createFilterDictionaryFrom, dictionaryToFilterElements, useFilterField, useSearchBuilder } from "@vaened/react-search-builder";
+import type { FilterBag, FilterName, InputSize, Translator } from "@vaened/react-search-builder";
+import {
+  createFilterDictionaryFrom,
+  dictionaryToFilterElements,
+  useFilterField,
+  useSearchBuilder,
+  useSearchEngineConfig,
+} from "@vaened/react-search-builder";
 import React, { useMemo, useState, type ReactNode } from "react";
 
 type IndexLabels = {

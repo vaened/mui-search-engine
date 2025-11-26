@@ -3,10 +3,6 @@
  * @link https://vaened.dev DevFolio
  */
 
-import DebounceInputSearch from "@/components/DebounceInputSearch";
-import FlagsSelect, { type FlagsBag } from "@/components/FlagsSelect";
-import IndexSelect from "@/components/IndexSelect";
-import { useSearchEngineConfig, type Translator } from "@/config";
 import { Button } from "@mui/material";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
@@ -14,9 +10,12 @@ import InputLabel from "@mui/material/InputLabel";
 import MuiPaper, { type PaperProps } from "@mui/material/Paper";
 import { keyframes, styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import type { FilterBag, FilterName, InputSize } from "@vaened/react-search-builder";
-import { createFilterDictionaryFrom, useFilterField, useSearchBuilder } from "@vaened/react-search-builder";
+import type { FilterBag, FilterName, InputSize, Translator } from "@vaened/react-search-builder";
+import { createFilterDictionaryFrom, useFilterField, useSearchBuilder, useSearchEngineConfig } from "@vaened/react-search-builder";
 import { useId, useMemo, useRef, useState } from "react";
+import DebounceInputSearch from "./DebounceInputSearch";
+import FlagsSelect, { type FlagsBag } from "./FlagsSelect";
+import IndexSelect from "./IndexSelect";
 
 const HEIGHT = { small: 40, medium: 56 } as const;
 const INPUT_PY = { small: 8.5, medium: 16.5 } as const;

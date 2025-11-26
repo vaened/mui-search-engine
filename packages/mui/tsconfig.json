@@ -5,12 +5,11 @@
     "baseUrl": ".",
     "composite": false,
     "paths": {
-      "@/*": ["src/*"],
       "@vaened/react-search-builder": ["../react/src/index.ts"]
     },
 
     "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
-  "include": ["src", "tsup.config.ts", "vitest.config.ts", "package.json", "../react/src/**/*"],
+  "include": ["src", "tsup.config.ts", "vitest.config.ts", "package.json"],
   "exclude": ["dist", "node_modules"]
 }

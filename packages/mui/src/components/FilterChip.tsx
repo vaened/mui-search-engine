@@ -4,8 +4,8 @@
  */
 
 import { Chip, type ChipProps } from "@mui/material";
-import type { ActiveFilterTag, ScalarFilterValue } from "@vaened/react-search-builder";
-import { useSearchBuilder, type GenericRegisteredField } from "@vaened/react-search-builder";
+import type { ActiveFilterTag, GenericRegisteredField, ScalarFilterValue } from "@vaened/react-search-builder";
+import { useSearchBuilder } from "@vaened/react-search-builder";
 import React from "react";
 
 export type FilterChipProps = Omit<ChipProps, "label" | "onDelete" | "size"> & {
