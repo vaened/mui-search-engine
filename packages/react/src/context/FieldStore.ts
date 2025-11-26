@@ -13,7 +13,7 @@ import type {
   PrimitiveValue,
   ValueOf,
 } from "../field";
-import { url } from "../persistence";
+import { empty } from "../persistence";
 import type { PersistenceAdapter } from "../persistence/PersistenceAdapter";
 import { FieldsCollection } from "./FieldsCollection";
 import { createEventEmitter, type EventEmitter, type Unsubscribe } from "./event-emitter";
@@ -272,5 +272,5 @@ CURRENT FIELD REGISTRY:
 }
 
 export function createFieldStore({ persistence, emitter }: FieldStoreOptions = {}) {
-  return new FieldStore(persistence ?? url(), emitter ?? createEventEmitter());
+  return new FieldStore(persistence ?? empty(), emitter ?? createEventEmitter());
 }
