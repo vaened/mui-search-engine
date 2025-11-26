@@ -3,12 +3,12 @@
  * @link https://vaened.dev DevFolio
  */
 
-import FilterChip, { type FilterChipProps } from "./FilterChip";
 import type { Theme } from "@emotion/react";
 import { Box, Grid, IconButton, Skeleton, Tooltip, Typography, type SxProps } from "@mui/material";
 import type { GenericRegisteredField, Translator } from "@vaened/react-search-builder";
-import { useActiveFilters, useSearchEngineConfig, useSearchEngineIsReady } from "@vaened/react-search-builder";
+import { useActiveFilters, useSearchEngineConfig, useSearchReady } from "@vaened/react-search-builder";
 import React, { useMemo } from "react";
+import FilterChip, { type FilterChipProps } from "./FilterChip";
 
 export type ActiveFiltersBarProps = {
   chipProps?: Omit<FilterChipProps, "field" | "readonly">;
@@ -36,7 +36,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   sx,
   chipProps: { onRemove, ...restOfProps } = {},
 }) => {
-  const isReady = useSearchEngineIsReady();
+  const isReady = useSearchReady();
   const { translate, icon } = useSearchEngineConfig();
   const { hasActives, actives, syncFromStore, clearAll } = useActiveFilters({ preserveFieldsOrder });
   const { filtersLabel, headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);

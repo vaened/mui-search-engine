@@ -5,7 +5,7 @@
 
 import { useSearchBuilder } from "../context";
 
-export function useSearchEngineIsReady(): boolean {
+export function useSearchReady(): boolean {
   const { checkIsReady: checkInitialized } = useSearchBuilder();
   return checkInitialized();
 }
