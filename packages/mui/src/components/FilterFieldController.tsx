@@ -40,10 +40,6 @@ export interface ArrayFieldControllerProps<TKey extends ArrayTypeKey, TValue ext
   extends ArrayFilterFieldConfig<TKey, TValue>,
     FieldControllerProps<TValue> {}
 
-type GenericFieldControllerProps = {
-  [K in FilterTypeKey]: FieldController<K, FilterTypeMap[K]>;
-}[FilterTypeKey];
-
 export function FilterFieldController<TKey extends ScalarTypeKey, TValue extends FilterTypeMap[TKey]>(
   props: ScalarFieldControllerProps<TKey, TValue>
 ): ReactElement;
