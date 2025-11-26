@@ -1,6 +1,6 @@
-import type { FieldStore, FieldStoreState } from "@/context/FieldStore";
-import type { Field, FilterName, FilterTypeKey, FilterTypeMap, PrimitiveFilterDictionary } from "@/field";
 import { createContext, useContext } from "react";
+import type { Field, FilterName, FilterTypeKey, FilterTypeMap, PrimitiveFilterDictionary } from "../field";
+import type { FieldStore, FieldStoreState } from "./FieldStore";
 
 export interface RegisteredField<TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]> extends Field<TKey, TValue> {
   defaultValue: TValue | null;

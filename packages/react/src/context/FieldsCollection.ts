@@ -1,6 +1,6 @@
-import type { GenericRegisteredField, RegisteredFieldDictionary } from "@/context";
-import type { FilterName, PrimitiveFilterDictionary, Serializer, ValueFilterDictionary } from "@/field";
-import type { NonUndefined } from "@/internal";
+import type { FilterName, PrimitiveFilterDictionary, Serializer, ValueFilterDictionary } from "../field";
+import type { NonUndefined } from "../internal";
+import type { GenericRegisteredField, RegisteredFieldDictionary } from "./index";
 
 export const EMPTY_VALUE = "";
 

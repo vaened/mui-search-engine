@@ -1,6 +1,6 @@
-import type { GenericField, Serializer } from "@/field";
-import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
 import { beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
+import type { GenericField, Serializer } from "../field";
+import type { PersistenceAdapter } from "../persistence/PersistenceAdapter";
 import { FieldStore } from "./FieldStore";
 import { createEventEmitter, type EventEmitter, type Events } from "./event-emitter";
 

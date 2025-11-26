@@ -1,14 +1,8 @@
-/**
- * @author enea dhack <contact@vaened.dev>
- * @link https://vaened.dev DevFolio
- */
-
-import type translations from "@/config/translations";
-import type { Paths } from "@/internal";
+import type { Paths } from "./internal";
 
 export type InputSize = "small" | "medium";
 
-export type Locale = keyof typeof translations;
+export type Locale = "en" | "es";
 
 export type TranslationStrings = {
   global: {
@@ -45,5 +39,5 @@ export type IconSet = {
   activeFiltersClearAllIcon: React.ReactNode;
 };
 
-export type TranslationDictionary = Record<string, TranslationStrings>;
+export type TranslationDictionary = Record<Locale, TranslationStrings>;
 export type TranslationKey = Paths<TranslationStrings>;

@@ -1,5 +1,5 @@
-import type { Serializer } from "@/field";
-import { createSerializer } from "@/serializers/resolve";
+import type { Serializer } from "../field";
+import { createSerializer } from "../serializers/resolve";
 
 export const dateSerializer: Serializer<Date> = {
   serialize(value: Date) {

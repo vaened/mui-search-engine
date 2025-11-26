@@ -3,10 +3,10 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { useSearchBuilder, type GenericRegisteredField } from "@/context";
-import type { FieldsCollection } from "@/context/FieldsCollection";
-import type { HumanizedValue, Humanizer, ScalarFilterValue, ValueOf } from "@/field";
 import { useCallback, useEffect, useState } from "react";
+import { useSearchBuilder, type GenericRegisteredField } from "../context";
+import type { FieldsCollection } from "../context/FieldsCollection";
+import type { HumanizedValue, Humanizer, ScalarFilterValue, ValueOf } from "../field";
 
 type AnyHumanizedValue = HumanizedValue<any>;
 

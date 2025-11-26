@@ -3,9 +3,6 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { GenericRegisteredField, RegisteredField, RegisteredFieldDictionary } from "@/context";
-import { FieldsCollection } from "@/context/FieldsCollection";
-import { createEventEmitter, type EventEmitter, type Unsubscribe } from "@/context/event-emitter";
 import type {
   FieldOptions,
   FilterName,
@@ -15,9 +12,12 @@ import type {
   PrimitiveFilterDictionary,
   PrimitiveValue,
   ValueOf,
-} from "@/field";
-import { url } from "@/persistence";
-import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
+} from "../field";
+import { url } from "../persistence";
+import type { PersistenceAdapter } from "../persistence/PersistenceAdapter";
+import { FieldsCollection } from "./FieldsCollection";
+import { createEventEmitter, type EventEmitter, type Unsubscribe } from "./event-emitter";
+import type { GenericRegisteredField, RegisteredField, RegisteredFieldDictionary } from "./index";
 
 export type FieldOperation = "set" | "update" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
 

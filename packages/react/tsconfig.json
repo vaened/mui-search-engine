@@ -6,10 +6,6 @@
     "composite": false,
     "declaration": true,
     "emitDeclarationOnly": false,
-    "paths": {
-      "@/*": ["src/*"]
-    },
-
     "types": ["vitest/globals"]
   },
   "include": ["src/**/*", "tsup.config.ts", "vitest.config.ts", "package.json"],

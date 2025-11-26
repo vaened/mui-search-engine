@@ -1,5 +1,11 @@
-import type { RegisteredField } from "@/context";
-import { FieldStore } from "@/context/FieldStore";
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
+import { useEffect, useMemo, useSyncExternalStore } from "react";
+import type { RegisteredField } from "../context";
+import { FieldStore } from "../context/FieldStore";
 import type {
   ArrayFieldConfig,
   ArrayTypeKey,
@@ -10,9 +16,8 @@ import type {
   GenericField,
   ScalarFieldConfig,
   ScalarTypeKey,
-} from "@/field";
-import resolve from "@/serializers/resolve";
-import { useEffect, useMemo, useSyncExternalStore } from "react";
+} from "../field";
+import resolve from "../serializers/resolve";
 
 export type FilterFieldReturn<TResolved, TRegistered> = {
   field: TRegistered | undefined;

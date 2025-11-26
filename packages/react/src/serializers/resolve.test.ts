@@ -1,5 +1,5 @@
-import type { ArrayFilterValue, Serializer } from "@/field";
 import { describe, expect, it } from "vitest";
+import type { ArrayFilterValue, Serializer } from "../field";
 import resolve from "./resolve";
 
 describe("resolve serializer", () => {

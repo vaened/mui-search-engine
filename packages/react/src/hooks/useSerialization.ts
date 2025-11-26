@@ -3,8 +3,8 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { FilterValue } from "@/field";
 import { useMemo } from "react";
+import type { FilterValue } from "../field";
 
 export type Type =
   | "undefined"

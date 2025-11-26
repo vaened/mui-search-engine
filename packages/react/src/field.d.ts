@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { FieldsCollection } from "@/context/FieldsCollection";
+import type { FieldsCollection } from "./context/FieldsCollection";
 
 export type FilterName = string;
 export type FilterLabel = string;

@@ -1,4 +1,4 @@
-import type { FilterValue, Serializer, SerializeReturnType } from "@/field";
+import type { FilterValue, Serializer, SerializeReturnType } from "../field";
 
 export function createArraySerializer<V extends FilterValue>(serializer: Serializer<V>) {
   return {

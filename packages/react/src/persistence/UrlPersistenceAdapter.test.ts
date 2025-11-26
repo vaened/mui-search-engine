@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { UrlPersistenceAdapter } from "./UrlPersistenceAdapter";
 

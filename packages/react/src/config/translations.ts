@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { TranslationDictionary } from "@vaened/react-search-builder";
+import type { TranslationDictionary } from "../types";
 
 export default {
   en: {

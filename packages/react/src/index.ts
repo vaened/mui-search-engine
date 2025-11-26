@@ -13,6 +13,7 @@ export * from "./persistence";
 
 export * from "./serializers";
 
+export * from "./config";
 export * from "./utils";
 
 export type * from "./field";

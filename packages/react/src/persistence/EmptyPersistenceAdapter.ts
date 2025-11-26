@@ -3,8 +3,8 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { PrimitiveFilterDictionary } from "@/field";
-import type { PersistenceAdapter } from "@/persistence/PersistenceAdapter";
+import type { PrimitiveFilterDictionary } from "../field";
+import type { PersistenceAdapter } from "../persistence/PersistenceAdapter";
 
 export class EmptyPersistenceAdapter implements PersistenceAdapter {
   read(): PrimitiveFilterDictionary {

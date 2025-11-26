@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { FilterBag, FilterContext, FilterDictionary, FilterElement, FilterLabel, FilterMetaData, FilterName } from "@/field";
+import type { FilterBag, FilterContext, FilterDictionary, FilterElement, FilterLabel, FilterMetaData, FilterName } from "./field";
 
 export function isFilterContextLabel(x: FilterContext): x is FilterLabel {
   return typeof x === "string";

@@ -1,6 +1,11 @@
-import { createFieldStore, FieldStore, type FieldStoreOptions } from "@/context/FieldStore";
-import { empty, url } from "@/persistence";
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 import { useRef } from "react";
+import { createFieldStore, FieldStore, type FieldStoreOptions } from "../context/FieldStore";
+import { empty, url } from "../persistence";
 
 type SearchEngineOptionsResolver = () => FieldStoreOptions;
 type SearchEngineOptions = { persistInUrl: boolean };
