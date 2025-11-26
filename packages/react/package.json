@@ -1,0 +1,29 @@
+{
+  "name": "@vaened/react-search-builder",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "test": "vitest",
+    "test:ci": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=19.2",
+    "react-dom": ">=19.2"
+  },
+  "devDependencies": {
+    "tsup": "^8.5",
+    "react": "^19.2",
+    "react-dom": "^19.2",
+    "@types/react": "^19.2",
+    "@types/react-dom": "^19.2",
+    "@testing-library/react": "^16.3"
+  }
+}

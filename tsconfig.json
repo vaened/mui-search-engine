@@ -1,35 +1,30 @@
 {
   "compilerOptions": {
     "target": "ESNext",
+    "useDefineForClassFields": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
 
     "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
 
+    "composite": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "dist",
-
-    "strict": true,
-    "skipLibCheck": true,
-
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    },
-    "types": ["vitest/globals", "@testing-library/jest-dom"]
+    "baseUrl": "."
   },
 
-  "include": ["src", "src/types.d.ts", "src/field.d.ts", "tsup.config.ts", "vite.config.ts", "playground", "FieldStore.ts"],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["node_modules", "dist", "packages/**/dist"]
 }

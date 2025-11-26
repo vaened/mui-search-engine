@@ -3,10 +3,9 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { useSearchBuilder, type GenericRegisteredField } from "@/context";
-import type { ScalarFilterValue } from "@/field";
-import type { ActiveFilterTag } from "@/hooks/useActiveFilters";
 import { Chip, type ChipProps } from "@mui/material";
+import type { ActiveFilterTag, ScalarFilterValue } from "@vaened/react-search-builder";
+import { useSearchBuilder, type GenericRegisteredField } from "@vaened/react-search-builder";
 import React from "react";
 
 export type FilterChipProps = Omit<ChipProps, "label" | "onDelete" | "size"> & {

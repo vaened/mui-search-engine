@@ -1,14 +1,14 @@
-import type { FieldStore } from "@/context/FieldStore";
+import type { FieldStore } from "@vaened/react-search-builder";
 import {
   useFilterField,
   type ArrayFilterFieldConfig,
   type EmptyArrayFilterFieldConfig,
   type FilterFieldConfig,
   type ScalarFilterFieldConfig,
-} from "@/hooks/useFilterField";
+} from "@vaened/react-search-builder";
 import { type ReactElement } from "react";
 
-import type { ArrayTypeKey, FilterTypeKey, FilterTypeMap, ScalarTypeKey } from "@/field"; // O donde estén tus tipos
+import type { ArrayTypeKey, FilterTypeKey, FilterTypeMap, ScalarTypeKey } from "@vaened/react-search-builder"; // O donde estén tus tipos
 
 type Event = { target: any } | any;
 
@@ -57,11 +57,7 @@ export function FilterFieldController<TKey extends ArrayTypeKey, TValue extends 
 export function FilterFieldController<TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]>(props: any) {
   const { store, control, ...restOfProps } = props as FieldController<TKey, TValue>;
 
-  
-  const { value, set } = useFilterField(
-    store,
-    restOfProps as any
-  );
+  const { value, set } = useFilterField(store, restOfProps as any);
 
   function onChange(event: Event) {
     set(getEventValue(event) as TValue);

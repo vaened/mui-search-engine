@@ -5,11 +5,6 @@
 
 import DropdownMenu from "@/components/DropdownMenu";
 import { useSearchEngineConfig, type Translator } from "@/config";
-import { useSearchBuilder } from "@/context";
-import type { FilterBag, FilterDictionary, FilterElement, FilterName } from "@/field";
-import { useFilterField } from "@/hooks/useFilterField";
-import type { InputSize } from "@/types";
-import { createFilterDictionaryFrom } from "@/utils";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
@@ -22,6 +17,8 @@ import ListItemText from "@mui/material/ListItemText";
 import Radio from "@mui/material/Radio";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import type { FilterBag, FilterDictionary, FilterElement, FilterName, InputSize } from "@vaened/react-search-builder";
+import { createFilterDictionaryFrom, useFilterField, useSearchBuilder } from "@vaened/react-search-builder";
 import { useMemo, useRef, useState, type ReactNode } from "react";
 
 export type AdditiveFilterFlagBag<N extends FilterName> = Record<N, boolean>;

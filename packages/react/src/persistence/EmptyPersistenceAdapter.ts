@@ -11,9 +11,9 @@ export class EmptyPersistenceAdapter implements PersistenceAdapter {
     return {};
   }
 
-  write(values: PrimitiveFilterDictionary, whitelist?: string[]): void {}
+  write(): void {}
 
-  subscribe(callback: () => void): () => void {
+  subscribe(): () => void {
     return () => {};
   }
 }

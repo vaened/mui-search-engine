@@ -1,0 +1,40 @@
+{
+  "name": "@vaened/mui-search-builder",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean --external react",
+    "test": "vitest --passWithNoTests",
+    "test:ci": "vitest run --passWithNoTests",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vaened/react-search-builder": "workspace:*",
+    "@tabler/icons-react": "^3.35.0"
+  },
+  "peerDependencies": {
+    "react": ">=19.2",
+    "react-dom": ">=19.2",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.0.0",
+    "@mui/material": "^7.3.5",
+    "@tabler/icons-react": "^3.35.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5",
+    "react": ">=19.2",
+    "react-dom": ">=19.2",
+    "@mui/material": "^7.3.5",
+    "@emotion/styled": "^11.0.0",
+    "@emotion/react": "^11.14.0",
+    "@types/react": "^19.2",
+    "@types/react-dom": "^19.2",
+    "@testing-library/react": "^16.3"
+  }
+}

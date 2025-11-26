@@ -26,7 +26,7 @@ type useSerializationProps = {
 };
 
 export function useSerialization({ value }: useSerializationProps) {
-  const type = useMemo((): Type => {
+  return useMemo((): Type => {
     if (!Array.isArray(value)) {
       return infer(value);
     }

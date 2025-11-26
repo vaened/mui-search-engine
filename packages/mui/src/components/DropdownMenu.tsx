@@ -15,7 +15,7 @@ export type DropdownMenuProps = {
   open: boolean;
   title?: string;
   children: React.ReactNode;
-  anchorRef: React.RefObject<HTMLButtonElement>;
+  anchorRef: React.RefObject<HTMLButtonElement | null>;
   placement?: PopperProps["placement"];
   onClose: (event: Event | React.SyntheticEvent) => void;
 };

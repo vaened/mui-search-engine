@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
+    "types": ["vitest/globals", "@testing-library/jest-dom"]
+  },
+  "include": ["src", "tsup.config.ts", "vitest.config.ts", "package.json", "src/components/SearchBuilder.tsx"],
+  "exclude": ["dist", "node_modules"]
+}

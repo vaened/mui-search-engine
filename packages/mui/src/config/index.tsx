@@ -3,8 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { Paths, PathValue } from "@/internal";
-import type { IconSet, Locale, TranslationKey, TranslationStrings } from "@/types";
+import type { IconSet, Locale, Paths, PathValue, TranslationKey, TranslationStrings } from "@vaened/react-search-builder";
 import React, { createContext, useContext, useMemo, type ReactNode } from "react";
 import { default as iconsSet } from "./icons";
 import { default as translations } from "./translations";

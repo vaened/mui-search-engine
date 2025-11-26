@@ -3,11 +3,9 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { SearchBuilderContext, SearchFieldsStoreContext } from "@/context";
-import type { FieldsCollection } from "@/context/FieldsCollection";
-import { FieldStore } from "@/context/FieldStore";
-import type { PrimitiveFilterDictionary } from "@/field";
 import Grid from "@mui/material/Grid";
+import type { FieldsCollection, PrimitiveFilterDictionary } from "@vaened/react-search-builder";
+import { FieldStore, SearchBuilderContext, SearchFieldsStoreContext } from "@vaened/react-search-builder";
 import React, { useCallback, useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 
 export type SearchEngineContextProviderProps = {

@@ -1,5 +1,5 @@
-import type { IconSet } from "@/types";
 import { IconEraser, IconFilter, IconFilterOff, IconPrompt, IconRestore, IconSearch } from "@tabler/icons-react";
+import type { IconSet } from "@vaened/react-search-builder";
 
 export default {
   searchBarSearchIcon: <IconSearch />,

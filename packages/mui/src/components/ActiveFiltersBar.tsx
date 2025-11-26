@@ -5,11 +5,10 @@
 
 import FilterChip, { type FilterChipProps } from "@/components/FilterChip";
 import { useSearchEngineConfig, type Translator } from "@/config";
-import type { GenericRegisteredField } from "@/context";
-import { useActiveFilters } from "@/hooks/useActiveFilters";
-import { useSearchEngineIsReady } from "@/hooks/useSearchEngineIsReady";
 import type { Theme } from "@emotion/react";
 import { Box, Grid, IconButton, Skeleton, Tooltip, Typography, type SxProps } from "@mui/material";
+import type { GenericRegisteredField } from "@vaened/react-search-builder";
+import { useActiveFilters, useSearchEngineIsReady } from "@vaened/react-search-builder";
 import React, { useMemo } from "react";
 
 export type ActiveFiltersBarProps = {
