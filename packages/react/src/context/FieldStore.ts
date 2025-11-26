@@ -271,7 +271,7 @@ CURRENT FIELD REGISTRY:
 }
 
 export function createFieldStore(options: CreateStoreQuickOptions): FieldStore;
-export function createFieldStore(options: FieldStoreConfig): FieldStore;
+export function createFieldStore(config: FieldStoreConfig): FieldStore;
 export function createFieldStore(resolver: CreateStoreConfigResolver): FieldStore;
 export function createFieldStore(arg: CreateStoreOptions | undefined): FieldStore;
 export function createFieldStore(): FieldStore;
