@@ -2,14 +2,15 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-
     "baseUrl": ".",
+    "composite": false,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@vaened/react-search-builder": ["../react/src/index.ts"]
     },
 
     "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
-  "include": ["src", "tsup.config.ts", "vitest.config.ts", "package.json", "src/components/SearchBuilder.tsx"],
+  "include": ["src", "tsup.config.ts", "vitest.config.ts", "package.json", "../react/src/**/*"],
   "exclude": ["dist", "node_modules"]
 }
