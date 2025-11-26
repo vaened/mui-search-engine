@@ -16,7 +16,7 @@ import React, {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { SearchBuilderContext, SearchFieldsStoreContext } from ".";
+import { SearchBuilderContext, SearchStateContext } from ".";
 import type { PrimitiveFilterDictionary } from "../field";
 import { FieldsCollection } from "./FieldsCollection";
 import { FieldStore } from "./FieldStore";
@@ -41,7 +41,7 @@ export type SearchBuilderProviderProps = {
 
 function SearchStoreContextProvider({ store, children }: { store: FieldStore; children: ReactNode }) {
   const state = useSyncExternalStore(store.subscribe, store.state, store.state);
-  return <SearchFieldsStoreContext.Provider value={{ state }}>{children}</SearchFieldsStoreContext.Provider>;
+  return <SearchStateContext.Provider value={{ state }}>{children}</SearchStateContext.Provider>;
 }
 
 export function SearchBuilderProvider({

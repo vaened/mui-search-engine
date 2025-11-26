@@ -21,28 +21,28 @@ export interface SearchBuilderContextState {
   refresh: (params: PrimitiveFilterDictionary) => void;
 }
 
-export interface SearchStoreState {
+export interface SearchState {
   state: FieldStoreState;
 }
 
 export const SearchBuilderContext = createContext<SearchBuilderContextState | undefined>(undefined);
-export const SearchFieldsStoreContext = createContext<SearchStoreState | undefined>(undefined);
+export const SearchStateContext = createContext<SearchState | undefined>(undefined);
 
 export const useSearchBuilder = (): SearchBuilderContextState => {
   const context = useContext(SearchBuilderContext);
 
   if (!context) {
-    throw new Error("useSearchEngine must be used within a SearchBuilder");
+    throw new Error("useSearchBuilder must be used within a SearchBuilder");
   }
 
   return context;
 };
 
-export const useSearchStore = (): SearchStoreState => {
-  const context = useContext(SearchFieldsStoreContext);
+export const useSearchState = (): SearchState => {
+  const context = useContext(SearchStateContext);
 
   if (!context) {
-    throw new Error("useSearchFieldsStore must be used within a SearchBuilder");
+    throw new Error("useSearchState must be used within a SearchBuilder");
   }
 
   return context;
