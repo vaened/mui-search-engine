@@ -7,17 +7,17 @@ import { useRef } from "react";
 import { createFieldStore, FieldStore, type FieldStoreOptions } from "../context/FieldStore";
 import { empty, url } from "../persistence";
 
-type SearchEngineOptionsResolver = () => FieldStoreOptions;
-type SearchEngineOptions = { persistInUrl: boolean };
+type SearchStoreOptionsResolver = () => FieldStoreOptions;
+type SearchStoreOptions = { persistInUrl: boolean };
 
-export type UseSearchEngineProps = SearchEngineOptions | SearchEngineOptionsResolver;
+export type UseSearchStoreProps = SearchStoreOptions | SearchStoreOptionsResolver;
 
-export function useSearchEngine(options: SearchEngineOptions): FieldStore;
-export function useSearchEngine(resolver: SearchEngineOptionsResolver): FieldStore;
-export function useSearchEngine(arg: UseSearchEngineProps): FieldStore;
-export function useSearchEngine(): FieldStore;
+export function useSearchStore(options: SearchStoreOptions): FieldStore;
+export function useSearchStore(resolver: SearchStoreOptionsResolver): FieldStore;
+export function useSearchStore(arg: UseSearchStoreProps): FieldStore;
+export function useSearchStore(): FieldStore;
 
-export function useSearchEngine(args: UseSearchEngineProps | undefined = undefined): FieldStore {
+export function useSearchStore(args: UseSearchStoreProps | undefined = undefined): FieldStore {
   const instance = useRef<FieldStore | null>(null);
 
   switch (true) {
@@ -42,6 +42,6 @@ export function useSearchEngine(args: UseSearchEngineProps | undefined = undefin
   return instance.current;
 }
 
-function isResolverFunction(arg: unknown): arg is SearchEngineOptionsResolver {
+function isResolverFunction(arg: unknown): arg is SearchStoreOptionsResolver {
   return typeof arg === "function";
 }

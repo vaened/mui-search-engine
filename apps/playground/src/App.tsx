@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import { ActiveFiltersBar, FilterFieldController, OptionSelect, SearchBar, SearchForm, type FlagsKeysOf } from "@vaened/mui-search-builder";
 import type { FieldsCollection } from "@vaened/react-search-builder";
-import { useSearchEngine } from "@vaened/react-search-builder";
+import { useSearchStore } from "@vaened/react-search-builder";
 import { useState } from "react";
 
 const theme = createTheme();
@@ -103,7 +103,7 @@ interface Params {
 }
 
 export default function App() {
-  const store = useSearchEngine({ persistInUrl: true });
+  const store = useSearchStore({ persistInUrl: true });
 
   const data: number[] = [];
 
