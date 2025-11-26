@@ -1,7 +1,7 @@
 export * from "./hooks/useActiveFilters";
 export * from "./hooks/useFilterField";
-export * from "./hooks/useSearchEngine";
 export * from "./hooks/useSearchReady";
+export * from "./hooks/useSearchStore";
 export * from "./hooks/useSerialization";
 
 export * from "./context";
