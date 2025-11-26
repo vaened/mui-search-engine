@@ -1,8 +1,3 @@
-/**
- * @author enea dhack <contact@vaened.dev>
- * @link https://vaened.dev DevFolio
- */
-
 import type {
   FieldOptions,
   FilterName,
@@ -13,7 +8,7 @@ import type {
   PrimitiveValue,
   ValueOf,
 } from "../field";
-import { empty } from "../persistence";
+import { empty, url } from "../persistence";
 import type { PersistenceAdapter } from "../persistence/PersistenceAdapter";
 import { FieldsCollection } from "./FieldsCollection";
 import { createEventEmitter, type EventEmitter, type Unsubscribe } from "./event-emitter";
@@ -25,6 +20,10 @@ export type FieldStoreOptions = {
   persistence?: PersistenceAdapter;
   emitter?: EventEmitter;
 };
+
+type CreateStoreResolverOptions = () => FieldStoreOptions;
+type CreateStoreQuickOptions = { persistInUrl: boolean };
+export type CreateStoreOptions = FieldStoreOptions | CreateStoreQuickOptions | CreateStoreResolverOptions;
 
 export type FieldStoreState = Readonly<{
   collection: FieldsCollection;
@@ -271,6 +270,36 @@ CURRENT FIELD REGISTRY:
   `);
 }
 
-export function createFieldStore({ persistence, emitter }: FieldStoreOptions = {}) {
+export function createFieldStore(options: CreateStoreQuickOptions): FieldStore;
+export function createFieldStore(options: FieldStoreOptions): FieldStore;
+export function createFieldStore(resolver: CreateStoreResolverOptions): FieldStore;
+export function createFieldStore(arg: CreateStoreOptions | undefined): FieldStore;
+export function createFieldStore(): FieldStore;
+
+export function createFieldStore(args: CreateStoreOptions | undefined = undefined): FieldStore {
+  if (args === undefined) {
+    return create();
+  }
+
+  if (isResolverFunction(args)) {
+    return create(args());
+  }
+
+  if (isStoreOptionsObject(args)) {
+    return create({ persistence: args.persistInUrl ? url() : empty() });
+  }
+
+  return create(args);
+}
+
+function create({ persistence = undefined, emitter = undefined }: FieldStoreOptions = {}): FieldStore {
   return new FieldStore(persistence ?? empty(), emitter ?? createEventEmitter());
+}
+
+function isResolverFunction(arg: unknown): arg is CreateStoreResolverOptions {
+  return typeof arg === "function";
+}
+
+function isStoreOptionsObject(arg: unknown): arg is CreateStoreQuickOptions {
+  return typeof arg === "object" && arg !== null && "persistInUrl" in arg;
 }
