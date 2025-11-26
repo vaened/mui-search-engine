@@ -1,10 +1,3 @@
-import ActiveFiltersBar from "@/components/ActiveFiltersBar";
-import FilterFieldController from "@/components/FilterFieldController";
-import OptionSelect from "@/components/OptionSelect";
-import SearchBar, { type FlagsKeysOf } from "@/components/SearchBar";
-import SearchBuilder from "@/components/SearchBuilder";
-import type { FieldsCollection } from "@/context/FieldsCollection";
-import { useSearchEngine } from "@/hooks/useSearchEngine";
 import {
   Container,
   CssBaseline,
@@ -24,7 +17,17 @@ import {
   Typography,
   createTheme,
 } from "@mui/material";
-import { useRef, useState } from "react";
+import {
+  ActiveFiltersBar,
+  FilterFieldController,
+  OptionSelect,
+  SearchBar,
+  SearchBuilder,
+  type FlagsKeysOf,
+} from "@vaened/mui-search-builder";
+import type { FieldsCollection } from "@vaened/react-search-builder";
+import { useSearchEngine } from "@vaened/react-search-builder";
+import { useState } from "react";
 
 const theme = createTheme();
 
@@ -104,16 +107,6 @@ interface Params {
   q?: string;
   index?: keyof typeof indexes;
   flags?: FlagsKeysOf<typeof flags>[];
-}
-
-function useSingleton<T>(state: () => T): T {
-  const instance = useRef<T | null>();
-
-  if (!instance.current) {
-    instance.current = state();
-  }
-
-  return instance.current;
 }
 
 export default function App() {
@@ -231,7 +224,7 @@ export default function App() {
                 <SearchBar name={{ query: "q" }} size="medium" indexes={indexes} flags={flags} defaultIndex={"account"} />
               </Grid>
               <Grid size={12}>
-                <ActiveFiltersBar limitTags={4}  />
+                <ActiveFiltersBar limitTags={4} />
               </Grid>
             </SearchBuilder>
           </Grid>

@@ -1,4 +1,4 @@
-import { SearchEngineConfigProvider } from "@/config";
+import { SearchEngineConfigProvider } from "@vaened/react-search-builder";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 
