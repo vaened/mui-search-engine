@@ -21,9 +21,9 @@ export type FieldStoreConfig = {
   emitter?: EventEmitter;
 };
 
-type CreateStoreResolverOptions = () => FieldStoreConfig;
+type CreateStoreConfigResolver = () => FieldStoreConfig;
 type CreateStoreQuickOptions = { persistInUrl: boolean };
-export type CreateStoreOptions = FieldStoreConfig | CreateStoreQuickOptions | CreateStoreResolverOptions;
+export type CreateStoreOptions = FieldStoreConfig | CreateStoreQuickOptions | CreateStoreConfigResolver;
 
 export type FieldStoreState = Readonly<{
   collection: FieldsCollection;
@@ -272,7 +272,7 @@ CURRENT FIELD REGISTRY:
 
 export function createFieldStore(options: CreateStoreQuickOptions): FieldStore;
 export function createFieldStore(options: FieldStoreConfig): FieldStore;
-export function createFieldStore(resolver: CreateStoreResolverOptions): FieldStore;
+export function createFieldStore(resolver: CreateStoreConfigResolver): FieldStore;
 export function createFieldStore(arg: CreateStoreOptions | undefined): FieldStore;
 export function createFieldStore(): FieldStore;
 
@@ -296,7 +296,7 @@ function create({ persistence = undefined, emitter = undefined }: FieldStoreConf
   return new FieldStore(persistence ?? empty(), emitter ?? createEventEmitter());
 }
 
-function isResolverFunction(arg: unknown): arg is CreateStoreResolverOptions {
+function isResolverFunction(arg: unknown): arg is CreateStoreConfigResolver {
   return typeof arg === "function";
 }
 
