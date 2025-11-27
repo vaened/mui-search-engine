@@ -15,9 +15,11 @@ import ListItemText from "@mui/material/ListItemText";
 import Radio from "@mui/material/Radio";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import type { FilterBag, FilterDictionary, FilterElement, FilterName, InputSize, Translator } from "@vaened/react-search-builder";
-import { createFilterDictionaryFrom, useFilterField, useSearchBuilder, useSearchEngineConfig } from "@vaened/react-search-builder";
+import type { FilterBag, FilterDictionary, FilterElement, FilterName } from "@vaened/react-search-builder";
+import { createFilterDictionaryFrom, useFilterField, useSearchBuilder } from "@vaened/react-search-builder";
 import { useMemo, useRef, useState, type ReactNode } from "react";
+import { Translator, useMuiSearchBuilderConfig } from "../config";
+import { InputSize } from "../types";
 import DropdownMenu from "./DropdownMenu";
 
 export type AdditiveFilterFlagBag<N extends FilterName> = Record<N, boolean>;
@@ -65,7 +67,7 @@ export function FlagsSelect<N extends FilterName>({
   onChange,
 }: FlagsSelectProps<N>) {
   const { store } = useSearchBuilder();
-  const { icon, translate } = useSearchEngineConfig();
+  const { icon, translate } = useMuiSearchBuilderConfig();
   const anchorRef = useRef<HTMLButtonElement>(null);
   const dictionary = useMemo(() => createDictionary(options), [options]);
 

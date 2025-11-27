@@ -3,7 +3,8 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { TranslationDictionary } from "../types";
+import { TranslationStrings } from "@vaened/react-search-builder";
+import type { Locale } from "../types";
 
 export default {
   en: {
@@ -56,4 +57,4 @@ export default {
       clearAllAriaLabel: "borrar",
     },
   },
-} satisfies TranslationDictionary;
+} satisfies Record<Locale, TranslationStrings>;

@@ -10,9 +10,11 @@ import InputLabel from "@mui/material/InputLabel";
 import MuiPaper, { type PaperProps } from "@mui/material/Paper";
 import { keyframes, styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import type { FilterBag, FilterName, InputSize, Translator } from "@vaened/react-search-builder";
-import { createFilterDictionaryFrom, useFilterField, useSearchBuilder, useSearchEngineConfig } from "@vaened/react-search-builder";
+import type { FilterBag, FilterName } from "@vaened/react-search-builder";
+import { createFilterDictionaryFrom, useFilterField, useSearchBuilder } from "@vaened/react-search-builder";
 import { useId, useMemo, useRef, useState } from "react";
+import { Translator, useMuiSearchBuilderConfig } from "../config";
+import { InputSize } from "../types";
 import DebounceInputSearch from "./DebounceInputSearch";
 import FlagsSelect, { type FlagsBag } from "./FlagsSelect";
 import IndexSelect from "./IndexSelect";
@@ -172,7 +174,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
 }: SearchBarProps<IB, FB>) {
   const inputId = id || useId();
   const { store, submitOnChange, isLoading } = useSearchBuilder();
-  const { icon, translate } = useSearchEngineConfig();
+  const { icon, translate } = useMuiSearchBuilderConfig();
   const inputSearch = useRef<HTMLInputElement>(undefined);
   const dictionary = useMemo(() => createFilterDictionaryFrom<KeysOf<IB>>(indexes), [indexes]);
   const [index, setIndex] = useState<KeysOf<IB> | undefined>(() => {

@@ -1,5 +1,10 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 import { IconEraser, IconFilter, IconFilterOff, IconPrompt, IconRestore, IconSearch } from "@tabler/icons-react";
-import type { IconSet } from "../types";
+import { IconSet } from "@vaened/react-search-builder";
 
 export default {
   searchBarSearchIcon: <IconSearch />,

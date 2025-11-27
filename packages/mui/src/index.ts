@@ -7,3 +7,5 @@ export * from "./components/IndexSelect";
 export * from "./components/OptionSelect";
 export * from "./components/SearchBar";
 export * from "./components/SearchForm";
+
+export * from "./config";

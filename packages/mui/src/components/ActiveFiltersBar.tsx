@@ -5,9 +5,10 @@
 
 import type { Theme } from "@emotion/react";
 import { Box, Grid, IconButton, Skeleton, Tooltip, Typography, type SxProps } from "@mui/material";
-import type { GenericRegisteredField, Translator } from "@vaened/react-search-builder";
-import { useActiveFilters, useSearchEngineConfig, useSearchReady } from "@vaened/react-search-builder";
+import type { GenericRegisteredField } from "@vaened/react-search-builder";
+import { useActiveFilters, useSearchReady } from "@vaened/react-search-builder";
 import React, { useMemo } from "react";
+import { useMuiSearchBuilderConfig, type Translator } from "../config";
 import FilterChip, { type FilterChipProps } from "./FilterChip";
 
 export type ActiveFiltersBarProps = {
@@ -37,7 +38,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   chipProps: { onRemove, ...restOfProps } = {},
 }) => {
   const isReady = useSearchReady();
-  const { translate, icon } = useSearchEngineConfig();
+  const { translate, icon } = useMuiSearchBuilderConfig();
   const { hasActives, actives, syncFromStore, clearAll } = useActiveFilters({ preserveFieldsOrder });
   const { filtersLabel, headerTitle, emptyStateMessage, clearAllButtonTooltip } = useFilterBarTranslations(translate, labels);
 

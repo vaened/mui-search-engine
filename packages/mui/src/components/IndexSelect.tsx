@@ -3,22 +3,18 @@
  * @link https://vaened.dev DevFolio
  */
 
-import DropdownMenu from "./DropdownMenu";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import { IconChevronDown } from "@tabler/icons-react";
-import type { FilterBag, FilterName, InputSize, Translator } from "@vaened/react-search-builder";
-import {
-  createFilterDictionaryFrom,
-  dictionaryToFilterElements,
-  useFilterField,
-  useSearchBuilder,
-  useSearchEngineConfig,
-} from "@vaened/react-search-builder";
+import type { FilterBag, FilterName } from "@vaened/react-search-builder";
+import { createFilterDictionaryFrom, dictionaryToFilterElements, useFilterField, useSearchBuilder } from "@vaened/react-search-builder";
 import React, { useMemo, useState, type ReactNode } from "react";
+import { Translator, useMuiSearchBuilderConfig } from "../config";
+import { InputSize } from "../types";
+import DropdownMenu from "./DropdownMenu";
 
 type IndexLabels = {
   defaultActionLabel?: string;
@@ -50,7 +46,7 @@ export function IndexSelect<N extends FilterName>({
   onChange,
 }: IndexSelectProps<N>) {
   const { store } = useSearchBuilder();
-  const { icon, translate } = useSearchEngineConfig();
+  const { icon, translate } = useMuiSearchBuilderConfig();
   const anchorRef = React.useRef<HTMLButtonElement>(null);
   const dictionary = useMemo(() => createFilterDictionaryFrom(options), [options]);
   const elements = useMemo(() => dictionaryToFilterElements(dictionary), [dictionary]);
