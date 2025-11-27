@@ -11,7 +11,7 @@ export * from "./hooks/useSerialization";
 
 export * from "./context";
 export * from "./context/SearchBuilderConfig";
-export * from "./context/SearchBuilderProvider";
+export * from "./context/SearchForm";
 export * from "./store/event-emitter";
 export * from "./store/FieldsCollection";
 export * from "./store/FieldStore";

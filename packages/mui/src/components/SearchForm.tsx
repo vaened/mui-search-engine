@@ -4,10 +4,10 @@
  */
 
 import Grid, { GridProps } from "@mui/material/Grid";
-import type { SearchBuilderProviderProps } from "@vaened/react-search-builder";
-import { SearchBuilderProvider } from "@vaened/react-search-builder";
+import type { SearchFormProps as NativeSearchFormProps } from "@vaened/react-search-builder";
+import { SearchForm as NativeSearchForm } from "@vaened/react-search-builder";
 
-export type SearchFormProps = Omit<SearchBuilderProviderProps, "Container"> &
+export type SearchFormProps = Omit<NativeSearchFormProps, "Container"> &
   Omit<GridProps, "container" | "component" | "onSubmit" | "onChange">;
 
 function MuiForm(props: GridProps) {
@@ -27,7 +27,7 @@ export function SearchForm({
   ...restOfProps
 }: SearchFormProps) {
   return (
-    <SearchBuilderProvider
+    <NativeSearchForm
       store={store}
       loading={loading}
       manualStart={manualStart}
@@ -38,7 +38,7 @@ export function SearchForm({
       onChange={onChange}
       Container={<MuiForm {...restOfProps} />}>
       {children}
-    </SearchBuilderProvider>
+    </NativeSearchForm>
   );
 }
 

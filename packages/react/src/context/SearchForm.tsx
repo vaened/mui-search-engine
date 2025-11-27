@@ -27,7 +27,7 @@ type FormProps = {
   [key: string]: unknown;
 };
 
-export type SearchBuilderProviderProps = {
+export type SearchFormProps = {
   children: ReactNode;
   store?: FieldStore;
   loading: boolean;
@@ -45,7 +45,7 @@ function SearchStoreContextProvider({ store, children }: { store: FieldStore; ch
   return <SearchStateContext.Provider value={{ state }}>{children}</SearchStateContext.Provider>;
 }
 
-export function SearchBuilderProvider({
+export function SearchForm({
   children,
   store: source,
   loading,
@@ -57,7 +57,7 @@ export function SearchBuilderProvider({
   onSearch,
   onChange,
   ...restOfProps
-}: SearchBuilderProviderProps) {
+}: SearchFormProps) {
   const autostarted = useRef(false);
   const isReady = useRef(manualStart === true);
   const store = useResolveFieldStoreInstance(source, configuration);
@@ -168,4 +168,4 @@ export function SearchBuilderProvider({
   );
 }
 
-export default SearchBuilderProvider;
+export default SearchForm;
