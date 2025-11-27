@@ -136,6 +136,7 @@ export function OptionSelect<TKey extends OptionSelectArrayTypeKey, TValue exten
 export function OptionSelect<TKey extends OptionSelectArrayTypeKey, TValue extends FilterTypeMap[TKey], TItem, TItemsObj>(
   props: ArrayOptionSelectConfig<TKey, TValue, TItem, TItemsObj>
 ): ReactElement;
+
 export function OptionSelect<
   Tkey extends OptionSelectTypeKey,
   TValue extends FilterTypeMap[Tkey],
