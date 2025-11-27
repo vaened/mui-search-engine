@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 import { createContext, useContext } from "react";
 import type { Field, FilterName, FilterTypeKey, FilterTypeMap, PrimitiveFilterDictionary } from "../field";
 import type { FieldStore, FieldStoreState } from "../store";

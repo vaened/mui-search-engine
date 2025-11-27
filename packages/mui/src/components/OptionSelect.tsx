@@ -1,4 +1,8 @@
-import FilterFieldController, { type FieldController } from "./FilterFieldController";
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 import { MenuItem, Select, type SelectProps } from "@mui/material";
 import type {
   ArrayFilterFieldConfig,
@@ -12,6 +16,7 @@ import type {
 } from "@vaened/react-search-builder";
 import { EMPTY_VALUE, useSearchBuilder } from "@vaened/react-search-builder";
 import { type ReactElement, type ReactNode, useMemo } from "react";
+import FilterFieldController, { type FieldController } from "./FilterFieldController";
 
 type NormalizedOptionItem<I extends string | number> = {
   value: I;

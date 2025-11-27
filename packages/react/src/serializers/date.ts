@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 import type { Serializer } from "../field";
 import { createSerializer } from "../serializers/resolve";
 

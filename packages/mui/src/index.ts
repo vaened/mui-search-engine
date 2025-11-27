@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 export * from "./components/ActiveFiltersBar";
 export * from "./components/DropdownMenu";
 export * from "./components/FilterChip";

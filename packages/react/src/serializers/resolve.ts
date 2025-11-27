@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 import type { FilterTypeKey, FilterValue, Serializer, SerializeReturnType } from "../field";
 import { createArraySerializer } from "../serializers/array";
 import { booleanSerializer } from "../serializers/boolean";

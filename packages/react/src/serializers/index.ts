@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 export * from "./array";
 export * from "./boolean";
 export * from "./date";

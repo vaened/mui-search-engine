@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 import { describe, expect, it } from "vitest";
 import type { ArrayFilterValue, Serializer } from "../field";
 import resolve from "./resolve";

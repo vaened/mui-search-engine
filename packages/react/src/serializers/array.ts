@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 import type { FilterValue, Serializer, SerializeReturnType } from "../field";
 
 export function createArraySerializer<V extends FilterValue>(serializer: Serializer<V>) {
