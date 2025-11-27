@@ -21,6 +21,7 @@ export function SearchForm({
   autoStartDelay,
   submitOnChange,
   children,
+  configuration,
   onSearch,
   onChange,
   ...restOfProps
@@ -32,6 +33,7 @@ export function SearchForm({
       manualStart={manualStart}
       autoStartDelay={autoStartDelay}
       submitOnChange={submitOnChange}
+      configuration={configuration}
       onSearch={onSearch}
       onChange={onChange}
       Container={<MuiForm {...restOfProps} />}>

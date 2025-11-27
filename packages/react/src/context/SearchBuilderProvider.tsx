@@ -18,7 +18,8 @@ import React, {
 } from "react";
 import { SearchBuilderContext, SearchStateContext } from ".";
 import type { PrimitiveFilterDictionary } from "../field";
-import { FieldsCollection, FieldStore } from "../store";
+import { useResolveFieldStoreInstance } from "../hooks/useResolveFieldStoreInstance";
+import { CreateStoreOptions, FieldsCollection, FieldStore } from "../store";
 
 type FormProps = {
   onSubmit?: FormEventHandler;
@@ -28,12 +29,13 @@ type FormProps = {
 
 export type SearchBuilderProviderProps = {
   children: ReactNode;
-  store: FieldStore;
+  store?: FieldStore;
   loading: boolean;
   manualStart?: boolean;
   autoStartDelay?: number;
   submitOnChange?: boolean;
   Container?: ReactElement<FormProps>;
+  configuration?: CreateStoreOptions;
   onSearch?: (params: FieldsCollection) => void;
   onChange?: (params: FieldsCollection) => void;
 } & Omit<ComponentProps<"form">, "onSubmit" | "onChange">;
@@ -45,11 +47,12 @@ function SearchStoreContextProvider({ store, children }: { store: FieldStore; ch
 
 export function SearchBuilderProvider({
   children,
-  store,
+  store: source,
   loading,
   manualStart,
   autoStartDelay = 200,
   submitOnChange = false,
+  configuration,
   Container,
   onSearch,
   onChange,
@@ -57,6 +60,7 @@ export function SearchBuilderProvider({
 }: SearchBuilderProviderProps) {
   const autostarted = useRef(false);
   const isReady = useRef(manualStart === true);
+  const store = useResolveFieldStoreInstance(source, configuration);
 
   const checkIsReady = useCallback(() => isReady.current, []);
   const checkAutostartable = useCallback(() => !autostarted.current && !manualStart, [manualStart]);
