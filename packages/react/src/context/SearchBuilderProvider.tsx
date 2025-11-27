@@ -18,8 +18,7 @@ import React, {
 } from "react";
 import { SearchBuilderContext, SearchStateContext } from ".";
 import type { PrimitiveFilterDictionary } from "../field";
-import { FieldsCollection } from "./FieldsCollection";
-import { FieldStore } from "./FieldStore";
+import { FieldsCollection, FieldStore } from "../store";
 
 type FormProps = {
   onSubmit?: FormEventHandler;

@@ -1,3 +1,9 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
+import type { GenericRegisteredField, RegisteredField, RegisteredFieldDictionary } from "../context/index";
 import type {
   FieldOptions,
   FilterName,
@@ -12,7 +18,6 @@ import { empty, url } from "../persistence";
 import type { PersistenceAdapter } from "../persistence/PersistenceAdapter";
 import { FieldsCollection } from "./FieldsCollection";
 import { createEventEmitter, type EventEmitter, type Unsubscribe } from "./event-emitter";
-import type { GenericRegisteredField, RegisteredField, RegisteredFieldDictionary } from "./index";
 
 export type FieldOperation = "set" | "update" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
 

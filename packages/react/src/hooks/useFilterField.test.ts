@@ -5,8 +5,8 @@
 
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { createFieldStore } from "../context/FieldStore";
 import { empty } from "../persistence";
+import { createFieldStore } from "../store";
 import { useFilterField } from "./useFilterField";
 
 const createStore = () => createFieldStore({ persistence: empty() });

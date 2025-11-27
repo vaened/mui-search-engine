@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useRef } from "react";
-import { createFieldStore, CreateStoreOptions, FieldStore } from "../context/FieldStore";
+import { createFieldStore, CreateStoreOptions, FieldStore } from "../store";
 
 export function useResolveFieldStoreInstance(source?: FieldStore, fallback?: CreateStoreOptions): FieldStore {
   const instance = useRef<FieldStore | null>(null);

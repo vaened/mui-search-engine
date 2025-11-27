@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { CreateStoreOptions, FieldStore } from "../context/FieldStore";
+import { CreateStoreOptions, FieldStore } from "../store";
 import { useResolveFieldStoreInstance } from "./useResolveFieldStoreInstance";
 
 export function useSearchStore(args: CreateStoreOptions | undefined = undefined): FieldStore {

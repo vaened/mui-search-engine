@@ -5,8 +5,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useSearchBuilder, type GenericRegisteredField } from "../context";
-import type { FieldsCollection } from "../context/FieldsCollection";
 import type { HumanizedValue, Humanizer, ScalarFilterValue, ValueOf } from "../field";
+import type { FieldsCollection } from "../store";
 
 type AnyHumanizedValue = HumanizedValue<any>;
 

@@ -1,3 +1,8 @@
+/**
+ * @author enea dhack <contact@vaened.dev>
+ * @link https://vaened.dev DevFolio
+ */
+
 export * from "./hooks/useActiveFilters";
 export * from "./hooks/useFilterField";
 export * from "./hooks/useSearchReady";
@@ -5,11 +10,11 @@ export * from "./hooks/useSearchStore";
 export * from "./hooks/useSerialization";
 
 export * from "./context";
-export * from "./context/event-emitter";
-export * from "./context/FieldsCollection";
-export * from "./context/FieldStore";
 export * from "./context/SearchBuilderConfig";
 export * from "./context/SearchBuilderProvider";
+export * from "./store/event-emitter";
+export * from "./store/FieldsCollection";
+export * from "./store/FieldStore";
 
 export * from "./persistence";
 
