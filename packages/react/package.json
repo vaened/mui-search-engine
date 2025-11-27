@@ -14,9 +14,6 @@
     "test:ci": "vitest run",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "@tabler/icons-react": "^3.35.0"
-  },
   "peerDependencies": {
     "react": ">=19.2",
     "react-dom": ">=19.2"
