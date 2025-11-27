@@ -33,6 +33,10 @@ export interface SearchState {
 export const SearchBuilderContext = createContext<SearchBuilderContextState | undefined>(undefined);
 export const SearchStateContext = createContext<SearchState | undefined>(undefined);
 
+export const useSearchBuilderQuietly = (): SearchBuilderContextState | undefined => {
+  return useContext(SearchBuilderContext);
+};
+
 export const useSearchBuilder = (): SearchBuilderContextState => {
   const context = useContext(SearchBuilderContext);
 

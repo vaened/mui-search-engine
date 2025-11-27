@@ -9,12 +9,13 @@ import type {
   ArrayItemType,
   EmptyArrayFilterFieldConfig,
   FieldConfig,
+  FieldStore,
   FilterLabel,
   FilterTypeKey,
   FilterTypeMap,
   ScalarFilterFieldConfig,
 } from "@vaened/react-search-builder";
-import { EMPTY_VALUE, useSearchBuilder } from "@vaened/react-search-builder";
+import { EMPTY_VALUE, useSearchBuilderQuietly } from "@vaened/react-search-builder";
 import { type ReactElement, type ReactNode, useMemo } from "react";
 import FilterFieldController, { type FieldController } from "./FilterFieldController";
 
@@ -56,7 +57,9 @@ export type UiVariantProps<TValue, TItem, TItemsObj> =
 type OmittedSelectProps = "value" | "name" | "defaultValue" | "multiple" | "type" | "multiple" | "onChange" | "items" | "children";
 type OmittedConfigProps = "humanize" | "serializer";
 
-export interface OptionSelectProps extends Omit<SelectProps, OmittedSelectProps> {}
+export interface OptionSelectProps extends Omit<SelectProps, OmittedSelectProps> {
+  store?: FieldStore;
+}
 
 type OptionSelectConfig<
   TKey extends OptionSelectTypeKey,
@@ -145,14 +148,27 @@ export function OptionSelect<
   TitemsObj extends Record<Extract<TIOption, string | number>, ReactNode | string>
 >(props: any) {
   validateOptionSelectProps(props);
+  const context = useSearchBuilderQuietly();
 
-  const { store } = useSearchBuilder();
+  const {
+    store: source,
+    name,
+    type,
+    defaultValue,
+    submittable,
+    items,
+    children,
+    toHumanLabel,
+    getValue,
+    getLabel,
+    ...restOfProps
+  } = props as OptionSelectConfig<Tkey, TValue, TItem, TIOption, TitemsObj>;
 
-  const { name, type, defaultValue, submittable, items, children, toHumanLabel, getValue, getLabel, ...restOfProps } =
-    props as OptionSelectConfig<Tkey, TValue, TItem, TIOption, TitemsObj>;
-
+  const store = source ?? context?.store;
   const multiple = type.endsWith("[]");
   const emptyValue = multiple ? [] : EMPTY_VALUE;
+
+  validateStoreAvailability(store);
 
   const humanize = useMemo(() => {
     if (!toHumanLabel) {
@@ -229,6 +245,37 @@ function normalize<TValue extends string | number, TItem, TItemsObj extends Reco
   }
 
   return null;
+}
+function validateStoreAvailability(store: FieldStore | undefined | null): asserts store is FieldStore {
+  if (store) {
+    return;
+  }
+
+  throw new Error(`
+MISSING STORE CONFIGURATION
+================================================================
+
+PROBLEM: The <OptionSelect /> component requires a "store" to function, but none was found.
+It seems you are trying to use this component outside of a <SearchBuilder> context without providing a store manually.
+
+SOLUTION: You must provide a store using one of the following patterns:
+
+PATTERN 1: Context Integration
+  Wrap your component within the main provider:
+
+  <SearchForm>
+    <OptionSelect name="status" items={...} />
+  </SearchForm>
+
+PATTERN 2: Manual Injection
+  Pass the store instance explicitly via props:
+
+  const store = useSearchStore();
+  // ...
+  <OptionSelect store={store} name="status" items={...} />
+
+================================================================
+    `);
 }
 
 function validateOptionSelectProps<TValue extends string | number, TItem, TItemsObj extends Record<TValue, ReactNode | string>>(
