@@ -140,7 +140,8 @@ export function FlagsSelect<N extends FilterName>({
             color={hasFilter ? "primary" : "inherit"}
             aria-controls={open ? "composition-menu" : undefined}
             aria-expanded={open ? "true" : undefined}
-            aria-haspopup="true">
+            aria-haspopup="true"
+            data-testid="flags-trigger-button">
             {hasFilter ? icon("flagsFilterActiveIcon") : icon("flagsFilterInactiveIcon")}
           </IconButton>
         </Tooltip>

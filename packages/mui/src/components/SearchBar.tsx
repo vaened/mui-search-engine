@@ -243,13 +243,19 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
               disabled={isLoading}
               delay={debounceDelay}
               placeholder={placeholder}
-              inputProps={{ "aria-label": searchAriaLabel }}
+              inputProps={{ "aria-label": searchAriaLabel, "data-testid": "search-input-text" }}
               value={value ?? ""}
               submitOnChange={isSubmitOnChangeEnabled}
               onChange={apply}
             />
 
-            <Button loading={isLoading} size={size} type="submit" aria-label={searchAriaLabel || "submit search"} sx={{ minWidth: "34px" }}>
+            <Button
+              loading={isLoading}
+              size={size}
+              type="submit"
+              aria-label={searchAriaLabel || "submit search"}
+              sx={{ minWidth: "34px" }}
+              data-testid="search-trigger-button">
               <AnimateIcon>{icon("searchBarSearchIcon")}</AnimateIcon>
             </Button>
 

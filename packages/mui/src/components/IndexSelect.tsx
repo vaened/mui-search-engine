@@ -79,6 +79,7 @@ export function IndexSelect<N extends FilterName>({
             onClick={openMenu}
             size={size}
             variant="text"
+            data-testid="index-trigger-button"
             endIcon={uncaret ? undefined : <IconChevronDown size={16} />}
             sx={{ display: { xs: "none", sm: "inline-flex" }, lineHeight: 1.7, "& .MuiButton-icon": { marginLeft: "4px" } }}
             aria-controls={open ? "composition-menu" : undefined}
@@ -95,6 +96,7 @@ export function IndexSelect<N extends FilterName>({
           <IconButton
             onClick={openMenu}
             size={size}
+            data-testid="index-trigger-button"
             sx={{ display: { xs: "inline-flex", sm: "none" }, p: "6px" }}
             aria-controls={open ? "composition-menu" : undefined}
             aria-expanded={open ? "true" : undefined}
