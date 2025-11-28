@@ -40,7 +40,7 @@ export type SearchFormProps = {
   onChange?: (params: FieldsCollection) => void;
 } & Omit<ComponentProps<"form">, "onSubmit" | "onChange">;
 
-function SearchStoreContextProvider({ store, children }: { store: FieldStore; children: ReactNode }) {
+function SearchStateContextProvider({ store, children }: { store: FieldStore; children: ReactNode }) {
   const state = useSyncExternalStore(store.subscribe, store.state, store.state);
   return <SearchStateContext.Provider value={{ state }}>{children}</SearchStateContext.Provider>;
 }
@@ -155,7 +155,7 @@ export function SearchForm({
 
   return (
     <SearchBuilderContext.Provider value={value}>
-      <SearchStoreContextProvider store={store}>
+      <SearchStateContextProvider store={store}>
         {isValidElement(Container) ? (
           cloneElement(Container, { onSubmit }, children)
         ) : (
@@ -163,7 +163,7 @@ export function SearchForm({
             {children}
           </form>
         )}
-      </SearchStoreContextProvider>
+      </SearchStateContextProvider>
     </SearchBuilderContext.Provider>
   );
 }
