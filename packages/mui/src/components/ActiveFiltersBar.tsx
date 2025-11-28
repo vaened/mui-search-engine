@@ -96,7 +96,11 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
           <Box>
             <Tooltip title={clearAllButtonTooltip} placement="left" arrow>
               <span>
-                <IconButton onClick={clearAll} aria-label={clearAllButtonTooltip || "Clear all filters"} disabled={!hasActives}>
+                <IconButton
+                  onClick={clearAll}
+                  aria-label={clearAllButtonTooltip || "Clear all filters"}
+                  disabled={!hasActives}
+                  data-testid="clear-all-filters-trigger-button">
                   {icon("activeFiltersClearAllIcon")}
                 </IconButton>
               </span>
