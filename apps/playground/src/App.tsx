@@ -125,64 +125,49 @@ export default function App() {
           <Grid>
             <SearchForm store={store} onSearch={search} onChange={onChange} loading={false}>
               <Grid size={6}>
-                <FormControl fullWidth>
-                  <InputLabel id="countries" shrink>
-                    Paises
-                  </InputLabel>
-                  <OptionSelect
-                    type="number"
-                    name="countries"
-                    labelId="countries"
-                    label="Paises"
-                    items={countries}
-                    getValue={(country) => country.value}
-                    getLabel={(country) => country.label}
-                    toHumanLabel={(v) => countries.find((country) => country.value === v)?.label ?? v.toString()}
-                    submittable
-                    displayEmpty
-                  />
-                </FormControl>
+                <OptionSelect
+                  type="number"
+                  name="countries"
+                  labelId="countries"
+                  label="Paises"
+                  items={countries}
+                  getValue={(country) => country.value}
+                  getLabel={(country) => country.label}
+                  toHumanLabel={(v) => countries.find((country) => country.value === v)?.label ?? v.toString()}
+                  submittable
+                  displayEmpty
+                />
               </Grid>
               <Grid size={6}>
-                <FormControl fullWidth>
-                  <InputLabel id="additives" shrink>
-                    Aditivos
-                  </InputLabel>
-                  <OptionSelect
-                    type="string[]"
-                    name="additives"
-                    labelId="additives"
-                    defaultValue={[]}
-                    label="Aditivos"
-                    toHumanLabel={(value) => additives[value as keyof typeof additives] as string}
-                    submittable
-                    displayEmpty>
-                    <MenuItem value="" disabled>
-                      Todos
-                    </MenuItem>
-                  </OptionSelect>
-                </FormControl>
+                <OptionSelect
+                  type="string[]"
+                  name="additives"
+                  labelId="additives"
+                  defaultValue={[]}
+                  label="Aditivos"
+                  toHumanLabel={(value) => additives[value as keyof typeof additives] as string}
+                  submittable
+                  displayEmpty>
+                  <MenuItem value="" disabled>
+                    Todos
+                  </MenuItem>
+                </OptionSelect>
               </Grid>
               <Grid size={6}>
-                <FormControl fullWidth>
-                  <InputLabel id="centers" shrink>
-                    Sedesf
-                  </InputLabel>
-                  <OptionSelect
-                    type="string"
-                    name="centers"
-                    labelId="centers"
-                    label="Sedesd"
-                    defaultValue={""}
-                    toHumanLabel={(v) => v}
-                    displayEmpty>
-                    <MenuItem value="" disabled>
-                      Todos
-                    </MenuItem>
-                    <MenuItem value="San Juan de Lurigancho">San Juan de Lurigancho</MenuItem>
-                    <MenuItem value="Independencia">Independencia</MenuItem>
-                  </OptionSelect>
-                </FormControl>
+                <OptionSelect
+                  type="string"
+                  name="centers"
+                  labelId="centers"
+                  label="Sedesd"
+                  defaultValue={""}
+                  toHumanLabel={(v) => v}
+                  displayEmpty>
+                  <MenuItem value="" disabled>
+                    Todos
+                  </MenuItem>
+                  <MenuItem value="San Juan de Lurigancho">San Juan de Lurigancho</MenuItem>
+                  <MenuItem value="Independencia">Independencia</MenuItem>
+                </OptionSelect>
               </Grid>
               <Grid size={6}>
                 <FilterFieldController
