@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { MenuItem, Select, type SelectProps } from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select as MuiSelect, type SelectProps } from "@mui/material";
 import type {
   ArrayFilterFieldConfig,
   ArrayItemType,
@@ -16,7 +16,7 @@ import type {
   ScalarFilterFieldConfig,
 } from "@vaened/react-search-builder";
 import { EMPTY_VALUE, useSearchBuilderQuietly } from "@vaened/react-search-builder";
-import { type ReactElement, type ReactNode, useMemo } from "react";
+import { type ReactElement, type ReactNode, useId, useMemo } from "react";
 import FilterFieldController, { type FieldController } from "./FilterFieldController";
 
 type NormalizedOptionItem<I extends string | number> = {
@@ -157,6 +157,9 @@ export function OptionSelect<
     defaultValue,
     submittable,
     items,
+    size,
+    label: labelProp,
+    variant,
     children,
     toHumanLabel,
     getValue,
@@ -164,6 +167,8 @@ export function OptionSelect<
     ...restOfProps
   } = props as OptionSelectConfig<Tkey, TValue, TItem, TIOption, TitemsObj>;
 
+  const selectId = useId();
+  const labelId = `${selectId}-label`;
   const store = source ?? context?.store;
   const multiple = type.endsWith("[]");
   const emptyValue = multiple ? [] : EMPTY_VALUE;
@@ -200,18 +205,48 @@ export function OptionSelect<
       store={store}
       {...(config as any)}
       control={({ value, onChange }) => {
+        const internalProps = {
+          ...restOfProps,
+          children,
+          normalizedItems,
+          size,
+          label: labelProp,
+          multiple,
+          value: value ?? emptyValue,
+          onChange,
+          id: selectId,
+          labelId: labelId,
+        };
+
+        if (!labelProp) {
+          return <Select {...internalProps} />;
+        }
+
         return (
-          <Select {...restOfProps} multiple={multiple} value={value ?? emptyValue} onChange={onChange}>
-            {children ??
-              normalizedItems?.map(({ value, label }) => (
-                <MenuItem key={`option-select-item-${value}`} value={value}>
-                  {label}
-                </MenuItem>
-              ))}
-          </Select>
+          <FormControl variant={variant} size={size} fullWidth>
+            <InputLabel id={selectId} shrink>{labelProp}</InputLabel>
+            <Select {...internalProps} />
+          </FormControl>
         );
       }}
     />
+  );
+}
+
+function Select<Value = unknown>({
+  children,
+  normalizedItems,
+  ...restOfProps
+}: SelectProps<Value> & { normalizedItems: NormalizedOptionItem<string | number>[] | null }) {
+  return (
+    <MuiSelect {...restOfProps}>
+      {children ??
+        normalizedItems?.map(({ value, label }) => (
+          <MenuItem key={`option-select-item-${value}`} value={value}>
+            {label}
+          </MenuItem>
+        ))}
+    </MuiSelect>
   );
 }
 
