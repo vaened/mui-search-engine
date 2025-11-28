@@ -17,6 +17,7 @@ export const DebounceInputSearch: React.FC<DebounceInputSearchProps> = ({
   value,
   delay = 400,
   submitOnChange,
+  inputProps,
   onChange,
   ...restOfProps
 }) => {
@@ -64,6 +65,10 @@ export const DebounceInputSearch: React.FC<DebounceInputSearchProps> = ({
       fullWidth
       sx={{ ml: 1, flex: 1 }}
       value={queryString ?? ""}
+      inputProps={{
+        "aria-label": "search query",
+        ...inputProps,
+      }}
       onKeyDown={onQueryStringKeyDown}
       onChange={onQueryStringChange}
     />

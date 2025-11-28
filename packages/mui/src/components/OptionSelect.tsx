@@ -169,6 +169,7 @@ export function OptionSelect<
     label: labelProp,
     ref,
     variant,
+    inputProps,
     children,
     toHumanLabel,
     getValue,
@@ -225,19 +226,26 @@ export function OptionSelect<
           onChange,
           ref,
           id: selectId,
-          labelId: labelId,
         } satisfies InternalSelectProps<unknown>;
 
         if (!labelProp) {
-          return <Select {...internalProps} />;
+          return (
+            <Select
+              {...internalProps}
+              inputProps={{
+                "aria-label": name,
+                ...inputProps,
+              }}
+            />
+          );
         }
 
         return (
           <FormControl variant={variant} size={size} fullWidth>
-            <InputLabel id={selectId} shrink>
+            <InputLabel id={labelId} shrink>
               {labelProp}
             </InputLabel>
-            <Select {...internalProps} />
+            <Select {...internalProps} labelId={labelId} />
           </FormControl>
         );
       }}

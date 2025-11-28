@@ -249,7 +249,7 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
               onChange={apply}
             />
 
-            <Button loading={isLoading} size={size} type="submit" aria-label={searchAriaLabel} sx={{ minWidth: "34px" }}>
+            <Button loading={isLoading} size={size} type="submit" aria-label={searchAriaLabel || "submit search"} sx={{ minWidth: "34px" }}>
               <AnimateIcon>{icon("searchBarSearchIcon")}</AnimateIcon>
             </Button>
 
