@@ -19,6 +19,8 @@ import { EMPTY_VALUE, useSearchBuilderQuietly } from "@vaened/react-search-build
 import { type ReactElement, type ReactNode, useId, useMemo } from "react";
 import FilterFieldController, { type FieldController } from "./FilterFieldController";
 
+type MuiSelectRef = React.ComponentRef<typeof MuiSelect>;
+
 type NormalizedOptionItem<I extends string | number> = {
   value: I;
   label: ReactElement | string;
@@ -59,7 +61,13 @@ type OmittedConfigProps = "humanize" | "serializer";
 
 export interface OptionSelectProps extends Omit<SelectProps, OmittedSelectProps> {
   store?: FieldStore;
+  ref?: React.Ref<MuiSelectRef>;
 }
+
+type InternalSelectProps<Value = unknown> = SelectProps<Value> & {
+  normalizedItems: NormalizedOptionItem<string | number>[] | null;
+  ref?: React.Ref<MuiSelectRef>;
+};
 
 type OptionSelectConfig<
   TKey extends OptionSelectTypeKey,
@@ -159,6 +167,7 @@ export function OptionSelect<
     items,
     size,
     label: labelProp,
+    ref,
     variant,
     children,
     toHumanLabel,
@@ -214,9 +223,10 @@ export function OptionSelect<
           multiple,
           value: value ?? emptyValue,
           onChange,
+          ref,
           id: selectId,
           labelId: labelId,
-        };
+        } satisfies InternalSelectProps<unknown>;
 
         if (!labelProp) {
           return <Select {...internalProps} />;
@@ -224,7 +234,9 @@ export function OptionSelect<
 
         return (
           <FormControl variant={variant} size={size} fullWidth>
-            <InputLabel id={selectId} shrink>{labelProp}</InputLabel>
+            <InputLabel id={selectId} shrink>
+              {labelProp}
+            </InputLabel>
             <Select {...internalProps} />
           </FormControl>
         );
@@ -233,13 +245,9 @@ export function OptionSelect<
   );
 }
 
-function Select<Value = unknown>({
-  children,
-  normalizedItems,
-  ...restOfProps
-}: SelectProps<Value> & { normalizedItems: NormalizedOptionItem<string | number>[] | null }) {
+function Select<Value = unknown>({ ref, children, normalizedItems, ...restOfProps }: InternalSelectProps<Value>) {
   return (
-    <MuiSelect {...restOfProps}>
+    <MuiSelect ref={ref} {...restOfProps}>
       {children ??
         normalizedItems?.map(({ value, label }) => (
           <MenuItem key={`option-select-item-${value}`} value={value}>
