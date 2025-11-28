@@ -30,7 +30,7 @@ type FormProps = {
 export type SearchFormProps = {
   children: ReactNode;
   store?: FieldStore;
-  loading: boolean;
+  loading?: boolean;
   manualStart?: boolean;
   autoStartDelay?: number;
   submitOnChange?: boolean;
@@ -48,7 +48,7 @@ function SearchStoreContextProvider({ store, children }: { store: FieldStore; ch
 export function SearchForm({
   children,
   store: source,
-  loading,
+  loading = false,
   manualStart,
   autoStartDelay = 200,
   submitOnChange = false,
