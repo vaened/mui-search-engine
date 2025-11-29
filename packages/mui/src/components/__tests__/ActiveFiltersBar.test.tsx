@@ -1,16 +1,19 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createFieldStore, GenericField } from "@vaened/react-search-builder";
 import { describe, expect, it } from "vitest";
 import { ActiveFiltersBar } from "../ActiveFiltersBar";
 import { SearchForm } from "../SearchForm";
 
-const renderWithStore = (initialData: Record<string, any> = {}) => {
+const renderWithStore = (initialData: Record<string, string> = {}) => {
   const store = createFieldStore({ persistInUrl: false });
 
   Object.entries(initialData).forEach(([key, value]) => {
-    store.register({ name: key, type: "string", value: "" } as GenericField);
-    store.set(key, value);
+    store.register({ name: key, type: "string", value: "", humanize: (v: string) => v } as unknown as GenericField);
+
+    if (value) {
+      store.set(key, value);
+    }
   });
 
   store.persist();
@@ -18,7 +21,7 @@ const renderWithStore = (initialData: Record<string, any> = {}) => {
   return {
     ...render(
       <SearchForm store={store}>
-        <ActiveFiltersBar />
+        <ActiveFiltersBar limitTags={100} />
       </SearchForm>
     ),
     store,
@@ -31,22 +34,30 @@ describe("ActiveFiltersBar", () => {
     expect(screen.queryByTestId("clear-all-filters-trigger-button")).toBeDisabled();
   });
 
-  it("should render chips for active filters", () => {
+  it("should render chips for active filters", async () => {
     renderWithStore({ status: "active", type: "user" });
 
-    expect(screen.getByText("active")).toBeInTheDocument();
-    expect(screen.getByText("user")).toBeInTheDocument();
+    const chipActive = await screen.findByText("active");
+    expect(chipActive).toBeInTheDocument();
+
+    const chipUser = await screen.findByText("user");
+    expect(chipUser).toBeInTheDocument();
   });
 
   it("should remove a specific filter when clicking its chip delete icon", async () => {
     const user = userEvent.setup();
     const { store } = renderWithStore({ status: "active", role: "admin" });
+    const chipLabel = await screen.findByText("active");
 
-    const deleteBtn = screen.getByTestId("CancelIcon");
+    const chip = chipLabel.closest(".MuiChip-root");
+
+    expect(chip).toBeInTheDocument();
+
+    const deleteBtn = within(chip as HTMLElement).getByTestId("CancelIcon");
 
     await user.click(deleteBtn);
 
-    expect(store.get("status")?.value).toBe("");
+    expect(store.get("status")?.value).toBeNull();
     expect(store.get("role")?.value).toBe("admin");
   });
 
@@ -55,6 +66,10 @@ describe("ActiveFiltersBar", () => {
     const { store } = renderWithStore({ a: "1", b: "2" });
 
     const clearButton = screen.getByTestId("clear-all-filters-trigger-button");
+
+    await waitFor(() => {
+      expect(clearButton).not.toBeDisabled();
+    });
 
     await user.click(clearButton);
 
