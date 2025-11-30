@@ -5,7 +5,7 @@
 
 export * from "./hooks/useActiveFilters";
 export * from "./hooks/useFilterField";
-export * from "./hooks/useSearchReady";
+export * from "./hooks/useSearchFormReady";
 export * from "./hooks/useSearchStore";
 export * from "./hooks/useSerialization";
 
