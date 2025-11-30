@@ -1,11 +1,6 @@
-/**
- * @author enea dhack <contact@vaened.dev>
- * @link https://vaened.dev DevFolio
- */
-
 import { useSearchBuilder } from "../context";
 
 export function useSearchReady(): boolean {
-  const { checkIsReady: checkInitialized } = useSearchBuilder();
-  return checkInitialized();
+  const { isFormReady } = useSearchBuilder();
+  return isFormReady;
 }

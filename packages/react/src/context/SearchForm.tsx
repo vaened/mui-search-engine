@@ -13,6 +13,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  useState,
   useSyncExternalStore,
   type ReactNode,
 } from "react";
@@ -59,10 +60,9 @@ export function SearchForm({
   ...restOfProps
 }: SearchFormProps) {
   const autostarted = useRef(false);
-  const isReady = useRef(manualStart === true);
+  const [isFormReady, setReadyState] = useState(manualStart === true);
   const store = useResolveFieldStoreInstance(source, configuration);
 
-  const checkIsReady = useCallback(() => isReady.current, []);
   const checkAutostartable = useCallback(() => !autostarted.current && !manualStart, [manualStart]);
 
   useEffect(() => {
@@ -86,14 +86,14 @@ export function SearchForm({
 
   useEffect(() => {
     if (!checkAutostartable()) {
-      isReady.current = true;
+      setReadyState(true);
       return;
     }
 
     const timmer = setTimeout(() => {
       dispatch(store.collection());
       autostarted.current = true;
-      isReady.current = true;
+      setReadyState(true);
     }, autoStartDelay);
 
     return () => {
@@ -147,10 +147,10 @@ export function SearchForm({
       store,
       isLoading: loading,
       submitOnChange,
-      checkIsReady,
+      isFormReady,
       refresh,
     }),
-    [store, loading, submitOnChange, checkIsReady, refresh]
+    [store, loading, submitOnChange, isFormReady, refresh]
   );
 
   return (
