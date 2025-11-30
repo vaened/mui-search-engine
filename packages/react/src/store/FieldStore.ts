@@ -90,7 +90,7 @@ export class FieldStore {
   persist = () => {
     const collection = this.#state.collection;
     this.#persistence.write(collection.toPrimitives(), this.#whitelist);
-    this.#emitter.emit("submit", collection);
+    this.#emitter.emit("persist", collection);
   };
 
   rehydrate = (newValues: PrimitiveFilterDictionary): FieldsCollection | undefined => {
@@ -198,8 +198,8 @@ export class FieldStore {
     return this.#persistence.subscribe(() => listener(this.sync()));
   };
 
-  onFieldSubmit = (listener: (fields: FieldsCollection) => void): Unsubscribe => {
-    return this.#emitter.on("submit", listener);
+  onFieldPersisted = (listener: (fields: FieldsCollection) => void): Unsubscribe => {
+    return this.#emitter.on("persist", listener);
   };
 
   onFieldChange = (listener: (state: FieldStoreState) => void): Unsubscribe => {

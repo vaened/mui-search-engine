@@ -7,7 +7,7 @@ import type { FieldsCollection } from "./FieldsCollection";
 import type { FieldStoreState } from "./FieldStore";
 
 export type Events = {
-  submit: FieldsCollection;
+  persist: FieldsCollection;
   change: FieldStoreState;
 };
 

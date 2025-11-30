@@ -190,7 +190,7 @@ describe("FieldStore", () => {
   });
 
   describe("3. Persistence (Sync/Persist)", () => {
-    it("should write to persistence and emit 'submit' on persist()", () => {
+    it("should write to persistence and emit 'persist' on persist()", () => {
       store.register(createTestField("q", "test"));
       emitSpy.mockClear();
 
@@ -198,7 +198,7 @@ describe("FieldStore", () => {
 
       expect(persistence.write).toHaveBeenCalledWith(expect.objectContaining({ q: "test" }), expect.any(Array));
 
-      expect(emitSpy).toHaveBeenCalledWith("submit", expect.anything());
+      expect(emitSpy).toHaveBeenCalledWith("persist", expect.anything());
     });
 
     it("should sync from persistence and emit change", () => {
