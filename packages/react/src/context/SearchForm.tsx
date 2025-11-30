@@ -28,6 +28,8 @@ type FormProps = {
   [key: string]: unknown;
 };
 
+type SubmitResult = void | boolean;
+
 export type SearchFormProps = {
   children: ReactNode;
   store?: FieldStore;
@@ -37,7 +39,7 @@ export type SearchFormProps = {
   submitOnChange?: boolean;
   Container?: ReactElement<FormProps>;
   configuration?: CreateStoreOptions;
-  onSearch?: (params: FieldsCollection) => void;
+  onSearch?: (params: FieldsCollection) => SubmitResult | Promise<SubmitResult>;
   onChange?: (params: FieldsCollection) => void;
 } & Omit<ComponentProps<"form">, "onSubmit" | "onChange">;
 
@@ -61,6 +63,9 @@ export function SearchForm({
 }: SearchFormProps) {
   const autostarted = useRef(false);
   const [isFormReady, setReadyState] = useState(manualStart === true);
+  const [isAutoLoading, setAutoLoadingStatus] = useState(false);
+  const isLoading = isAutoLoading || loading;
+
   const store = useResolveFieldStoreInstance(source, configuration);
 
   const checkAutostartable = useCallback(() => !autostarted.current && !manualStart, [manualStart]);
@@ -135,9 +140,20 @@ export function SearchForm({
   }, []);
 
   const dispatch = useCallback(
-    (values: FieldsCollection) => {
-      onSearch?.(values);
-      store.persist();
+    function (values: FieldsCollection) {
+      const response = Promise.resolve(onSearch?.(values));
+
+      setAutoLoadingStatus(true);
+
+      response
+        .then((result) => {
+          if (result === false) {
+            return;
+          }
+
+          store.persist();
+        })
+        .finally(() => setAutoLoadingStatus(false));
     },
     [store]
   );
@@ -145,12 +161,12 @@ export function SearchForm({
   const value = useMemo(
     () => ({
       store,
-      isLoading: loading,
+      isLoading,
       submitOnChange,
       isFormReady,
       refresh,
     }),
-    [store, loading, submitOnChange, isFormReady, refresh]
+    [store, isLoading, submitOnChange, isFormReady, refresh]
   );
 
   return (
