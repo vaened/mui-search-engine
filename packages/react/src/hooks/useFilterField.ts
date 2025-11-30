@@ -4,7 +4,6 @@
  */
 
 import { useEffect, useMemo, useSyncExternalStore } from "react";
-import type { RegisteredField } from "../contexts";
 import type {
   ArrayFieldConfig,
   ArrayTypeKey,
@@ -17,6 +16,7 @@ import type {
   ScalarTypeKey,
 } from "../field";
 import resolve from "../serializers/resolve";
+import type { RegisteredField } from "../store";
 import { FieldStore } from "../store";
 
 export type FilterFieldReturn<TResolved, TRegistered> = {

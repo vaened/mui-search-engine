@@ -3,9 +3,27 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { GenericRegisteredField, RegisteredFieldDictionary } from "../contexts/index";
-import type { FilterName, PrimitiveFilterDictionary, Serializer, ValueFilterDictionary } from "../field";
+import type {
+  Field,
+  FilterName,
+  FilterTypeKey,
+  FilterTypeMap,
+  PrimitiveFilterDictionary,
+  Serializer,
+  ValueFilterDictionary,
+} from "../field";
 import type { NonUndefined } from "../internal";
+
+export interface RegisteredField<TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]> extends Field<TKey, TValue> {
+  defaultValue: TValue | null;
+  updatedAt: number;
+}
+
+export type GenericRegisteredField = {
+  [K in FilterTypeKey]: RegisteredField<K, FilterTypeMap[K]>;
+}[FilterTypeKey];
+
+export type RegisteredFieldDictionary = Map<FilterName, GenericRegisteredField>;
 
 export const EMPTY_VALUE = "";
 

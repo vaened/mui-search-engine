@@ -4,19 +4,8 @@
  */
 
 import { createContext, useContext } from "react";
-import type { Field, FilterName, FilterTypeKey, FilterTypeMap, PrimitiveFilterDictionary } from "../field";
+import type { PrimitiveFilterDictionary } from "../field";
 import type { FieldStore, FieldStoreState } from "../store";
-
-export interface RegisteredField<TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]> extends Field<TKey, TValue> {
-  defaultValue: TValue | null;
-  updatedAt: number;
-}
-
-export type GenericRegisteredField = {
-  [K in FilterTypeKey]: RegisteredField<K, FilterTypeMap[K]>;
-}[FilterTypeKey];
-
-export type RegisteredFieldDictionary = Map<FilterName, GenericRegisteredField>;
 
 export interface SearchBuilderContextState {
   store: FieldStore;
