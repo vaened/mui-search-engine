@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { GenericRegisteredField, RegisteredFieldDictionary } from "../context/index";
+import type { GenericRegisteredField, RegisteredFieldDictionary } from "../contexts/index";
 import type { FilterName, PrimitiveFilterDictionary, Serializer, ValueFilterDictionary } from "../field";
 import type { NonUndefined } from "../internal";
 

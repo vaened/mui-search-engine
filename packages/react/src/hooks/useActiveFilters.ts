@@ -4,7 +4,7 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
-import { useSearchBuilder, type GenericRegisteredField } from "../context";
+import { useSearchBuilder, type GenericRegisteredField } from "../contexts";
 import type { HumanizedValue, Humanizer, ScalarFilterValue, ValueOf } from "../field";
 import type { FieldsCollection } from "../store";
 

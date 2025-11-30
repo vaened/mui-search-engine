@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useMemo, useSyncExternalStore } from "react";
-import type { RegisteredField } from "../context";
+import type { RegisteredField } from "../contexts";
 import type {
   ArrayFieldConfig,
   ArrayTypeKey,

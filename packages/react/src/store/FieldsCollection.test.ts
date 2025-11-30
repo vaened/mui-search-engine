@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { GenericRegisteredField } from "../context/index";
+import type { GenericRegisteredField } from "../contexts/index";
 import type { Serializer } from "../field";
 import { EMPTY_VALUE, FieldsCollection } from "./FieldsCollection";
 
