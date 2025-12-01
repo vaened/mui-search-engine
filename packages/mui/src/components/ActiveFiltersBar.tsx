@@ -12,7 +12,7 @@ import { useMuiSearchBuilderConfig, type Translator } from "../config";
 import FilterChip, { type FilterChipProps } from "./FilterChip";
 
 export type ActiveFiltersBarProps = {
-  chipProps?: Omit<FilterChipProps, "field" | "readonly">;
+  chipProps?: Omit<FilterChipProps, "tag" | "readonly">;
   readonly?: boolean;
   untitled?: boolean;
   unstyled?: boolean;
