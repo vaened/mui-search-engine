@@ -12,20 +12,20 @@ import { useMuiSearchBuilderConfig, type Translator } from "../config";
 import FilterChip, { type FilterChipProps } from "./FilterChip";
 
 export type ActiveFiltersBarProps = {
-  chipProps?: Omit<FilterChipProps, "tag" | "readonly">;
-  readonly?: boolean;
   untitled?: boolean;
   unstyled?: boolean;
   limitTags?: number;
-  disableAutoSubmit?: boolean;
-  preserveFieldsOrder?: boolean;
   sx?: SxProps<Theme>;
+  preserveFieldsOrder?: boolean;
+  readonly?: FilterChipProps["readonly"];
+  disableAutoSubmit?: FilterChipProps["disableAutoSubmit"];
   labels?: {
     filtersLabel?: string;
     headerTitle?: string;
     emptyStateMessage?: string;
     clearAllButtonTooltip?: string;
   };
+  onRemove?: FilterChipProps["onRemove"];
 };
 
 export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
@@ -37,7 +37,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   disableAutoSubmit,
   preserveFieldsOrder,
   sx,
-  chipProps: { onRemove, ...restOfProps } = {},
+  onRemove,
 }) => {
   const isReady = useSearchFormReady();
   const { translate, icon } = useMuiSearchBuilderConfig();
@@ -85,7 +85,6 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
                 readonly={readonly}
                 disableAutoSubmit={disableAutoSubmit}
                 onRemove={onFilterChipRemove}
-                {...restOfProps}
               />
             ))}
 
