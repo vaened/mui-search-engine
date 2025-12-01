@@ -10,6 +10,6 @@
 
     "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
-  "include": ["src", "tsup.config.ts", "vitest.config.ts", "package.json"],
+  "include": ["src", "tsup.config.ts", "vitest.config.ts", "package.json", "../react/src/**/*"],
   "exclude": ["dist", "node_modules"]
 }
