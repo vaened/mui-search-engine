@@ -190,10 +190,6 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
       const currentIndex = dictionary && index ? dictionary[index].label : null;
       return [currentIndex, currentValue].filter((label) => label).join(": ");
     },
-    serializer: {
-      serialize: (v) => v,
-      unserialize: (v) => v,
-    },
   });
 
   const { defaultIndexLabel, searchAriaLabel } = useSearchBarTranslations(translate, labels);
