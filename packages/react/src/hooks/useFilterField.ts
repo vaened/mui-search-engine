@@ -21,7 +21,7 @@ import { FieldStore } from "../store";
 
 export type FilterFieldReturn<TResolved, TRegistered> = {
   field: TRegistered | undefined;
-  value: TResolved;
+  value: TResolved | null;
   set: (value: TResolved) => void;
 };
 
