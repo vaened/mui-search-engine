@@ -104,7 +104,8 @@ describe("FilterFieldController", () => {
     });
 
     expect(store.get("testField")?.value).toBe(10);
-    expect(store.get("testField")?.serializer).toBe(serializer);
+    expect(store.get("testField")?.serializer.serialize(2)).toBe("4");
+    expect(store.get("testField")?.serializer.unserialize("2")).toBe(1);
   });
 
   it("should unregister the field when component unmounts", () => {

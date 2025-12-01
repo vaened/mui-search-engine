@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { useEffect, useMemo, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import type {
   ArrayFieldConfig,
   ArrayTypeKey,
@@ -11,9 +11,12 @@ import type {
   FieldOptions,
   FilterTypeKey,
   FilterTypeMap,
+  FilterValue,
   GenericField,
+  Humanizer,
   ScalarFieldConfig,
   ScalarTypeKey,
+  Serializer,
 } from "../field";
 import resolve from "../serializers/resolve";
 import type { RegisteredField } from "../store";
@@ -68,10 +71,36 @@ export function useFilterField<TKey extends FilterTypeKey, TValue extends Filter
   store: FieldStore,
   config: any
 ): FilterFieldReturn<TValue, RegisteredField<TKey, TValue>> {
-  const { name, type, defaultValue, submittable, serializer, ...restOfProps } = config as GenericFilterFieldConfig;
-
+  const {
+    name,
+    type,
+    defaultValue,
+    submittable,
+    serializer: configSerializer,
+    humanize: configHumanize,
+    ...restOfProps
+  } = config as GenericFilterFieldConfig;
+  const parser = useRef({ serializer: configSerializer, humanize: configHumanize });
   const selector = useMemo(() => store.listen<TKey, TValue>(name), [store, name]);
   const field = useSyncExternalStore(store.subscribe, selector, selector);
+
+  const defaultSerializer = useMemo(() => resolve(type), [type]);
+  const humanize = useCallback<Humanizer<FilterValue>>((value, fields) => parser.current.humanize?.(value as never, fields), []);
+  const serializer = useMemo<Serializer<FilterValue>>(() => {
+    const safe = (userSerializer: Serializer<FilterValue> | null) => userSerializer ?? defaultSerializer;
+
+    return {
+      unserialize: (value) => safe(parser.current.serializer).unserialize(value as never),
+      serialize: (value) => safe(parser.current.serializer).serialize(value as never),
+    };
+  }, [defaultSerializer]);
+
+  useEffect(() => {
+    parser.current = {
+      serializer: configSerializer,
+      humanize: configHumanize,
+    };
+  });
 
   useEffect(() => {
     store.register({
@@ -79,7 +108,8 @@ export function useFilterField<TKey extends FilterTypeKey, TValue extends Filter
       name,
       submittable,
       value: defaultValue,
-      serializer: serializer || resolve(type),
+      serializer,
+      humanize,
       ...restOfProps,
     } as GenericField);
 
