@@ -1,5 +1,5 @@
 import { describe, expectTypeOf, test } from "vitest";
-import { useFilterField } from "../hooks";
+import { useFilterField } from ".";
 import { createFieldStore } from "../store";
 
 declare const store: ReturnType<typeof createFieldStore>;
