@@ -186,9 +186,9 @@ export function SearchBar<IB extends FilterBag<FilterName>, FB extends FlagsBag<
     name: name?.query || "q",
     defaultValue: defaultValue ?? "",
     submittable: submittable?.query,
-    humanize: (currentValue, fields) => {
-      const currentIndex = fields.get(indexName)?.value as KeysOf<IB> | undefined;
-      return [dictionary && currentIndex ? dictionary[currentIndex].label : null, currentValue].filter((label) => label).join(": ");
+    humanize: (currentValue) => {
+      const currentIndex = dictionary && index ? dictionary[index].label : null;
+      return [currentIndex, currentValue].filter((label) => label).join(": ");
     },
     serializer: {
       serialize: (v) => v,
