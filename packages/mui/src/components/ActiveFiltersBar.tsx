@@ -17,6 +17,7 @@ export type ActiveFiltersBarProps = {
   untitled?: boolean;
   unstyled?: boolean;
   limitTags?: number;
+  disableAutoSubmit?: boolean;
   preserveFieldsOrder?: boolean;
   sx?: SxProps<Theme>;
   labels?: {
@@ -33,6 +34,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   untitled,
   unstyled,
   limitTags = 10,
+  disableAutoSubmit,
   preserveFieldsOrder,
   sx,
   chipProps: { onRemove, ...restOfProps } = {},
@@ -46,7 +48,10 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
   const restOfTagNumber = actives.length - tags.length;
 
   function onFilterChipRemove(field: GenericRegisteredField) {
-    syncFromStore();
+    if (disableAutoSubmit) {
+      syncFromStore();
+    }
+
     onRemove?.(field);
   }
 
@@ -78,6 +83,7 @@ export const ActiveFiltersBar: React.FC<ActiveFiltersBarProps> = ({
                 key={`filter-chip-group-${tag.field.name}-${index}`}
                 tag={tag}
                 readonly={readonly}
+                disableAutoSubmit={disableAutoSubmit}
                 onRemove={onFilterChipRemove}
                 {...restOfProps}
               />

@@ -10,17 +10,23 @@ import React from "react";
 
 export type FilterChipProps = Omit<ChipProps, "label" | "onDelete" | "size"> & {
   tag: ActiveFilterTag;
+  disableAutoSubmit?: boolean;
   readonly?: boolean;
   onRemove?: (field: GenericRegisteredField) => void;
 };
 
-export const FilterChip: React.FC<FilterChipProps> = ({ tag, readonly, onRemove, ...restOfProps }) => {
+export const FilterChip: React.FC<FilterChipProps> = ({ tag, readonly, disableAutoSubmit, onRemove, ...restOfProps }) => {
   const { store } = useSearchBuilder();
   const { field, value, label } = tag;
 
   function remove(value?: ScalarFilterValue) {
     const newValue = Array.isArray(field.value) ? field.value.filter((v) => v !== value) : null;
-    store.set(field.name, newValue);
+
+    if (disableAutoSubmit) {
+      store.set(field.name, newValue);
+    } else {
+      store.flush(field.name, newValue);
+    }
 
     onRemove?.(field);
   }
