@@ -71,7 +71,6 @@ export function useFilterField<TKey extends FilterTypeKey, TValue extends Filter
   const { name, type, defaultValue, submittable, serializer, ...restOfProps } = config as GenericFilterFieldConfig;
 
   const selector = useMemo(() => store.listen<TKey, TValue>(name), [store, name]);
-
   const field = useSyncExternalStore(store.subscribe, selector, selector);
 
   useEffect(() => {
