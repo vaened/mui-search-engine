@@ -74,13 +74,13 @@ export function SearchForm({
   const checkAutostartable = useCallback(() => !autostarted.current && !manualStart, [manualStart]);
 
   useEffect(() => {
-    const unsubscribe = store.onFieldChange(({ collection: fields, operation: lastOperation, touched: touchedFieldNames }) => {
-      onChange?.(fields);
+    const unsubscribe = store.onFieldChange(({ collection, operation, touched }) => {
+      onChange?.(collection);
 
-      const isForcedOperation = forcedOperations.includes(lastOperation);
-      const isValueOperation = valueOperations.includes(lastOperation);
+      const isForcedOperation = forcedOperations.includes(operation);
+      const isValueOperation = valueOperations.includes(operation);
 
-      const isSubmittableField = isValueOperation && touchedFieldNames.some((name) => fields.get(name)?.submittable);
+      const isSubmittableField = isValueOperation && touched.some((name) => collection.get(name)?.submittable);
       const isReadyForNewSubmit = !checkAutostartable();
 
       const canBeSubmitted = isReadyForNewSubmit && (submitOnChange || isForcedOperation || isSubmittableField);
@@ -89,7 +89,7 @@ export function SearchForm({
         return;
       }
 
-      dispatch(fields);
+      dispatch(collection);
     });
 
     return () => unsubscribe();
