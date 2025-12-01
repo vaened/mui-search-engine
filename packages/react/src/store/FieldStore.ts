@@ -19,7 +19,7 @@ import type { PersistenceAdapter } from "../persistence/PersistenceAdapter";
 import { FieldsCollection } from "./FieldsCollection";
 import { createEventEmitter, type EventEmitter, type Unsubscribe } from "./event-emitter";
 
-export type FieldOperation = "set" | "update" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
+export type FieldOperation = "set" | "flush" | "update" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
 
 export type FieldStoreConfig = {
   persistence?: PersistenceAdapter;
@@ -162,15 +162,11 @@ export class FieldStore {
   };
 
   set = (name: FilterName, value: GenericRegisteredField["value"] | null) => {
-    const field = this.#fields.get(name);
+    this.#apply(name, value, "set");
+  };
 
-    if (!field || Object.is(field.value, value)) {
-      return;
-    }
-
-    this.#override(field, value as ValueOf<typeof field>);
-
-    this.#commit({ operation: "set", touched: [name], collection: new FieldsCollection(this.#fields) });
+  flush = (name: FilterName, value: GenericRegisteredField["value"] | null) => {
+    this.#apply(name, value, "flush");
   };
 
   reset = () => {
@@ -205,6 +201,18 @@ export class FieldStore {
   onFieldChange = (listener: (state: FieldStoreState) => void): Unsubscribe => {
     return this.#emitter.on("change", (state) => listener(state));
   };
+
+  #apply(name: FilterName, value: GenericRegisteredField["value"] | null, operation: Extract<FieldOperation, "set" | "flush">) {
+    const field = this.#fields.get(name);
+
+    if (!field || Object.is(field.value, value)) {
+      return;
+    }
+
+    this.#override(field, value as ValueOf<typeof field>);
+
+    this.#commit({ operation, touched: [name], collection: new FieldsCollection(this.#fields) });
+  }
 
   #fillFieldsFrom = (newValues: PrimitiveFilterDictionary): FilterName[] | undefined => {
     const touched: FilterName[] = [];
