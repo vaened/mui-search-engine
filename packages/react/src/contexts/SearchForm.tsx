@@ -48,7 +48,8 @@ function SearchStateContextProvider({ store, children }: { store: FieldStore; ch
   return <SearchStateContext.Provider value={{ state }}>{children}</SearchStateContext.Provider>;
 }
 
-const submittableOperations: FieldOperation[] = ["sync", "reset", "set", "flush"];
+const forcedOperations: FieldOperation[] = ["reset", "flush"];
+const valueOperations: FieldOperation[] = ["sync", "set"];
 
 export function SearchForm({
   children,
@@ -76,10 +77,13 @@ export function SearchForm({
     const unsubscribe = store.onFieldChange(({ collection: fields, operation: lastOperation, touched: touchedFieldNames }) => {
       onChange?.(fields);
 
-      const isSubmittableOperation = submittableOperations.includes(lastOperation);
-      const isSubmittableTouched = touchedFieldNames.some((name) => fields.get(name)?.submittable);
-      const isAutoSubmitEnable = !checkAutostartable() && (submitOnChange || isSubmittableTouched);
-      const canBeSubmitted = isSubmittableOperation && isAutoSubmitEnable;
+      const isForcedOperation = forcedOperations.includes(lastOperation);
+      const isValueOperation = valueOperations.includes(lastOperation);
+
+      const isSubmittableField = isValueOperation && touchedFieldNames.some((name) => fields.get(name)?.submittable);
+      const isReadyForNewSubmit = !checkAutostartable();
+
+      const canBeSubmitted = isReadyForNewSubmit && (submitOnChange || isForcedOperation || isSubmittableField);
 
       if (!canBeSubmitted) {
         return;
