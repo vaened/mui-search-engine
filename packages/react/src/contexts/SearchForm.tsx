@@ -20,7 +20,7 @@ import React, {
 import { SearchBuilderContext, SearchStateContext } from ".";
 import type { PrimitiveFilterDictionary } from "../field";
 import { useResolveFieldStoreInstance } from "../hooks/useResolveFieldStoreInstance";
-import { CreateStoreOptions, FieldsCollection, FieldStore } from "../store";
+import { CreateStoreOptions, FieldOperation, FieldsCollection, FieldStore } from "../store";
 
 type FormProps = {
   onSubmit?: FormEventHandler;
@@ -48,6 +48,8 @@ function SearchStateContextProvider({ store, children }: { store: FieldStore; ch
   return <SearchStateContext.Provider value={{ state }}>{children}</SearchStateContext.Provider>;
 }
 
+const submittableOperations: FieldOperation[] = ["sync", "reset", "set", "flush"];
+
 export function SearchForm({
   children,
   store: source,
@@ -74,7 +76,7 @@ export function SearchForm({
     const unsubscribe = store.onFieldChange(({ collection: fields, operation: lastOperation, touched: touchedFieldNames }) => {
       onChange?.(fields);
 
-      const isSubmittableOperation = ["sync", "reset", "set"].includes(lastOperation ?? "");
+      const isSubmittableOperation = submittableOperations.includes(lastOperation);
       const isSubmittableTouched = touchedFieldNames.some((name) => fields.get(name)?.submittable);
       const isAutoSubmitEnable = !checkAutostartable() && (submitOnChange || isSubmittableTouched);
       const canBeSubmitted = isSubmittableOperation && isAutoSubmitEnable;
