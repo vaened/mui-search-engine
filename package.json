@@ -9,6 +9,7 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "test:ci": "pnpm -r test:ci",
+    "test:types": "pnpm -r test:types",
     "typecheck": "pnpm -r typecheck",
     "clean": "rimraf packages/**/dist node_modules",
     "lint": "eslint .",
