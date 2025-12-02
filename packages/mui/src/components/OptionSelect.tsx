@@ -154,7 +154,7 @@ export function OptionSelect<
   TItem,
   TIOption extends string | number,
   TitemsObj extends Record<Extract<TIOption, string | number>, ReactNode | string>
->(props: any) {
+>(props: OptionSelectConfig<Tkey, TValue, TItem, TIOption, TitemsObj>) {
   validateOptionSelectProps(props);
   const context = useSearchBuilderQuietly();
 
@@ -175,7 +175,7 @@ export function OptionSelect<
     getValue,
     getLabel,
     ...restOfProps
-  } = props as OptionSelectConfig<Tkey, TValue, TItem, TIOption, TitemsObj>;
+  } = props;
 
   const selectId = useId();
   const labelId = `${selectId}-label`;
