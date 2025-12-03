@@ -23,6 +23,8 @@ export type GenericRegisteredField = {
   [K in FilterTypeKey]: RegisteredField<K, FilterTypeMap[K]>;
 }[FilterTypeKey];
 
+export type RegisteredFieldValue = GenericRegisteredField["value"];
+
 export type RegisteredFieldDictionary = Map<FilterName, GenericRegisteredField>;
 
 export const EMPTY_VALUE = "";

@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { GenericRegisteredField, RegisteredField, RegisteredFieldDictionary } from ".";
+import type { GenericRegisteredField, RegisteredField, RegisteredFieldDictionary, RegisteredFieldValue } from ".";
 import type {
   FieldOptions,
   FilterName,
@@ -12,13 +12,13 @@ import type {
   GenericField,
   PrimitiveFilterDictionary,
   PrimitiveValue,
-  ValueOf,
 } from "../field";
 import { empty, url } from "../persistence";
 import type { PersistenceAdapter } from "../persistence/PersistenceAdapter";
 import { FieldsCollection } from "./FieldsCollection";
 import { createEventEmitter, type EventEmitter, type Unsubscribe } from "./event-emitter";
 
+type SerializedValue = string & string[];
 export type FieldOperation = "set" | "flush" | "update" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
 
 export type FieldStoreConfig = {
@@ -119,10 +119,11 @@ export class FieldStore {
     } as unknown as GenericRegisteredField;
 
     this.#whitelist.push(field.name);
-    this.#override(registered, this.#parse(this.#initial[field.name], registered));
+    this.#override(registered, {
+      value: this.#parse(this.#initial[field.name], registered),
+    });
     this.#commit({ operation: "register", collection: new FieldsCollection(this.#fields) });
   }
-
   unregister = (name: FilterName) => {
     if (!this.exists(name)) {
       return;
@@ -161,11 +162,11 @@ export class FieldStore {
     return this.#state.collection.get(name) as RegisteredField<TKey, TValue> | undefined;
   };
 
-  set = (name: FilterName, value: GenericRegisteredField["value"] | null) => {
+  set = (name: FilterName, value: RegisteredFieldValue) => {
     this.#apply(name, value, "set");
   };
 
-  flush = (name: FilterName, value: GenericRegisteredField["value"] | null) => {
+  flush = (name: FilterName, value: RegisteredFieldValue) => {
     this.#apply(name, value, "flush");
   };
 
@@ -174,7 +175,9 @@ export class FieldStore {
 
     this.#fields.forEach((field) => {
       if (!Object.is(field.value, field.defaultValue)) {
-        this.#override(field, field.defaultValue as ValueOf<typeof field>);
+        this.#override(field, {
+          value: field.defaultValue as RegisteredFieldValue,
+        });
         touched.push(field.name);
       }
     });
@@ -202,14 +205,14 @@ export class FieldStore {
     return this.#emitter.on("change", (state) => listener(state));
   };
 
-  #apply(name: FilterName, value: GenericRegisteredField["value"] | null, operation: Extract<FieldOperation, "set" | "flush">) {
+  #apply(name: FilterName, value: RegisteredFieldValue | null, operation: Extract<FieldOperation, "set" | "flush">) {
     const field = this.#fields.get(name);
 
     if (!field || Object.is(field.value, value)) {
       return;
     }
 
-    this.#override(field, value as ValueOf<typeof field>);
+    this.#override(field, { value: value as RegisteredFieldValue });
 
     this.#commit({ operation, touched: [name], collection: new FieldsCollection(this.#fields) });
   }
@@ -221,7 +224,7 @@ export class FieldStore {
       const newValue = this.#parse(newValues[field.name], field);
 
       if (!Object.is(field.value, newValue)) {
-        this.#override(field, newValue);
+        this.#override(field, { value: newValue });
         touched.push(field.name);
       }
     });
@@ -239,19 +242,22 @@ export class FieldStore {
     this.#emitter.emit("change", this.#state);
   };
 
-  #parse = <T extends GenericRegisteredField>(newValue: PrimitiveValue, field: Pick<T, "defaultValue" | "serializer">): ValueOf<T> => {
+  #parse = <T extends GenericRegisteredField>(
+    newValue: PrimitiveValue,
+    field: Pick<T, "defaultValue" | "serializer">
+  ): RegisteredFieldValue => {
     if (newValue === undefined || newValue === null) {
-      return field.defaultValue as ValueOf<T>;
+      return field.defaultValue as RegisteredFieldValue;
     }
 
-    return field.serializer.unserialize(newValue as any) as ValueOf<T>;
+    return field.serializer.unserialize(newValue as SerializedValue) as RegisteredFieldValue;
   };
 
-  #override<F extends GenericRegisteredField>(field: F, newValue: ValueOf<F>): void {
+  #override<F extends GenericRegisteredField>(field: F, partial: Pick<F, "value">): void {
     this.#fields.set(field.name, {
       ...(field as F),
       updatedAt: Date.now(),
-      value: newValue,
+      ...partial,
     });
   }
 

@@ -40,7 +40,7 @@ export type FilterTypeKey = keyof FilterTypeMap;
 export type ScalarTypeKey = Exclude<FilterTypeKey, `${string}[]`>;
 export type ArrayTypeKey = Extract<FilterTypeKey, `${string}[]`>;
 
-export type FilterValue = FilterTypeMap[FilterTypeKey];
+export type FilterValue = FilterTypeMap[FilterTypeKey] | null;
 export type ScalarFilterValue = ScalarFilterTypeMap[keyof ScalarFilterTypeMap];
 export type ArrayFilterValue = ArrayFilterTypeMap[keyof ArrayFilterTypeMap];
 
@@ -99,15 +99,15 @@ export type ArrayFieldConfig<TKey extends ArrayTypeKey, TValue extends FilterTyp
 };
 
 export interface Field<TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]> extends FieldConfig<TKey, TValue> {
-  value: TValue;
+  value: TValue | null;
 }
 
 export interface ScalarField<TKey extends ScalarTypeKey, TValue extends FilterTypeMap[TKey]> extends ScalarFieldConfig<TKey, TValue> {
-  value: TValue;
+  value: TValue | null;
 }
 
 export interface ArrayField<TKey extends ArrayTypeKey, TValue extends FilterTypeMap[TKey]> extends ArrayFieldConfig<TKey, TValue> {
-  value: TValue;
+  value: TValue | null;
 }
 
 export type GenericField = {
