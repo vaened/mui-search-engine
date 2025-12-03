@@ -11,6 +11,10 @@ describe("Complex Type Inference (useFilterField)", () => {
         name: "query",
         type: "string",
         defaultValue: "initial" as string,
+        serializer: {
+          serialize: (v) => v,
+          unserialize: (v) => v,
+        },
       });
 
       expectTypeOf(value).toEqualTypeOf<string | null>();
@@ -25,6 +29,10 @@ describe("Complex Type Inference (useFilterField)", () => {
         name: "age",
         type: "number",
         defaultValue: 18 as number,
+        serializer: {
+          serialize: (v) => String(v),
+          unserialize: (v) => Number(v),
+        },
       });
 
       expectTypeOf(value).toEqualTypeOf<number | null>();
@@ -39,6 +47,10 @@ describe("Complex Type Inference (useFilterField)", () => {
         name: "isActive",
         type: "boolean",
         defaultValue: true as boolean,
+        serializer: {
+          serialize: (v) => v.toString(),
+          unserialize: (v) => v === "true",
+        },
       });
 
       expectTypeOf(value).toEqualTypeOf<boolean | null>();
