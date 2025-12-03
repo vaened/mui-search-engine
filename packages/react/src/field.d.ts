@@ -9,7 +9,7 @@ export type FilterName = string;
 export type FilterLabel = string;
 export type ArrayItemType<T> = T extends (infer U)[] ? U : never;
 export type FilterMultiLabel<T> = { value: ArrayItemType<T>; label: string }[];
-export type ValueOf<T> = T extends { value: infer V } ? V : never;
+export type ValueOf<T> = T extends { value: infer V } ? V | null : never;
 
 export type FilterMetaData = { label: FilterLabel; description?: string };
 export type FilterContext = FilterLabel | FilterMetaData;
@@ -63,7 +63,7 @@ export type Humanizer<TValue, TResponse = HumanizeReturnType<TValue>> = (value: 
 
 export type AsynchronousSerializer<TValue> = {
   serialize(value: TValue): SerializeReturnType<TValue>;
-  unserialize(value: SerializeReturnType<TValue>): Promise<NoInfer<TValue>> | undefined;
+  unserialize(value: SerializeReturnType<TValue>): Promise<NoInfer<TValue | undefined>>;
 };
 
 export type SynchronousSerializer<TValue> = {
