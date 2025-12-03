@@ -60,10 +60,18 @@ export type PrimitiveFilterDictionary = Record<FilterName, PrimitiveValue>;
 export type ValueFilterDictionary = Record<FilterName, FilterValue>;
 
 export type Humanizer<TValue, TResponse = HumanizeReturnType<TValue>> = (value: TValue, fields: FieldsCollection) => TResponse;
-export type Serializer<TValue> = {
+
+export type AsynchronousSerializer<TValue> = {
+  serialize(value: TValue): SerializeReturnType<TValue>;
+  unserialize(value: SerializeReturnType<TValue>): Promise<NoInfer<TValue>> | undefined;
+};
+
+export type SynchronousSerializer<TValue> = {
   serialize(value: TValue): SerializeReturnType<TValue>;
   unserialize(value: SerializeReturnType<TValue>): NoInfer<TValue> | undefined;
 };
+
+export type Serializer<TValue> = AsynchronousSerializer<TValue> | SynchronousSerializer<TValue>;
 
 export interface FieldOptions {
   submittable?: boolean;
