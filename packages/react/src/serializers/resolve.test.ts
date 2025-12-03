@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import type { ArrayFilterValue, Serializer } from "../field";
+import type { ArrayFilterValue, SynchronousSerializer } from "../field";
 import resolve from "./resolve";
 
 describe("resolve serializer", () => {
@@ -36,7 +36,7 @@ describe("resolve serializer", () => {
     });
 
     it("should accept various common date formats", () => {
-      const serializer = resolve("date") as Serializer<Date>;
+      const serializer = resolve("date") as SynchronousSerializer<Date>;
 
       const shortDate = serializer.unserialize("2023-01-30");
       expect(shortDate).toBeInstanceOf(Date);
@@ -82,9 +82,11 @@ describe("resolve serializer", () => {
     });
 
     it("should handle invalid items in 'date[]' by returning undefined elements", () => {
-      const serializer = resolve("date[]") as Serializer<ArrayFilterValue>;
+      const serializer = resolve("date[]") as SynchronousSerializer<ArrayFilterValue>;
 
       const result = serializer.unserialize(["2023-01-01", "not-a-date"]);
+
+      expect(Array.isArray(result)).toBe(true);
 
       expect(result?.[0]).toBeInstanceOf(Date);
       expect(result?.[1]).toBeUndefined();

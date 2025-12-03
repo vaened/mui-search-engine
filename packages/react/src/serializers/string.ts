@@ -3,10 +3,10 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { Serializer } from "../field";
+import type { SynchronousSerializer } from "../field";
 import { createSerializer } from "../serializers/resolve";
 
-export const stringSerializer: Serializer<string> = {
+export const stringSerializer: SynchronousSerializer<string> = {
   serialize(value: string) {
     return value.toString();
   },
@@ -15,4 +15,4 @@ export const stringSerializer: Serializer<string> = {
   },
 };
 
-export const createStringSerializer = <T extends string>() => createSerializer<T>(stringSerializer as Serializer<T>);
+export const createStringSerializer = <T extends string>() => createSerializer<T>(stringSerializer as SynchronousSerializer<T>);

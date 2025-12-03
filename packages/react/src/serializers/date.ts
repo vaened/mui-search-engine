@@ -3,10 +3,10 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { Serializer } from "../field";
+import type { SynchronousSerializer } from "../field";
 import { createSerializer } from "../serializers/resolve";
 
-export const dateSerializer: Serializer<Date> = {
+export const dateSerializer: SynchronousSerializer<Date> = {
   serialize(value: Date) {
     return value.toISOString();
   },

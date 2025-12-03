@@ -3,10 +3,10 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { Serializer } from "../field";
+import type { SynchronousSerializer } from "../field";
 import { createSerializer } from "../serializers/resolve";
 
-export const booleanSerializer: Serializer<boolean> = {
+export const booleanSerializer: SynchronousSerializer<boolean> = {
   serialize(value: boolean) {
     return value.toString();
   },

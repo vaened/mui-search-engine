@@ -3,9 +3,9 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { FilterValue, Serializer, SerializeReturnType } from "../field";
+import type { FilterValue, Serializer, SerializeReturnType, SynchronousSerializer } from "../field";
 
-export function createArraySerializer<V extends FilterValue>(serializer: Serializer<V>) {
+export function createArraySerializer<V extends FilterValue>(serializer: SynchronousSerializer<V>) {
   return {
     serialize(value: V[]): string[] {
       return value.map((v) => serializer.serialize(v) as string);

@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { FilterTypeKey, FilterValue, Serializer, SerializeReturnType } from "../field";
+import type { FilterTypeKey, FilterValue, SerializeReturnType, SynchronousSerializer } from "../field";
 import { createArraySerializer } from "../serializers/array";
 import { booleanSerializer } from "../serializers/boolean";
 import { dateSerializer } from "../serializers/date";
@@ -11,14 +11,14 @@ import { numberSerializer } from "../serializers/number";
 import { stringSerializer } from "../serializers/string";
 export { createArraySerializer } from "./array";
 
-export function createSerializer<T>(serializer: Serializer<T>): Serializer<T> {
+export function createSerializer<T>(serializer: SynchronousSerializer<T>): SynchronousSerializer<T> {
   return {
     serialize: (value: T) => serializer.serialize(value) as SerializeReturnType<T>,
     unserialize: (value: SerializeReturnType<T>) => serializer.unserialize(value) as NoInfer<T>,
   };
 }
 
-export default function resolve(type: FilterTypeKey): Serializer<FilterValue> {
+export default function resolve(type: FilterTypeKey): SynchronousSerializer<FilterValue> {
   switch (type) {
     case "string":
       return stringSerializer;
