@@ -77,13 +77,16 @@ export function SearchForm({
     const unsubscribe = store.onFieldChange(({ collection, operation, touched }) => {
       onChange?.(collection);
 
+      if (checkAutostartable()) {
+        return;
+      }
+
       const isForcedOperation = forcedOperations.includes(operation);
       const isValueOperation = valueOperations.includes(operation);
 
       const isSubmittableField = isValueOperation && touched.some((name) => collection.get(name)?.submittable);
-      const isReadyForNewSubmit = !checkAutostartable();
 
-      const canBeSubmitted = isReadyForNewSubmit && (submitOnChange || isForcedOperation || isSubmittableField);
+      const canBeSubmitted = submitOnChange || isForcedOperation || isSubmittableField;
 
       if (!canBeSubmitted) {
         return;
