@@ -29,7 +29,7 @@ export type FilterFieldReturn<TResolved, TRegistered> = {
 };
 
 export interface UseFilterFieldProps<TValue> {
-  defaultValue: TValue;
+  defaultValue?: TValue;
 }
 
 export interface FilterFieldConfig<TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]>
@@ -107,7 +107,7 @@ export function useFilterField<TKey extends FilterTypeKey, TValue extends Filter
       type,
       name,
       submittable,
-      value: defaultValue,
+      value: defaultValue ?? null,
       serializer,
       humanize,
       ...restOfProps,
