@@ -13,6 +13,7 @@ export * from "./contexts/SearchBuilderConfig";
 export * from "./contexts/SearchForm";
 
 export * from "./utils";
+export * from "./validations";
 
 export type * from "./field";
 export type * from "./internal";
