@@ -20,7 +20,9 @@ import React, {
 import { SearchBuilderContext, SearchStateContext } from ".";
 import type { PrimitiveFilterDictionary } from "../field";
 import { useResolveFieldStoreInstance } from "../hooks/useResolveFieldStoreInstance";
-import { CreateStoreOptions, FieldOperation, FieldsCollection, FieldStore } from "../store";
+import { CreateStoreOptions, FieldOperation, FieldsCollection, FieldStore, FieldStoreState } from "../store";
+
+const SKIP_PERSISTENCE = false;
 
 type FormProps = {
   onSubmit?: FormEventHandler;
@@ -49,7 +51,6 @@ function SearchStateContextProvider({ store, children }: { store: FieldStore; ch
 }
 
 const forcedOperations: FieldOperation[] = ["reset", "flush"];
-const valueOperations: FieldOperation[] = ["sync", "set"];
 
 export function SearchForm({
   children,
@@ -65,67 +66,59 @@ export function SearchForm({
   ...restOfProps
 }: SearchFormProps) {
   const autostarted = useRef(false);
-  const [isFormReady, setReadyState] = useState(manualStart === true);
   const [isAutoLoading, setAutoLoadingStatus] = useState(false);
-  const isLoading = isAutoLoading || loading;
 
   const store = useResolveFieldStoreInstance(source, configuration);
+  const isHydrating = useSyncExternalStore(store.subscribe, store.isHydrating, store.isHydrating);
+  const { isFormReady, markTimmerAsCompleted } = useReadyState({ isReady: manualStart === true, isHydrating });
+
+  const isLoading = isAutoLoading || loading || isHydrating;
 
   const checkAutostartable = useCallback(() => !autostarted.current && !manualStart, [manualStart]);
 
   useEffect(() => {
-    const unsubscribe = store.onFieldChange(({ collection, operation, touched }) => {
-      onChange?.(collection);
-
-      if (checkAutostartable()) {
-        return;
-      }
-
-      const isForcedOperation = forcedOperations.includes(operation);
-      const isValueOperation = valueOperations.includes(operation);
-
-      const isSubmittableField = isValueOperation && touched.some((name) => collection.get(name)?.submittable);
-
-      const canBeSubmitted = submitOnChange || isForcedOperation || isSubmittableField;
-
-      if (!canBeSubmitted) {
-        return;
-      }
-
-      dispatch(collection);
-    });
-
-    return () => unsubscribe();
-  }, [submitOnChange, checkAutostartable]);
-
-  useEffect(() => {
-    if (!checkAutostartable()) {
-      setReadyState(true);
+    if (!isFormReady) {
       return;
     }
 
-    const timmer = setTimeout(() => {
-      dispatch(store.collection());
+    const unsubscribe = store.onFieldChange(({ collection, operation, touched, isHydrating }) => {
+      if (operation === null) {
+        return;
+      }
+      
+      onChange?.(collection);
+      resolution({ collection, touched, operation, isHydrating });
+    });
+
+    return () => unsubscribe();
+  }, [submitOnChange, isFormReady]);
+
+  useEffect(() => {
+    if (!checkAutostartable()) {
+      markTimmerAsCompleted();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      dispatch();
       autostarted.current = true;
-      setReadyState(true);
+      markTimmerAsCompleted();
     }, autoStartDelay);
 
     return () => {
-      clearTimeout(timmer);
+      clearTimeout(timer);
       autostarted.current = false;
     };
   }, [store, autoStartDelay]);
 
   useEffect(() => {
-    const handleExternalUpdate = (newFields: FieldsCollection | undefined) => {
-      if (!newFields || submitOnChange) {
+    const unsubscribe = store.onPersistenceChange(({ touched }) => {
+      if (touched.length === 0) {
         return;
       }
 
-      onSearch?.(newFields);
-    };
-
-    const unsubscribe = store.onPersistenceChange(handleExternalUpdate);
+      dispatch(SKIP_PERSISTENCE);
+    });
 
     return () => unsubscribe();
   }, [store]);
@@ -133,7 +126,7 @@ export function SearchForm({
   const onSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      dispatch(store.collection());
+      dispatch();
     },
     [store.collection()]
   );
@@ -145,26 +138,46 @@ export function SearchForm({
       return;
     }
 
-    onSearch?.(newFields);
+    dispatch(SKIP_PERSISTENCE);
   }, []);
 
   const dispatch = useCallback(
-    function (values: FieldsCollection) {
-      const response = Promise.resolve(onSearch?.(values));
+    function (persist: boolean = true) {
+      store.whenReady("search-form", () => {
+        const response = Promise.resolve(onSearch?.(store.collection()));
 
-      setAutoLoadingStatus(true);
+        setAutoLoadingStatus(true);
 
-      response
-        .then((result) => {
-          if (result === false) {
-            return;
-          }
+        response
+          .then((result) => {
+            if (result === false || !persist) {
+              return;
+            }
 
-          store.persist();
-        })
-        .finally(() => setAutoLoadingStatus(false));
+            store.persist();
+          })
+          .finally(() => setTimeout(() => setAutoLoadingStatus(false), 1000));
+      });
     },
     [store]
+  );
+
+  const resolution = useCallback(
+    ({ collection, touched, operation }: FieldStoreState) => {
+      const isForcedOperation = forcedOperations.includes(operation);
+      const isSetOperation = operation === "set";
+
+      const isSubmittableField = isSetOperation && touched.some((name) => collection.get(name)?.submittable);
+
+      const canBeSubmitted = submitOnChange || isForcedOperation || isSubmittableField;
+
+      if (!canBeSubmitted) {
+        return;
+      }
+
+      dispatch();
+    },
+    [submitOnChange]
   );
 
   const value = useMemo(
@@ -193,4 +206,27 @@ export function SearchForm({
   );
 }
 
+function useReadyState({ isReady, isHydrating }: { isReady: boolean; isHydrating: boolean }) {
+  const [isFormReady, setReadyState] = useState(isReady);
+  const [isTimerCompleted, setTimerStatus] = useState(isReady);
+
+  useEffect(() => {
+    if (isFormReady) {
+      return;
+    }
+
+    if (isTimerCompleted && !isHydrating) {
+      setReadyState(true);
+    }
+  }, [isFormReady, isTimerCompleted, isHydrating]);
+
+  function markTimmerAsCompleted() {
+    setTimerStatus(true);
+  }
+
+  return {
+    isFormReady,
+    markTimmerAsCompleted,
+  };
+}
 export default SearchForm;
