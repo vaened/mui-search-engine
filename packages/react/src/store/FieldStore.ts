@@ -114,16 +114,16 @@ export class FieldStore {
 
     results.forEach((result, index) => {
       const field = this.#fields.get(deferredFieldNames[index]);
-      const isSucessful = result.status === "fulfilled";
+      const isSuccessful = result.status === "fulfilled";
 
       if (field === undefined) {
         return;
       }
 
       this.#tracker.release();
-      const value = (!isSucessful ? field.value : result.value) ?? field.defaultValue;
+      const value = (!isSuccessful ? field.value : result.value) ?? field.defaultValue;
 
-      if (isSucessful && this.#isDirty(field, result.value)) {
+      if (isSuccessful && this.#isDirty(field, result.value)) {
         touched.push(field.name);
       }
 
