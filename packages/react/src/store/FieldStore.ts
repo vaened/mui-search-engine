@@ -23,11 +23,6 @@ import { createTaskMonitor, TaskMonitor } from "./task-monitor";
 type SerializedValue = string & string[];
 export type FieldOperation = "set" | "flush" | "update" | "hydrate" | "unregister" | "register" | "rehydrate" | "reset" | null;
 
-export type FieldStoreConfig = {
-  persistence?: PersistenceAdapter;
-  emitter?: EventEmitter;
-};
-
 export type AsynchronousValue = { deferred: true; hydrated: Promise<RegisteredFieldValue> };
 export type SynchronousValue = { deferred: false; hydrated: RegisteredFieldValue };
 export type ParseValue = AsynchronousValue | SynchronousValue;

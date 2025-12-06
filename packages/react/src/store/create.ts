@@ -1,9 +1,15 @@
 import { empty, url } from "../persistence";
-import { createEventEmitter } from "./event-emitter";
-import { FieldStore, FieldStoreConfig } from "./FieldStore";
+import { PersistenceAdapter } from "../persistence/PersistenceAdapter";
+import { createEventEmitter, EventEmitter } from "./event-emitter";
+import { FieldStore } from "./FieldStore";
 
-type CreateStoreConfigResolver = () => FieldStoreConfig;
-type CreateStoreQuickOptions = { persistInUrl: boolean };
+export type FieldStoreConfig = {
+  persistence?: PersistenceAdapter;
+  emitter?: EventEmitter;
+};
+
+export type CreateStoreConfigResolver = () => FieldStoreConfig;
+export type CreateStoreQuickOptions = { persistInUrl: boolean };
 export type CreateStoreOptions = FieldStoreConfig | CreateStoreQuickOptions | CreateStoreConfigResolver;
 
 export function createFieldStore(options: CreateStoreQuickOptions): FieldStore;
