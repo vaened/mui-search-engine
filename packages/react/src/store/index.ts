@@ -6,3 +6,4 @@
 export * from "./event-emitter";
 export * from "./FieldsCollection";
 export * from "./FieldStore";
+export * from "./create";
