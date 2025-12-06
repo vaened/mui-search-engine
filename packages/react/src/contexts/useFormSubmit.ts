@@ -43,7 +43,7 @@ export function useFormSubmit({ store, submitOnChange, onSearch }: UseFormSubmit
     [store]
   );
 
-  const resolution = useCallback(
+  const performAutoSearch = useCallback(
     ({ collection, touched, operation }: FieldStoreState) => {
       const isForcedOperation = forcedOperations.includes(operation);
       const isSetOperation = operation === "set";
@@ -64,6 +64,6 @@ export function useFormSubmit({ store, submitOnChange, onSearch }: UseFormSubmit
   return {
     isAutoLoading,
     dispatch,
-    resolution,
+    performAutoSearch,
   };
 }
