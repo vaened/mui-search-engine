@@ -22,7 +22,7 @@ import { createEventEmitter, type EventEmitter, type Unsubscribe } from "./event
 import { createTaskMonitor, TaskMonitor } from "./task-monitor";
 
 type SerializedValue = string & string[];
-export type FieldOperation = "set" | "flush" | "update" | "hydrate" | "unregister" | "register" | "sync" | "reset" | null;
+export type FieldOperation = "set" | "flush" | "update" | "hydrate" | "unregister" | "register" | "rehydrate" | "reset" | null;
 
 export type FieldStoreConfig = {
   persistence?: PersistenceAdapter;
@@ -88,7 +88,7 @@ export class FieldStore {
     return () => this.#state.collection.get(name) as RegisteredField<TKey, TValue> | undefined;
   };
 
-  sync = async (): Promise<void> => {
+  rehydrate = async (): Promise<void> => {
     const newValues = this.#persistence.read();
     const touched: FilterName[] = [];
     const hydrators: Record<FilterName, Promise<FilterValue>> = {};
@@ -142,7 +142,7 @@ export class FieldStore {
       return;
     }
 
-    this.#commit({ operation: "sync", touched });
+    this.#commit({ operation: "rehydrate", touched });
   };
 
   persist = () => {
@@ -259,7 +259,7 @@ export class FieldStore {
 
   onPersistenceChange = (listener: (state: FieldStoreState) => void): Unsubscribe => {
     return this.#persistence.subscribe(async () => {
-      await this.sync();
+      await this.rehydrate();
       listener(this.#state);
     });
   };

@@ -189,7 +189,7 @@ describe("FieldStore", () => {
     });
   });
 
-  describe("3. Persistence (Sync/Persist)", () => {
+  describe("3. Persistence (Rehydrate/Persist)", () => {
     it("should write to persistence and emit 'persist' on persist()", () => {
       store.register(createTestField("q", "test"));
       emitSpy.mockClear();
@@ -201,20 +201,20 @@ describe("FieldStore", () => {
       expect(emitSpy).toHaveBeenCalledWith("persist", expect.anything());
     });
 
-    it("should sync from persistence and emit change", async () => {
+    it("should rehydrate from persistence and emit change", async () => {
       store.register(createTestField("category", "books"));
       emitSpy.mockClear();
 
       persistence.read = vi.fn().mockReturnValue({ category: "movies" });
 
-      await store.sync();
+      await store.rehydrate();
 
       expect(store.get("category")?.value).toBe("movies");
 
       expect(emitSpy).toHaveBeenCalledWith(
         "change",
         expect.objectContaining({
-          operation: "sync",
+          operation: "rehydrate",
           touched: ["category"],
         })
       );
