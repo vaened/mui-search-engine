@@ -270,7 +270,7 @@ export class FieldStore {
     return this.#emitter.on("change", (state) => listener(state));
   };
 
-  #apply(name: FilterName, value: RegisteredFieldValue | null, operation: Extract<FieldOperation, "set" | "flush">) {
+  #apply(name: FilterName, value: RegisteredFieldValue, operation: Extract<FieldOperation, "set" | "flush">) {
     const field = this.#fields.get(name);
 
     if (!field || Object.is(field.value, value)) {
