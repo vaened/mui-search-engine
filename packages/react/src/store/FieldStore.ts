@@ -22,7 +22,7 @@ import { createEventEmitter, type EventEmitter, type Unsubscribe } from "./event
 import { createTaskMonitor, TaskMonitor } from "./task-monitor";
 
 type SerializedValue = string & string[];
-export type FieldOperation = "set" | "flush" | "update" | "hydrate" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
+export type FieldOperation = "set" | "flush" | "update" | "hydrate" | "unregister" | "register" | "sync" | "reset" | null;
 
 export type FieldStoreConfig = {
   persistence?: PersistenceAdapter;
@@ -153,42 +153,6 @@ export class FieldStore {
     this.#emitter.emit("persist", collection);
   };
 
-  rehydrate = (newValues: PrimitiveFilterDictionary): FieldsCollection | undefined => {
-    const touched: FilterName[] = [];
-    let someFieldIsDeferred = false;
-
-    this.#fields.forEach((field) => {
-      const parsed = this.#parse(newValues[field.name], field);
-      const { deferred, hydrated } = parsed;
-      someFieldIsDeferred = someFieldIsDeferred || deferred;
-
-      this.#process(field, parsed);
-
-      if (!deferred && this.#isDirty(field, hydrated)) {
-        this.#override(field, { value: hydrated });
-        touched.push(field.name);
-      }
-
-      if (deferred) {
-        this.#override(field, { isHydrating: true });
-      }
-    });
-
-    if (touched.length > 0) {
-      const collection = new FieldsCollection(this.#fields);
-
-      this.#commit({ operation: "rehydrate", collection, touched });
-
-      return collection;
-    }
-
-    if (someFieldIsDeferred) {
-      this.#commit();
-    }
-
-    return;
-  };
-
   register<F extends GenericField>(field: F): void {
     if (this.exists(field.name)) {
       throwAlreadyRegisteredErrorFor(field, this.#fields);
@@ -270,7 +234,7 @@ export class FieldStore {
     this.#apply(name, value, "flush");
   };
 
-  reset = (newValues: ValueFilterDictionary = {}) => {
+  reset = (newValues: ValueFilterDictionary = {}): FilterName[] | undefined => {
     const touched: FilterName[] = [];
 
     this.#fields.forEach((field) => {
@@ -287,6 +251,8 @@ export class FieldStore {
     }
 
     this.#commit({ operation: "reset", collection: new FieldsCollection(this.#fields), touched });
+
+    return touched;
   };
 
   clean = () => {

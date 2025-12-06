@@ -18,7 +18,7 @@ import React, {
   type ReactNode,
 } from "react";
 import { SearchBuilderContext, SearchStateContext } from ".";
-import type { PrimitiveFilterDictionary } from "../field";
+import type { ValueFilterDictionary } from "../field";
 import { useResolveFieldStoreInstance } from "../hooks/useResolveFieldStoreInstance";
 import { CreateStoreOptions, FieldOperation, FieldsCollection, FieldStore, FieldStoreState } from "../store";
 import { useReadyState } from "./useReadyState";
@@ -132,8 +132,8 @@ export function SearchForm({
     [store.collection()]
   );
 
-  const refresh = useCallback((dictionary: PrimitiveFilterDictionary) => {
-    const newFields = store.rehydrate(dictionary);
+  const refresh = useCallback((dictionary: ValueFilterDictionary) => {
+    const newFields = store.reset(dictionary);
 
     if (!newFields) {
       return;
@@ -157,7 +157,7 @@ export function SearchForm({
 
             store.persist();
           })
-          .finally(() => setTimeout(() => setAutoLoadingStatus(false), 1000));
+          .finally(() => setTimeout(() => setAutoLoadingStatus(false), 500));
       });
     },
     [store]
