@@ -47,6 +47,15 @@ export type ArrayFilterValue = ArrayFilterTypeMap[keyof ArrayFilterTypeMap];
 export type HumanizeReturnType<T> = T extends unknown[] ? FilterMultiLabel<T>[] : string;
 export type SerializeReturnType<T> = T extends unknown[] ? string[] : string;
 
+export type ValidationStatus = {
+  value: boolean;
+  message?: string;
+};
+
+export type ValidationResponse = boolean | ValidationStatus;
+export type ValidationRule<TValue> = (value: TValue, fields: FieldsCollection) => ValidationResponse;
+export type ValidationSchema<TValue> = Array<ValidationRule<TValue>>;
+
 export interface PlainFilterChip {
   label: FilterLabel;
 }
@@ -58,6 +67,8 @@ export type PrimitiveValue = string | string[];
 export type HumanizedValue<V extends ArrayFilterValue> = string | ReadonlyArray<IndexedFilterChip<V>>;
 export type PrimitiveFilterDictionary = Record<FilterName, PrimitiveValue>;
 export type ValueFilterDictionary = Record<FilterName, FilterValue>;
+
+export type Validator<TValue> = (value: TValue, collection: FieldsCollection) => ValidationSchema<TValue>;
 
 export type Humanizer<TValue, TResponse = HumanizeReturnType<TValue>> = (value: TValue, fields: FieldsCollection) => TResponse;
 
@@ -81,6 +92,7 @@ export interface FieldConfig<TKey extends FilterTypeKey, TValue extends FilterTy
   type: TKey;
   name: FilterName;
   humanize: Humanizer<TValue>;
+  validate?: Validator<TValue>;
   serializer: Serializer<TValue>;
 }
 
@@ -88,6 +100,7 @@ export type ScalarFieldConfig<TKey extends ScalarTypeKey, TValue extends FilterT
   name: FilterName;
   type: TKey;
   humanize?: Humanizer<TValue, string>;
+  validate?: Validator<TValue>;
   serializer?: Serializer<TValue>;
 };
 
@@ -95,6 +108,7 @@ export type ArrayFieldConfig<TKey extends ArrayTypeKey, TValue extends FilterTyp
   name: FilterName;
   type: TKey;
   humanize?: Humanizer<TValue, FilterMultiLabel<TValue>>;
+  validate?: Validator<TValue>;
   serializer?: Serializer<TValue>;
 };
 
