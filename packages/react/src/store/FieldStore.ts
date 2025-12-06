@@ -13,6 +13,7 @@ import type {
   GenericField,
   PrimitiveFilterDictionary,
   PrimitiveValue,
+  ValueFilterDictionary,
 } from "../field";
 import { empty, url } from "../persistence";
 import type { PersistenceAdapter } from "../persistence/PersistenceAdapter";
@@ -269,14 +270,14 @@ export class FieldStore {
     this.#apply(name, value, "flush");
   };
 
-  reset = () => {
+  reset = (newValues: ValueFilterDictionary = {}) => {
     const touched: FilterName[] = [];
 
     this.#fields.forEach((field) => {
-      if (!Object.is(field.value, field.defaultValue)) {
-        this.#override(field, {
-          value: field.defaultValue as RegisteredFieldValue,
-        });
+      const value = newValues[field.name] ?? field.defaultValue;
+
+      if (this.#isDirty(field, value)) {
+        this.#override(field, { value });
         touched.push(field.name);
       }
     });
