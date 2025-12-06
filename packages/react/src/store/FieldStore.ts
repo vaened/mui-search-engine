@@ -303,7 +303,7 @@ export class FieldStore {
     return this.#emitter.on("persist", listener);
   };
 
-  onFieldChange = (listener: (state: FieldStoreState) => void): Unsubscribe => {
+  onStateChange = (listener: (state: FieldStoreState) => void): Unsubscribe => {
     return this.#emitter.on("change", (state) => listener(state));
   };
 

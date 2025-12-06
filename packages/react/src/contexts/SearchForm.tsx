@@ -82,7 +82,7 @@ export function SearchForm({
       return;
     }
 
-    const unsubscribe = store.onFieldChange(({ collection, operation, touched, isHydrating }) => {
+    const unsubscribe = store.onStateChange(({ collection, operation, touched, isHydrating }) => {
       if (operation === null) {
         return;
       }
