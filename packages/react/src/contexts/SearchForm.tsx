@@ -21,6 +21,7 @@ import { SearchBuilderContext, SearchStateContext } from ".";
 import type { PrimitiveFilterDictionary } from "../field";
 import { useResolveFieldStoreInstance } from "../hooks/useResolveFieldStoreInstance";
 import { CreateStoreOptions, FieldOperation, FieldsCollection, FieldStore, FieldStoreState } from "../store";
+import { useReadyState } from "./useReadyState";
 
 const SKIP_PERSISTENCE = false;
 
@@ -85,7 +86,7 @@ export function SearchForm({
       if (operation === null) {
         return;
       }
-      
+
       onChange?.(collection);
       resolution({ collection, touched, operation, isHydrating });
     });
@@ -206,27 +207,4 @@ export function SearchForm({
   );
 }
 
-function useReadyState({ isReady, isHydrating }: { isReady: boolean; isHydrating: boolean }) {
-  const [isFormReady, setReadyState] = useState(isReady);
-  const [isTimerCompleted, setTimerStatus] = useState(isReady);
-
-  useEffect(() => {
-    if (isFormReady) {
-      return;
-    }
-
-    if (isTimerCompleted && !isHydrating) {
-      setReadyState(true);
-    }
-  }, [isFormReady, isTimerCompleted, isHydrating]);
-
-  function markTimmerAsCompleted() {
-    setTimerStatus(true);
-  }
-
-  return {
-    isFormReady,
-    markTimmerAsCompleted,
-  };
-}
 export default SearchForm;
