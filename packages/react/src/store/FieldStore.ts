@@ -56,7 +56,7 @@ export class FieldStore {
     this.#fields = new Map();
     this.#persistence = persistence;
     this.#emitter = emitter;
-    this.#initial = persistence.read() ?? {};
+    this.#initial = persistence.read();
     this.#state = this.#initialState();
     this.#whitelist = [];
     this.#tracker = createTaskMonitor();
