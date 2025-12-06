@@ -13,6 +13,7 @@ import type {
   GenericField,
   PrimitiveFilterDictionary,
   PrimitiveValue,
+  Serializer,
   ValueFilterDictionary,
 } from "../field";
 import type { PersistenceAdapter } from "../persistence/PersistenceAdapter";
@@ -20,7 +21,6 @@ import { FieldsCollection } from "./FieldsCollection";
 import { type EventEmitter, type Unsubscribe } from "./event-emitter";
 import { createTaskMonitor, TaskMonitor } from "./task-monitor";
 
-type SerializedValue = string & string[];
 export type FieldOperation = "set" | "flush" | "update" | "hydrate" | "unregister" | "register" | "rehydrate" | "reset" | null;
 
 export type AsynchronousValue = { deferred: true; hydrated: Promise<RegisteredFieldValue> };
@@ -341,7 +341,9 @@ export class FieldStore {
       };
     }
 
-    const hydrated = field.serializer.unserialize(newValue as SerializedValue);
+    const unserialize = field.serializer.unserialize as Serializer<RegisteredFieldValue>["unserialize"];
+
+    const hydrated = unserialize(newValue);
     const deferred = hydrated instanceof Promise;
 
     return { deferred, hydrated } as ParseValue;
