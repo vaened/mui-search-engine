@@ -12,18 +12,15 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
-  useState,
   useSyncExternalStore,
   type ReactNode,
 } from "react";
 import { SearchBuilderContext, SearchStateContext } from ".";
 import type { ValueFilterDictionary } from "../field";
 import { useResolveFieldStoreInstance } from "../hooks/useResolveFieldStoreInstance";
-import { CreateStoreOptions, FieldOperation, FieldsCollection, FieldStore, FieldStoreState } from "../store";
+import { CreateStoreOptions, FieldsCollection, FieldStore } from "../store";
+import { SKIP_PERSISTENCE, useFormSubmit } from "./useFormSubmit";
 import { useReadyState } from "./useReadyState";
-
-const SKIP_PERSISTENCE = false;
 
 type FormProps = {
   onSubmit?: FormEventHandler;
@@ -51,8 +48,6 @@ function SearchStateContextProvider({ store, children }: { store: FieldStore; ch
   return <SearchStateContext.Provider value={{ state }}>{children}</SearchStateContext.Provider>;
 }
 
-const forcedOperations: FieldOperation[] = ["reset", "flush"];
-
 export function SearchForm({
   children,
   store: source,
@@ -66,16 +61,13 @@ export function SearchForm({
   onChange,
   ...restOfProps
 }: SearchFormProps) {
-  const autostarted = useRef(false);
-  const [isAutoLoading, setAutoLoadingStatus] = useState(false);
-
   const store = useResolveFieldStoreInstance(source, configuration);
+  const { dispatch, resolution, isAutoLoading } = useFormSubmit({ store, submitOnChange, onSearch });
+
   const isHydrating = useSyncExternalStore(store.subscribe, store.isHydrating, store.isHydrating);
   const { isFormReady, markTimmerAsCompleted } = useReadyState({ isReady: manualStart === true, isHydrating });
 
   const isLoading = isAutoLoading || loading || isHydrating;
-
-  const checkAutostartable = useCallback(() => !autostarted.current && !manualStart, [manualStart]);
 
   useEffect(() => {
     if (!isFormReady) {
@@ -92,25 +84,22 @@ export function SearchForm({
     });
 
     return () => unsubscribe();
-  }, [submitOnChange, isFormReady]);
+  }, [isFormReady, resolution]);
 
   useEffect(() => {
-    if (!checkAutostartable()) {
-      markTimmerAsCompleted();
+    if (isFormReady) {
       return;
     }
 
     const timer = setTimeout(() => {
       dispatch();
-      autostarted.current = true;
       markTimmerAsCompleted();
     }, autoStartDelay);
 
     return () => {
       clearTimeout(timer);
-      autostarted.current = false;
     };
-  }, [store, autoStartDelay]);
+  }, [store, isFormReady, autoStartDelay]);
 
   useEffect(() => {
     const unsubscribe = store.onPersistenceChange(({ touched }) => {
@@ -124,14 +113,6 @@ export function SearchForm({
     return () => unsubscribe();
   }, [store]);
 
-  const onSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      dispatch();
-    },
-    [store.collection()]
-  );
-
   const refresh = useCallback((dictionary: ValueFilterDictionary) => {
     const newFields = store.reset(dictionary);
 
@@ -142,43 +123,12 @@ export function SearchForm({
     dispatch(SKIP_PERSISTENCE);
   }, []);
 
-  const dispatch = useCallback(
-    function (persist: boolean = true) {
-      store.whenReady("search-form", () => {
-        const response = Promise.resolve(onSearch?.(store.collection()));
-
-        setAutoLoadingStatus(true);
-
-        response
-          .then((result) => {
-            if (result === false || !persist) {
-              return;
-            }
-
-            store.persist();
-          })
-          .finally(() => setTimeout(() => setAutoLoadingStatus(false), 500));
-      });
-    },
-    [store]
-  );
-
-  const resolution = useCallback(
-    ({ collection, touched, operation }: FieldStoreState) => {
-      const isForcedOperation = forcedOperations.includes(operation);
-      const isSetOperation = operation === "set";
-
-      const isSubmittableField = isSetOperation && touched.some((name) => collection.get(name)?.submittable);
-
-      const canBeSubmitted = submitOnChange || isForcedOperation || isSubmittableField;
-
-      if (!canBeSubmitted) {
-        return;
-      }
-
+  const onSubmit = useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
       dispatch();
     },
-    [submitOnChange]
+    [dispatch]
   );
 
   const value = useMemo(
