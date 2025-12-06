@@ -111,11 +111,9 @@ export class FieldStore {
 
     const deferredFieldNames = Object.keys(hydrators);
 
-    if (touched.length === 0 && deferredFieldNames.length === 0) {
-      return;
+    if (touched.length > 0 || deferredFieldNames.length > 0) {
+      this.#commit();
     }
-
-    this.#commit();
 
     const results = await Promise.allSettled(Object.values(hydrators));
 
