@@ -30,7 +30,9 @@ export function useFormSubmit({ store, submitOnChange, isHydrating, manualStart,
       store.whenReady("search-form", () => {
         const response = Promise.resolve(onSearch?.(store.collection()));
 
-        setLoadingStatus(true);
+        const loadingTimer = setTimeout(() => {
+          setLoadingStatus(true);
+        }, 200);
 
         response
           .then((result) => {
@@ -41,9 +43,8 @@ export function useFormSubmit({ store, submitOnChange, isHydrating, manualStart,
             store.persist();
           })
           .finally(() => {
-            setTimeout(() => {
-              setLoadingStatus(false);
-            }, 500);
+            clearTimeout(loadingTimer);
+            setLoadingStatus(false);
           });
       });
     },
