@@ -246,7 +246,6 @@ export class FieldStore {
   clean = () => {
     this.#fields.clear();
     this.#whitelist = [];
-    this.#initial = {};
     this.#commit(this.#initialState());
   };
 
