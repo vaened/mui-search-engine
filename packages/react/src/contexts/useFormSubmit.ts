@@ -3,8 +3,9 @@
  * @link https://vaened.dev DevFolio
  */
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { FieldOperation, FieldsCollection, FieldStore, FieldStoreState } from "../store";
+import { useFormStatus } from "./useFormStatus";
 
 export type SubmitResult = void | boolean;
 export type Submit = (params: FieldsCollection) => SubmitResult | Promise<SubmitResult>;
@@ -15,19 +16,21 @@ export type UseFormSubmitProps = {
   store: FieldStore;
   onSearch?: Submit;
   submitOnChange: boolean;
+  isHydrating: boolean;
+  manualStart?: boolean;
 };
 
 const forcedOperations: FieldOperation[] = ["reset", "flush"];
 
-export function useFormSubmit({ store, submitOnChange, onSearch }: UseFormSubmitProps) {
-  const [isAutoLoading, setAutoLoadingStatus] = useState(false);
+export function useFormSubmit({ store, submitOnChange, isHydrating, manualStart, onSearch }: UseFormSubmitProps) {
+  const { isFormLoading, setLoadingStatus } = useFormStatus({ isHydrating, manualStart });
 
   const dispatch = useCallback(
     function (persist: boolean = true) {
       store.whenReady("search-form", () => {
         const response = Promise.resolve(onSearch?.(store.collection()));
 
-        setAutoLoadingStatus(true);
+        setLoadingStatus(true);
 
         response
           .then((result) => {
@@ -37,7 +40,11 @@ export function useFormSubmit({ store, submitOnChange, onSearch }: UseFormSubmit
 
             store.persist();
           })
-          .finally(() => setTimeout(() => setAutoLoadingStatus(false), 500));
+          .finally(() => {
+            setTimeout(() => {
+              setLoadingStatus(false);
+            }, 500);
+          });
       });
     },
     [store]
@@ -62,7 +69,7 @@ export function useFormSubmit({ store, submitOnChange, onSearch }: UseFormSubmit
   );
 
   return {
-    isAutoLoading,
+    isFormLoading,
     dispatch,
     performAutoSearch,
   };

@@ -62,12 +62,18 @@ export function SearchForm({
   ...restOfProps
 }: SearchFormProps) {
   const store = useResolveFieldStoreInstance(source, configuration);
-  const { isAutoLoading, dispatch, performAutoSearch } = useFormSubmit({ store, submitOnChange, onSearch });
 
   const isHydrating = useSyncExternalStore(store.subscribe, store.isHydrating, store.isHydrating);
   const { isFormReady, markTimmerAsCompleted } = useReadyState({ isReady: manualStart === true, isHydrating });
+  const { isFormLoading, dispatch, performAutoSearch } = useFormSubmit({
+    store,
+    submitOnChange,
+    isHydrating,
+    manualStart,
+    onSearch,
+  });
 
-  const isLoading = isAutoLoading || loading || isHydrating;
+  const isLoading = isFormLoading || loading;
 
   useEffect(() => {
     if (!isFormReady) {
