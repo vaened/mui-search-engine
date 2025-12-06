@@ -76,7 +76,7 @@ describe("FieldStore", () => {
     });
   });
 
-  describe("2. State Manipulation (Set/Update/Reset/Rehydrate/Clean)", () => {
+  describe("2. State Manipulation (Set/Update/Reset/Clean)", () => {
     it("should update value with set() and emit event", () => {
       store.register(createTestField("query", "initial"));
       emitSpy.mockClear();
@@ -144,12 +144,12 @@ describe("FieldStore", () => {
       );
     });
 
-    it("should rehydrate state from dictionary and emit 'rehydrate'", () => {
+    it("should reset state from dictionary and emit 'reset'", () => {
       store.register(createTestField("category", "default"));
       emitSpy.mockClear();
 
       const newValues = { category: "fantasy" };
-      const result = store.rehydrate(newValues);
+      const result = store.reset(newValues);
 
       expect(store.get("category")?.value).toBe("fantasy");
 
@@ -158,17 +158,17 @@ describe("FieldStore", () => {
       expect(emitSpy).toHaveBeenCalledWith(
         "change",
         expect.objectContaining({
-          operation: "rehydrate",
+          operation: "reset",
           touched: ["category"],
         })
       );
     });
 
-    it("should NOT rehydrate if values are identical", () => {
+    it("should NOT reset if values are identical", () => {
       store.register(createTestField("category", "default"));
       emitSpy.mockClear();
 
-      const result = store.rehydrate({ category: "default" });
+      const result = store.reset({ category: "default" });
 
       expect(result).toBeUndefined();
       expect(emitSpy).not.toHaveBeenCalled();
@@ -201,13 +201,13 @@ describe("FieldStore", () => {
       expect(emitSpy).toHaveBeenCalledWith("persist", expect.anything());
     });
 
-    it("should sync from persistence and emit change", () => {
+    it("should sync from persistence and emit change", async () => {
       store.register(createTestField("category", "books"));
       emitSpy.mockClear();
 
       persistence.read = vi.fn().mockReturnValue({ category: "movies" });
 
-      store.sync();
+      await store.sync();
 
       expect(store.get("category")?.value).toBe("movies");
 
