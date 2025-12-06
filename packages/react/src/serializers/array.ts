@@ -3,7 +3,7 @@
  * @link https://vaened.dev DevFolio
  */
 
-import type { FilterValue, Serializer, SerializeReturnType, SynchronousSerializer } from "../field";
+import type { FilterValue, SerializeReturnType, SynchronousSerializer } from "../field";
 
 export function createArraySerializer<V extends FilterValue>(serializer: SynchronousSerializer<V>) {
   return {
@@ -14,5 +14,5 @@ export function createArraySerializer<V extends FilterValue>(serializer: Synchro
       const values = value.map((v) => serializer.unserialize(v as SerializeReturnType<V>));
       return values.filter((v) => v !== undefined);
     },
-  } as Serializer<V[]>;
+  } as SynchronousSerializer<V[]>;
 }
