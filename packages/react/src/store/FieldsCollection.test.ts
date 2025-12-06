@@ -14,6 +14,7 @@ const createField = (
     type: type as any,
     value,
     defaultValue: null,
+    isHydrating: false,
     updatedAt: Date.now(),
     submittable: true,
     humanize: (v: any) => String(v),

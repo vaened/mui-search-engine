@@ -9,6 +9,7 @@ import type {
   FilterName,
   FilterTypeKey,
   FilterTypeMap,
+  FilterValue,
   GenericField,
   PrimitiveFilterDictionary,
   PrimitiveValue,
@@ -17,9 +18,10 @@ import { empty, url } from "../persistence";
 import type { PersistenceAdapter } from "../persistence/PersistenceAdapter";
 import { FieldsCollection } from "./FieldsCollection";
 import { createEventEmitter, type EventEmitter, type Unsubscribe } from "./event-emitter";
+import { createTaskMonitor, TaskMonitor } from "./task-monitor";
 
 type SerializedValue = string & string[];
-export type FieldOperation = "set" | "flush" | "update" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
+export type FieldOperation = "set" | "flush" | "update" | "hydrate" | "unregister" | "register" | "rehydrate" | "sync" | "reset" | null;
 
 export type FieldStoreConfig = {
   persistence?: PersistenceAdapter;
@@ -30,15 +32,23 @@ type CreateStoreConfigResolver = () => FieldStoreConfig;
 type CreateStoreQuickOptions = { persistInUrl: boolean };
 export type CreateStoreOptions = FieldStoreConfig | CreateStoreQuickOptions | CreateStoreConfigResolver;
 
+export type AsynchronousValue = { deferred: true; hydrated: Promise<RegisteredFieldValue> };
+export type SynchronousValue = { deferred: false; hydrated: RegisteredFieldValue };
+export type ParseValue = AsynchronousValue | SynchronousValue;
+
+export type HydratorResponse = { label: string; value: FilterValue };
+
 export type FieldStoreState = Readonly<{
   collection: FieldsCollection;
   operation: FieldOperation;
   touched: FilterName[];
+  isHydrating: boolean;
 }>;
 
 export class FieldStore {
   readonly #persistence: PersistenceAdapter;
   readonly #emitter: EventEmitter;
+  readonly #tracker: TaskMonitor;
 
   #whitelist: FilterName[];
   #initial: PrimitiveFilterDictionary;
@@ -53,6 +63,7 @@ export class FieldStore {
     this.#initial = persistence.read() ?? {};
     this.#state = this.#initialState();
     this.#whitelist = [];
+    this.#tracker = createTaskMonitor();
   }
 
   state = () => this.#state;
@@ -60,6 +71,10 @@ export class FieldStore {
   exists = (name: FilterName) => this.#fields.has(name);
 
   collection = () => this.#state.collection;
+
+  isHydrating = () => this.#tracker.isHydrating();
+
+  whenReady = (name: string, task: () => void) => this.#tracker.whenReady(name, task);
 
   subscribe = (listener: () => void): Unsubscribe => {
     this.#listeners.add(listener);
@@ -72,19 +87,63 @@ export class FieldStore {
     return () => this.#state.collection.get(name) as RegisteredField<TKey, TValue> | undefined;
   };
 
-  sync = (): FieldsCollection | undefined => {
+  sync = async (): Promise<void> => {
     const newValues = this.#persistence.read();
-    const touched = this.#fillFieldsFrom(newValues);
+    const touched: FilterName[] = [];
+    const hydrators: Record<FilterName, Promise<FilterValue>> = {};
 
-    if (!touched) {
+    for (const field of this.#fields.values()) {
+      const { deferred, hydrated } = this.#parse(newValues[field.name], field);
+
+      if (deferred) {
+        this.#tracker.capture();
+        this.#override(field, { isHydrating: true });
+        hydrators[field.name] = hydrated;
+        continue;
+      }
+
+      if (this.#isDirty(field, hydrated)) {
+        this.#override(field, { value: hydrated });
+        touched.push(field.name);
+      }
+    }
+
+    const deferredFieldNames = Object.keys(hydrators);
+
+    if (touched.length === 0 && deferredFieldNames.length === 0) {
       return;
     }
 
-    const collection = new FieldsCollection(this.#fields);
+    this.#commit();
 
-    this.#commit({ operation: "sync", collection, touched });
+    const results = await Promise.allSettled(Object.values(hydrators));
 
-    return collection;
+    results.forEach((result, index) => {
+      const field = this.#fields.get(deferredFieldNames[index]);
+      const isSucessful = result.status === "fulfilled";
+
+      if (field === undefined) {
+        return;
+      }
+
+      this.#tracker.release();
+      const value = (!isSucessful ? field.value : result.value) ?? field.defaultValue;
+
+      if (isSucessful && this.#isDirty(field, result.value)) {
+        touched.push(field.name);
+      }
+
+      this.#override(field, {
+        value,
+        isHydrating: false,
+      });
+    });
+
+    if (touched.length === 0) {
+      return;
+    }
+
+    this.#commit({ operation: "sync", touched });
   };
 
   persist = () => {
@@ -94,17 +153,39 @@ export class FieldStore {
   };
 
   rehydrate = (newValues: PrimitiveFilterDictionary): FieldsCollection | undefined => {
-    const touched = this.#fillFieldsFrom(newValues);
+    const touched: FilterName[] = [];
+    let someFieldIsDeferred = false;
 
-    if (!touched) {
-      return;
+    this.#fields.forEach((field) => {
+      const parsed = this.#parse(newValues[field.name], field);
+      const { deferred, hydrated } = parsed;
+      someFieldIsDeferred = someFieldIsDeferred || deferred;
+
+      this.#process(field, parsed);
+
+      if (!deferred && this.#isDirty(field, hydrated)) {
+        this.#override(field, { value: hydrated });
+        touched.push(field.name);
+      }
+
+      if (deferred) {
+        this.#override(field, { isHydrating: true });
+      }
+    });
+
+    if (touched.length > 0) {
+      const collection = new FieldsCollection(this.#fields);
+
+      this.#commit({ operation: "rehydrate", collection, touched });
+
+      return collection;
     }
 
-    const collection = new FieldsCollection(this.#fields);
+    if (someFieldIsDeferred) {
+      this.#commit();
+    }
 
-    this.#commit({ operation: "rehydrate", collection, touched });
-
-    return collection;
+    return;
   };
 
   register<F extends GenericField>(field: F): void {
@@ -112,25 +193,43 @@ export class FieldStore {
       throwAlreadyRegisteredErrorFor(field, this.#fields);
     }
 
+    const defaultValue = field.value;
+    const persistedValue = this.#initial[field.name];
+    const parsed = this.#parse(persistedValue, { defaultValue, serializer: field.serializer });
+    const { deferred, hydrated } = parsed;
+    const value = deferred ? defaultValue : hydrated;
+
     const registered = {
       ...field,
-      defaultValue: field.value,
+      value,
+      defaultValue,
       updatedAt: Date.now(),
-    } as unknown as GenericRegisteredField;
+      isHydrating: deferred,
+    } as GenericRegisteredField;
 
+    this.#process(registered, parsed);
     this.#whitelist.push(field.name);
-    this.#override(registered, {
-      value: this.#parse(this.#initial[field.name], registered),
+    this.#fields.set(field.name, registered);
+
+    this.#commit({
+      operation: "register",
+      collection: new FieldsCollection(this.#fields),
     });
-    this.#commit({ operation: "register", collection: new FieldsCollection(this.#fields) });
   }
+
   unregister = (name: FilterName) => {
-    if (!this.exists(name)) {
+    const field = this.#fields.get(name);
+
+    if (!field) {
       return;
     }
 
     this.#fields.delete(name);
     this.#whitelist = this.#whitelist.filter((field) => field !== name);
+
+    if (field.isHydrating) {
+      this.#tracker.release();
+    }
 
     this.#commit({
       operation: "unregister",
@@ -193,8 +292,11 @@ export class FieldStore {
     this.#commit(this.#initialState());
   };
 
-  onPersistenceChange = (listener: (fields: FieldsCollection | undefined) => void): Unsubscribe => {
-    return this.#persistence.subscribe(() => listener(this.sync()));
+  onPersistenceChange = (listener: (state: FieldStoreState) => void): Unsubscribe => {
+    return this.#persistence.subscribe(async () => {
+      await this.sync();
+      listener(this.#state);
+    });
   };
 
   onFieldPersisted = (listener: (fields: FieldsCollection) => void): Unsubscribe => {
@@ -217,43 +319,78 @@ export class FieldStore {
     this.#commit({ operation, touched: [name], collection: new FieldsCollection(this.#fields) });
   }
 
-  #fillFieldsFrom = (newValues: PrimitiveFilterDictionary): FilterName[] | undefined => {
-    const touched: FilterName[] = [];
+  #process = ({ name, defaultValue }: Pick<GenericRegisteredField, "name" | "defaultValue">, { deferred, hydrated }: ParseValue) => {
+    if (!deferred) {
+      return;
+    }
 
-    this.#fields.forEach((field) => {
-      const newValue = this.#parse(newValues[field.name], field);
+    this.#tracker.capture();
 
-      if (!Object.is(field.value, newValue)) {
-        this.#override(field, { value: newValue });
-        touched.push(field.name);
-      }
-    });
+    hydrated
+      .then((value) => value ?? defaultValue)
+      .catch(() => defaultValue)
+      .then((value) => {
+        const field = this.#fields.get(name);
 
-    return touched.length ? touched : undefined;
+        if (!field) {
+          return;
+        }
+
+        this.#tracker.release();
+
+        if (!this.#isDirty(field, value)) {
+          this.#override(field, { isHydrating: false });
+          this.#commit({
+            collection: new FieldsCollection(this.#fields),
+          });
+
+          return;
+        }
+
+        this.#override(field, {
+          value,
+          isHydrating: false,
+        });
+
+        this.#commit({
+          operation: "hydrate",
+          collection: new FieldsCollection(this.#fields),
+        });
+      });
   };
 
-  #commit = (state: Partial<FieldStoreState>) => {
+  #commit = (state: Partial<FieldStoreState> = {}) => {
+    const operation = state.operation ?? null;
+    const touched = state.touched ?? [];
+    const collection = state.collection ?? new FieldsCollection(this.#fields);
+
     this.#state = {
       ...this.#state,
-      ...state,
+      operation,
+      touched,
+      collection,
+      isHydrating: this.#tracker.isHydrating(),
     };
 
     this.#listeners.forEach((listener) => listener());
     this.#emitter.emit("change", this.#state);
   };
 
-  #parse = <T extends GenericRegisteredField>(
-    newValue: PrimitiveValue,
-    field: Pick<T, "defaultValue" | "serializer">
-  ): RegisteredFieldValue => {
-    if (newValue === undefined || newValue === null) {
-      return field.defaultValue as RegisteredFieldValue;
+  #parse = <T extends GenericRegisteredField>(newValue: PrimitiveValue, field: Pick<T, "defaultValue" | "serializer">): ParseValue => {
+    if (newValue === undefined || newValue === null || !field.serializer.unserialize) {
+      return {
+        deferred: false,
+        hydrated: field.defaultValue,
+      };
     }
 
-    return field.serializer.unserialize(newValue as SerializedValue) as RegisteredFieldValue;
+    const hydrated = field.serializer.unserialize(newValue as SerializedValue);
+    const deferred = hydrated instanceof Promise;
+
+    return { deferred, hydrated } as ParseValue;
   };
 
-  #override<F extends GenericRegisteredField>(field: F, partial: Pick<F, "value">): void {
+  #override<F extends GenericRegisteredField>(field: F, partial: Partial<Pick<F, "value" | "isHydrating">>): void {
     this.#fields.set(field.name, {
       ...(field as F),
       updatedAt: Date.now(),
@@ -261,10 +398,15 @@ export class FieldStore {
     });
   }
 
+  #isDirty = (field: GenericRegisteredField, value: FilterValue) => {
+    return !Object.is(field.value, value);
+  };
+
   #initialState = (): FieldStoreState => ({
     collection: FieldsCollection.empty(),
     touched: [],
     operation: null,
+    isHydrating: false,
   });
 }
 
@@ -287,6 +429,17 @@ CURRENT FIELD REGISTRY:
 
 =================================
   `);
+}
+
+export function newLabeledPromise<T = FilterValue>(label: string, promise: Promise<T>) {
+  return {
+    async resolver() {
+      return {
+        label,
+        value: await promise,
+      };
+    },
+  };
 }
 
 export function createFieldStore(options: CreateStoreQuickOptions): FieldStore;

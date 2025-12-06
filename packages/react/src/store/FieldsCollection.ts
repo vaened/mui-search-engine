@@ -16,6 +16,7 @@ import type { NonUndefined } from "../internal";
 
 export interface RegisteredField<TKey extends FilterTypeKey, TValue extends FilterTypeMap[TKey]> extends Field<TKey, TValue> {
   defaultValue: TValue | null;
+  isHydrating: boolean;
   updatedAt: number;
 }
 
